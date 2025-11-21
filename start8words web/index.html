@@ -19,7 +19,7 @@
         逸晴命理 - 免費八字排盤工具
     </div>
 
-<div id="auth-container" style="text-align: right; padding: 0 20px; margin-bottom: 10px;">
+<div id="auth-container" class="auth-box">
     <button id="btnLogin" class="map-btn" style="width: auto; background-color: #4285F4;">Google 登入</button>
     
 <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 10px;">
@@ -32,9 +32,9 @@
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('solar')">公曆輸入</div>
-            <div class="tab" onclick="switchTab('lunar')">農曆輸入</div>
-            <div class="tab" onclick="switchTab('ganzhi')">干支輸入</div>
+            <div class="tab active" onclick="switchTab('solar')">西曆</div>
+            <div class="tab" onclick="switchTab('lunar')">農曆</div>
+            <div class="tab" onclick="switchTab('ganzhi')">干支</div>
         </div>
 
         <div class="input-row">
@@ -57,12 +57,12 @@
 </div>
 
         <div class="input-row" id="panelSolar">
-            <span>西曆：</span>
+            <span>出生時間：</span>
             <input type="datetime-local" id="birthDate">
         </div>
 
         <div class="input-row" id="panelLunar" style="display:none;">
-            <span>農曆：</span>
+            <span>出生時間：</span>
             <div style="display:flex; gap:5px; width:100%;">
                 <input type="number" id="lunarYear" placeholder="年" style="flex:1">
                 <select id="lunarMonth" style="flex:1"></select>
@@ -100,20 +100,21 @@
 
         <div class="tst-section">
             <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
+            
             <div style="display:flex; gap:5px; width:100%;">
                 <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
                 <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
             </div>
             
-            <div style="display:flex; align-items:center; gap:10px; padding-top:5px; border-top:1px dashed #ddd; width:100%;">
-                <span style="font-size:12px; color:#555;">經度:</span>
+            <div class="tst-row-control">
+                <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
                 <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
-                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px;">
-                    <input type="checkbox" id="useTST"> 真太陽時
+                
+                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:auto;">
+                    <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
                 </label>
             </div>
         </div>
-
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
@@ -451,5 +452,6 @@
 </body>
 
 </html>
+
 
 
