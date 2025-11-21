@@ -20,16 +20,24 @@
     </div>
 
 <div id="auth-container" class="auth-box">
-        <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; flex:1;">Google 登入</button>
 
-        <div id="userProfile" style="display: none; align-items: center; justify-content: center; gap: 10px; flex-wrap:wrap; width:100%;">
-            <img id="userAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%;">
-            <span id="userName" style="font-weight: bold;"></span>
+    <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <span class="auth-hint">使用Google帳戶登入後<br>可以儲存命盤。</span>
+        <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 15px; font-size: 13px;">Google 登入</button>
+    </div>
+
+    <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 10px; width: 100%; flex-wrap: wrap;">
+        <img id="userAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%;">
+        <span id="userName" style="font-weight: bold; font-size: 14px;"></span>
+
+        <div style="display: flex; gap: 5px;">
             <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
             <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50;">儲存排盤</button>
             <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
         </div>
     </div>
+
+</div>
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
@@ -100,21 +108,21 @@
         </div>
 
 <div class="tst-section">
-        <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
-        <div style="display:flex; gap:5px; width:100%;">
-            <input type="text" id="locationName" placeholder="地點 (如: 香港)，輸入後按搜尋" style="flex:1;">
-            <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
-        </div>
-
-        <div class="tst-bottom-row">
-            <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
-            <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
-
-            <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
-                <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
-            </label>
-        </div>
+    <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
+    <div style="display:flex; gap:5px; width:100%;">
+        <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
+        <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
     </div>
+
+    <div class="tst-bottom-row">
+        <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
+        <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
+
+        <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px; white-space: nowrap;">
+            <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
+        </label>
+    </div>
+</div>
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
@@ -432,26 +440,29 @@
             document.getElementById('chartModal').style.display = 'none';
         }
 
-        // --- 監聽登入 ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                if(btnLogin) btnLogin.style.display = 'none';
-                if(userProfile) {
-                    userProfile.style.display = 'flex';
-                    if(userName) userName.innerText = user.displayName;
-                    if(userAvatar) userAvatar.src = user.photoURL;
-                }
-            } else {
-                currentUser = null;
-                if(btnLogin) btnLogin.style.display = 'inline-block';
-                if(userProfile) userProfile.style.display = 'none';
-            }
-        });
+        // ... 
+onAuthStateChanged(auth, (user) => {
+    const loggedOutUI = document.getElementById('loggedOutUI'); // 獲取未登入區塊
+
+    if (user) {
+        currentUser = user;
+        if(loggedOutUI) loggedOutUI.style.display = 'none'; // 隱藏未登入區
+        if(userProfile) {
+            userProfile.style.display = 'flex';
+            if(userName) userName.innerText = user.displayName;
+            if(userAvatar) userAvatar.src = user.photoURL;
+        }
+    } else {
+        currentUser = null;
+        if(loggedOutUI) loggedOutUI.style.display = 'flex'; // 顯示未登入區
+        if(userProfile) userProfile.style.display = 'none';
+    }
+});
     </script>
 </body>
 
 </html>
+
 
 
 
