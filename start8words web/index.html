@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WW024NHKJF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WW024NHKJF');
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>逸晴命理 - 免費八字排盤工具</title>
@@ -19,25 +27,27 @@
         逸晴命理 - 免費八字排盤工具
     </div>
 
-<div id="auth-container" class="auth-box">
-
-    <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <span class="auth-hint">使用Google帳戶登入後<br>可以儲存命盤。</span>
-        <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 15px; font-size: 13px;">Google 登入</button>
-    </div>
-
-    <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 10px; width: 100%; flex-wrap: wrap;">
-        <img id="userAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%;">
-        <span id="userName" style="font-weight: bold; font-size: 14px;"></span>
-
-        <div style="display: flex; gap: 5px;">
-            <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
-            <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50;">儲存排盤</button>
-            <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
+    <div id="auth-container" class="auth-box">
+        
+        <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
+            <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
         </div>
-    </div>
+        
+        <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 15px; width: 100%; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-right: auto;">
+                <img id="userAvatar" src="" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd;">
+                <span id="userName" style="font-weight: bold; font-size: 15px;"></span>
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+                <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
+                <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50;">儲存排盤</button>
+                <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
+            </div>
+        </div>
 
-</div>
+    </div>
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
@@ -47,31 +57,32 @@
         </div>
 
         <div class="input-row">
-    <span>稱呼：</span>
-    <input type="text" id="nameInput" placeholder="輸入姓名" style="width: 100px;">
+            <span>稱呼：</span>
+            <input type="text" id="nameInput" placeholder="輸入姓名" style="width: 100px;">
+            
+            <span>分類：</span>
+            <select id="tagsInput" style="width: 100px;">
+                <option value="客戸">客戸</option>
+                <option value="自己">自己</option>
+                <option value="家人">家人</option>
+                <option value="朋友">朋友</option>
+                <option value="名人">名人</option>
+                <option value="案例">案例</option>
+            </select>
 
-    <span>分類：</span>
-    <select id="tagsInput" style="width: 100px;">
-        <option value="客戸">客戸</option>
-        <option value="朋友">朋友</option>
-        <option value="家人">家人</option>
-        <option value="自己">自己</option>
-        <option value="名人">名人</option>
-        <option value="案例">案例</option>
-    </select>
-    <select id="gender" style="width: 100px;">
-        <option value="1">男 (乾造)</option>
-        <option value="0">女 (坤造)</option>
-    </select>
-</div>
+            <select id="gender" style="width: 100px;">
+                <option value="1">男 (乾造)</option>
+                <option value="0">女 (坤造)</option>
+            </select>
+        </div>
 
         <div class="input-row" id="panelSolar">
-            <span>出生時間：</span>
+            <span>西曆：</span>
             <input type="datetime-local" id="birthDate">
         </div>
 
         <div class="input-row" id="panelLunar" style="display:none;">
-            <span>出生時間：</span>
+            <span>農曆：</span>
             <div style="display:flex; gap:5px; width:100%;">
                 <input type="number" id="lunarYear" placeholder="年" style="flex:1">
                 <select id="lunarMonth" style="flex:1"></select>
@@ -107,22 +118,23 @@
             </div>
         </div>
 
-<div class="tst-section">
-    <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
-    <div style="display:flex; gap:5px; width:100%;">
-        <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
-        <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
-    </div>
+        <div class="tst-section">
+            <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
+            <div style="display:flex; gap:5px; width:100%;">
+                <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
+                <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
+            </div>
+            
+            <div class="tst-bottom-row">
+                <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
+                <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
+                
+                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
+                    <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
+                </label>
+            </div>
+        </div>
 
-    <div class="tst-bottom-row">
-        <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
-        <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
-
-        <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px; white-space: nowrap;">
-            <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
-        </label>
-    </div>
-</div>
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
@@ -143,7 +155,7 @@
             <div class="info-item"><span class="info-label">出生地點:</span><span class="info-val" id="dispLoc">-</span></div>
         </div>
         <div class="info-col">
-            <div class="info-item"><span class="info-label">公曆:</span><span class="info-val" id="dispSolar">-</span></div>
+            <div class="info-item"><span class="info-label">西曆:</span><span class="info-val" id="dispSolar">-</span></div>
             <div class="info-item"><span class="info-label">農曆:</span><span class="info-val" id="dispLunar">-</span></div>
             <div class="info-item"><span class="info-label">真太陽時:</span><span class="info-val" id="dispTST">-</span></div>
         </div>
@@ -174,6 +186,32 @@
         <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
+    <div id="chartModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h3>📂 我的命盤紀錄</h3>
+                    <span class="close-modal" onclick="closeChartModal()">×</span>
+                </div>
+                
+                <input type="text" id="searchInput" class="search-input" placeholder="搜尋姓名或年份...">
+                
+                <div class="category-filters">
+                    <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
+                    <button class="filter-chip" onclick="filterCategory('客戸')">客戸</button>
+                    <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
+                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
+                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
+                    <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
+                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
+                </div>
+            </div>
+            <div id="chartList" class="chart-list">
+                <p style="text-align:center; color:#999;">載入中...</p>
+            </div>
+        </div>
+    </div>
+
     <div class="app-footer">
         <p>© 2025 逸晴命理 All Rights Reserved.</p>
         <a href="https://instagram.com/start_8words" target="_blank">
@@ -183,34 +221,10 @@
             @start_8words
         </a>
     </div>
-<div id="chartModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-<div class="modal-header">
-    <div class="modal-title-row">
-        <h3>📂 我的命盤紀錄</h3>
-        <span class="close-modal" onclick="closeChartModal()">×</span>
-    </div>
-    
-    <input type="text" id="searchInput" class="search-input" placeholder="搜尋姓名或年份...">
-    
-    <div class="category-filters">
-        <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
-        <button class="filter-chip" onclick="filterCategory('自己')">自己</button> 
-        <button class="filter-chip" onclick="filterCategory('客戸')">客戸</button>
-        <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
-        <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
-        <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-        <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
-    </div>
-</div>
-        <div id="chartList" class="chart-list">
-            <p style="text-align:center; color:#999;">載入中...</p>
-        </div>
-    </div>
-</div>
-<script src="script.js"></script>
 
-<script type="module">
+    <script src="script.js"></script>
+
+    <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
         const btnLogin = document.getElementById('btnLogin');
@@ -221,30 +235,28 @@
         const userProfile = document.getElementById('userProfile');
         const userAvatar = document.getElementById('userAvatar');
         const userName = document.getElementById('userName');
+        const loggedOutUI = document.getElementById('loggedOutUI');
         
         const modal = document.getElementById('chartModal');
         const chartList = document.getElementById('chartList');
         const searchInput = document.getElementById('searchInput');
 
         let currentUser = null; 
-        let allCharts = []; // 暫存所有排盤
-        let currentCategory = '全部'; // ★ 新增：當前選擇的分類
+        let allCharts = []; 
+        let currentCategory = '全部';
 
-        // --- 登入 ---
         if (btnLogin) {
             btnLogin.addEventListener('click', () => {
                 signInWithPopup(auth, provider).catch((error) => alert(error.message));
             });
         }
 
-        // --- 登出 ---
         if (btnLogout) {
             btnLogout.addEventListener('click', () => {
                 signOut(auth).then(() => { location.reload(); });
             });
         }
 
-        // --- 儲存 / 更新排盤 ---
         if (btnSave) {
             btnSave.addEventListener('click', async () => {
                 if (!window.currentBaziData) return alert("請先排盤後再儲存。");
@@ -279,14 +291,12 @@
             });
         }
 
-        // --- 我的排盤 (打開列表) ---
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
                 if (!currentUser) return;
                 modal.style.display = 'flex'; 
                 chartList.innerHTML = '<p style="text-align:center; padding:20px;">載入中...</p>';
                 
-                // 重置搜尋和分類
                 searchInput.value = ''; 
                 window.filterCategory('全部'); 
 
@@ -311,39 +321,35 @@
                         allCharts.push(data);
                     });
 
-                    applyFilters(); // 初始渲染
+                    applyFilters();
 
                 } catch (e) {
                     console.error(e);
-                    chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗，請稍後再試</p>';
+                    if(e.message && e.message.includes("requires an index")) {
+                        alert("系統索引建立中，請稍後再試。");
+                    } else {
+                        chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
+                    }
                 }
             });
         }
 
-        // --- ★ 核心過濾邏輯 (搜尋 + 分類) ★ ---
         function applyFilters() {
             const term = searchInput.value.toLowerCase();
             
             const filtered = allCharts.filter(c => {
-                // 1. 搜尋字串匹配 (姓名 或 年份)
                 const nameMatch = (c.name || '').toLowerCase().includes(term);
                 const yearMatch = (c.birthDate || '').includes(term);
                 const isSearchMatch = nameMatch || yearMatch;
-                
-                // 2. 分類匹配
                 const isCategoryMatch = (currentCategory === '全部') || (c.tags === currentCategory);
-                
                 return isSearchMatch && isCategoryMatch;
             });
             
             renderChartList(filtered);
         }
 
-        // --- 暴露給 HTML 的分類點擊函數 ---
         window.filterCategory = function(category) {
             currentCategory = category;
-            
-            // 更新按鈕樣式
             const chips = document.querySelectorAll('.filter-chip');
             chips.forEach(chip => {
                 if (chip.innerText === category) {
@@ -352,17 +358,13 @@
                     chip.classList.remove('active');
                 }
             });
-            
-            // 重新過濾並渲染
             applyFilters();
         }
 
-        // --- 搜尋框監聽 ---
         searchInput.addEventListener('input', () => {
             applyFilters();
         });
 
-        // --- 渲染列表 ---
         function renderChartList(charts) {
             chartList.innerHTML = '';
             if (charts.length === 0) {
@@ -374,13 +376,11 @@
                 const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
                 const div = document.createElement('div');
                 div.className = 'chart-item';
-                
-                // 標籤樣式
                 const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
                 
                 div.innerHTML = `
                     <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${data.gender === 1 ? '男' : '女'})</span></div>
+                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${data.gender === 1 ? '乾' : '坤'})</span></div>
                         <div class="chart-detail">${data.birthDate}</div>
                     </div>
                     <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
@@ -395,7 +395,6 @@
             });
         }
 
-        // --- 載入排盤 ---
         function loadChartData(data) {
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
@@ -403,7 +402,7 @@
             document.getElementById('useTST').checked = data.useTST || false;
             
             const tagsSelect = document.getElementById('tagsInput');
-            if (tagsSelect) tagsSelect.value = data.tags || '客戸'; // 還原標籤
+            if (tagsSelect) tagsSelect.value = data.tags || '客戸';
 
             window.switchTab('solar'); 
             const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
@@ -415,7 +414,6 @@
             window.initChart();
         }
 
-        // --- 刪除 ---
         window.deleteChart = async (e, docId) => {
             e.stopPropagation();
             if(!confirm("確定要刪除嗎？")) return;
@@ -425,11 +423,10 @@
                     window.currentDocId = null;
                     btnSave.innerText = "儲存排盤";
                 }
-                // 從本地陣列刪除並重新渲染，不需重新讀取資料庫
                 const idx = allCharts.findIndex(c => c.id === docId);
                 if (idx > -1) {
                     allCharts.splice(idx, 1);
-                    applyFilters(); // 重新過濾渲染
+                    applyFilters(); 
                 }
             } catch (err) {
                 alert("刪除失敗");
@@ -440,30 +437,21 @@
             document.getElementById('chartModal').style.display = 'none';
         }
 
-        // ... 
-onAuthStateChanged(auth, (user) => {
-    const loggedOutUI = document.getElementById('loggedOutUI'); // 獲取未登入區塊
-
-    if (user) {
-        currentUser = user;
-        if(loggedOutUI) loggedOutUI.style.display = 'none'; // 隱藏未登入區
-        if(userProfile) {
-            userProfile.style.display = 'flex';
-            if(userName) userName.innerText = user.displayName;
-            if(userAvatar) userAvatar.src = user.photoURL;
-        }
-    } else {
-        currentUser = null;
-        if(loggedOutUI) loggedOutUI.style.display = 'flex'; // 顯示未登入區
-        if(userProfile) userProfile.style.display = 'none';
-    }
-});
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                if(loggedOutUI) loggedOutUI.style.display = 'none';
+                if(userProfile) {
+                    userProfile.style.display = 'flex';
+                    if(userName) userName.innerText = user.displayName;
+                    if(userAvatar) userAvatar.src = user.photoURL;
+                }
+            } else {
+                currentUser = null;
+                if(loggedOutUI) loggedOutUI.style.display = 'flex';
+                if(userProfile) userProfile.style.display = 'none';
+            }
+        });
     </script>
 </body>
-
 </html>
-
-
-
-
-
