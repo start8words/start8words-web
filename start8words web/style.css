@@ -30,6 +30,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* 限制最大寬度容器 */
 .app-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -48,19 +49,19 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 1. 帳戶管理欄 (修正版) --- */
+/* --- 1. 帳戶管理欄 (修正白底框) --- */
 .auth-box {
     background: var(--panel-bg);
-    padding: 15px; /* 增加內邊距 */
+    padding: 15px 20px; /* 加大間距 */
     border-radius: 12px;
     border: 1px solid var(--border); /* 確保有邊框 */
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     margin-top: 15px;
     display: flex;
-    align-items: center;
-    min-height: 50px;
+    flex-direction: column; /* 確保內容垂直堆疊 */
+    gap: 10px;
     width: 100%;
-    box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
+    box-sizing: border-box;
 }
 
 /* 登入提示文字 */
@@ -69,6 +70,7 @@ body {
     color: #555;
     font-weight: 500;
     text-align: left;
+    flex: 1; /* 佔據左側空間 */
 }
 
 /* --- 輸入控制區 --- */
@@ -179,16 +181,16 @@ button.map-btn {
     box-sizing: border-box;
 }
 
-/* 2. 真太陽時強制並排 (修復電腦版對齊問題) */
+/* 2. 真太陽時並排樣式 */
 .tst-bottom-row {
     display: flex; 
     align-items: center; 
-    justify-content: flex-start; /* 靠左對齊 */
+    justify-content: flex-start; 
     gap: 10px; 
     padding-top: 5px; 
     border-top: 1px dashed #ddd; 
     width: 100%;
-    flex-wrap: nowrap; /* 禁止換行 */
+    flex-wrap: nowrap; 
 }
 
 .note { font-size: 12px; color: #888; margin-top: 5px; }
@@ -293,11 +295,9 @@ button.map-btn {
 /* 手機版調整 */
 @media (max-width: 600px) {
     body { padding: 5px; }
-    
     .main-display { gap: 5px; justify-content: flex-start; }
     .group-container { flex: 0 0 auto; justify-content: flex-start; }
     .pillar.main { width: 50px; min-width: 50px; min-height: 180px; padding: 4px 0; }
-    
     .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
     .title-text { font-size: 12px !important; margin-bottom: 1px; }
     .shishen-top { font-size: 11px !important; height: 14px; margin-bottom: 1px; }
@@ -306,12 +306,12 @@ button.map-btn {
     .canggan-box { gap: 1px; padding-top: 2px; }
     .canggan-row { gap: 2px; font-size: 11px !important; }
     .canggan-shishen { font-size: 10px !important; transform: scale(0.95); }
-    
     .lucky-mask { font-size: 16px; letter-spacing: 3px; top: 30px; }
     .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
     .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
     
-    /* 帳戶文字縮小 */
+    /* 帳戶欄調整 */
+    .auth-box { padding: 10px; margin-top: 10px; }
     .auth-hint { font-size: 12px; }
 }
 
