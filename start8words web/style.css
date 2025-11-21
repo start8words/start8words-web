@@ -25,7 +25,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 15px;
+    padding: 15px; /* 手機版邊距 */
     font-size: 15px; 
     -webkit-font-smoothing: antialiased;
 }
@@ -49,17 +49,19 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 帳戶管理欄 (新樣式) --- */
+/* --- 1. 帳戶管理欄 (白色底框) --- */
 .auth-box {
     background: var(--panel-bg);
-    padding: 10px 15px;
+    padding: 12px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     margin-top: 15px;
     display: flex;
     align-items: center;
     justify-content: center; /* 內容置中 */
+    gap: 10px;
+    flex-wrap: wrap; /* 防止爆開 */
 }
 
 /* --- 輸入控制區 --- */
@@ -112,7 +114,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
 }
-.input-row > * { flex: 1; min-width: 100px; }
+.input-row > * { flex: 1; min-width: 80px; } /* 調整最小寬度 */
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
 
 input, select {
@@ -170,19 +172,19 @@ button.map-btn {
     box-sizing: border-box;
 }
 
-/* 真太陽時行樣式修復 */
-.tst-row-control {
-    display: flex;
-    align-items: center; /* 垂直置中 */
-    gap: 10px;
-    padding-top: 5px;
-    border-top: 1px dashed #ddd;
+/* 2. 真太陽時強制並排樣式 */
+.tst-bottom-row {
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding-top: 5px; 
+    border-top: 1px dashed #ddd; 
     width: 100%;
 }
 
 .note { font-size: 12px; color: #888; margin-top: 5px; }
 
-/* --- 命主資訊 (3.5 : 6.5) --- */
+/* --- 命主資訊 --- */
 .info-dashboard {
     display: none;
     grid-template-columns: 3.5fr 6.5fr; 
@@ -227,7 +229,7 @@ button.map-btn {
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
     align-items: flex-end;
-    justify-content: space-between; /* 電腦版對齊 */
+    justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
 
@@ -279,15 +281,13 @@ button.map-btn {
     flex-shrink: 0;
 }
 
-/* --- 手機版調整 (極致空間) --- */
+/* 手機版調整 */
 @media (max-width: 600px) {
-    /* 減少 body padding 以用盡左右 */
+    /* 2. 用盡左右位置 */
     body { padding: 5px; } 
     
     .main-display { gap: 5px; justify-content: flex-start; }
     .group-container { flex: 0 0 auto; justify-content: flex-start; }
-    
-    /* 柱子寬度 */
     .pillar.main { width: 50px; min-width: 50px; min-height: 180px; padding: 4px 0; }
     
     .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
@@ -303,8 +303,8 @@ button.map-btn {
     .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
     .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
     
-    /* 帳戶欄在手機版微調 */
-    .auth-box { padding: 8px; margin-top: 10px; flex-wrap: wrap; gap: 5px; }
+    /* 確保帳戶欄在手機不爆 */
+    .auth-box { flex-wrap: wrap; padding: 10px; }
 }
 
 .top-info {
@@ -458,7 +458,7 @@ button.map-btn {
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* --- Modal Styles (修復分類滑動) --- */
+/* --- Modal Styles --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -470,9 +470,9 @@ button.map-btn {
 }
 .modal-content {
     background: #fff;
-    width: 90%;
+    width: 95%; /* 手機版加寬 */
     max-width: 500px;
-    max-height: 80vh;
+    max-height: 85vh;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     display: flex;
@@ -498,27 +498,29 @@ button.map-btn {
 
 .search-input {
     width: 100%;
-    padding: 8px;
+    padding: 10px; /* 加大點擊區 */
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
     box-sizing: border-box;
 }
 
-/* 分類濾鏡 (確保滑動) */
+/* --- 4. 分類濾鏡滑動修復 --- */
 .category-filters {
     display: flex;
     gap: 8px;
-    overflow-x: auto;
-    padding: 2px 0;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    width: 100%; /* 確保佔滿寬度以觸發滑動 */
+    overflow-x: auto; /* 必須 */
+    overflow-y: hidden;
+    padding: 5px 2px; /* 留點空間給陰影 */
+    white-space: nowrap; /* 必須：不換行 */
+    width: 100%; 
+    -webkit-overflow-scrolling: touch; /* iOS 順滑 */
+    scrollbar-width: none; /* Firefox 隱藏捲軸 */
 }
-.category-filters::-webkit-scrollbar { display: none; }
+.category-filters::-webkit-scrollbar { display: none; } /* Chrome/Safari 隱藏捲軸 */
 
 .filter-chip {
-    padding: 6px 14px;
+    padding: 8px 16px; /* 加大點擊區 */
     border-radius: 20px;
     border: 1px solid #ddd;
     background: #fff;
@@ -526,7 +528,8 @@ button.map-btn {
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
-    flex-shrink: 0; /* 關鍵：防止壓縮 */
+    flex-shrink: 0; /* 核心：防止按鈕被壓縮 */
+    white-space: nowrap;
 }
 .filter-chip:hover { background: #f0f0f0; }
 .filter-chip.active {
