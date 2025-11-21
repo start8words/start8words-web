@@ -20,15 +20,16 @@
     </div>
 
 <div id="auth-container" class="auth-box">
-    <button id="btnLogin" class="map-btn" style="width: auto; background-color: #4285F4;">Google 登入</button>
-    
-<div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 10px;">
-    <img id="userAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%;">
-    <span id="userName" style="font-weight: bold;"></span>
-    <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3; font-size: 12px;">我的排盤</button>
-    <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50; font-size: 12px;">儲存排盤</button>
-    <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666; font-size: 12px;">登出</button>
-</div>
+        <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; flex:1;">Google 登入</button>
+
+        <div id="userProfile" style="display: none; align-items: center; justify-content: center; gap: 10px; flex-wrap:wrap; width:100%;">
+            <img id="userAvatar" src="" style="width: 30px; height: 30px; border-radius: 50%;">
+            <span id="userName" style="font-weight: bold;"></span>
+            <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
+            <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50;">儲存排盤</button>
+            <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
+        </div>
+    </div>
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
@@ -48,7 +49,7 @@
         <option value="家人">家人</option>
         <option value="自己">自己</option>
         <option value="名人">名人</option>
-        <option value="研究案例">研究案例</option>
+        <option value="案例">案例</option>
     </select>
     <select id="gender" style="width: 100px;">
         <option value="1">男 (乾造)</option>
@@ -98,23 +99,22 @@
             </div>
         </div>
 
-        <div class="tst-section">
-            <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
-            
-            <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
-                <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
-            </div>
-            
-            <div class="tst-row-control">
-                <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
-                <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
-                
-                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:auto;">
-                    <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
-                </label>
-            </div>
+<div class="tst-section">
+        <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
+        <div style="display:flex; gap:5px; width:100%;">
+            <input type="text" id="locationName" placeholder="地點 (如: 香港)，輸入後按搜尋" style="flex:1;">
+            <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
         </div>
+
+        <div class="tst-bottom-row">
+            <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
+            <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
+
+            <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
+                <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
+            </label>
+        </div>
+    </div>
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
@@ -192,7 +192,7 @@
         <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
         <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
         <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-        <button class="filter-chip" onclick="filterCategory('研究案例')">研究案例</button>
+        <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
     </div>
 </div>
         <div id="chartList" class="chart-list">
@@ -452,6 +452,7 @@
 </body>
 
 </html>
+
 
 
 
