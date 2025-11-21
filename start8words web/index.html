@@ -371,7 +371,7 @@
                 
                 div.innerHTML = `
                     <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${data.gender === 1 ? '乾' : '坤'})</span></div>
+                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${data.gender === 1 ? '男' : '女'})</span></div>
                         <div class="chart-detail">${data.birthDate}</div>
                     </div>
                     <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
@@ -451,4 +451,5 @@
 </body>
 
 </html>
+
 
