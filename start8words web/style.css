@@ -25,12 +25,11 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 15px; /* 手機版邊距 */
+    padding: 15px;
     font-size: 15px; 
     -webkit-font-smoothing: antialiased;
 }
 
-/* 限制最大寬度容器 */
 .app-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -49,19 +48,27 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 1. 帳戶管理欄 (白色底框) --- */
+/* --- 1. 帳戶管理欄 (修正版) --- */
 .auth-box {
     background: var(--panel-bg);
-    padding: 12px;
+    padding: 15px; /* 增加內邊距 */
     border-radius: 12px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border); /* 確保有邊框 */
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     margin-top: 15px;
     display: flex;
     align-items: center;
-    justify-content: center; /* 內容置中 */
-    gap: 10px;
-    flex-wrap: wrap; /* 防止爆開 */
+    min-height: 50px;
+    width: 100%;
+    box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
+}
+
+/* 登入提示文字 */
+.auth-hint {
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+    text-align: left;
 }
 
 /* --- 輸入控制區 --- */
@@ -114,7 +121,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
 }
-.input-row > * { flex: 1; min-width: 80px; } /* 調整最小寬度 */
+.input-row > * { flex: 1; min-width: 80px; }
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
 
 input, select {
@@ -172,14 +179,16 @@ button.map-btn {
     box-sizing: border-box;
 }
 
-/* 2. 真太陽時強制並排樣式 */
+/* 2. 真太陽時強制並排 (修復電腦版對齊問題) */
 .tst-bottom-row {
     display: flex; 
     align-items: center; 
+    justify-content: flex-start; /* 靠左對齊 */
     gap: 10px; 
     padding-top: 5px; 
     border-top: 1px dashed #ddd; 
     width: 100%;
+    flex-wrap: nowrap; /* 禁止換行 */
 }
 
 .note { font-size: 12px; color: #888; margin-top: 5px; }
@@ -283,8 +292,7 @@ button.map-btn {
 
 /* 手機版調整 */
 @media (max-width: 600px) {
-    /* 2. 用盡左右位置 */
-    body { padding: 5px; } 
+    body { padding: 5px; }
     
     .main-display { gap: 5px; justify-content: flex-start; }
     .group-container { flex: 0 0 auto; justify-content: flex-start; }
@@ -303,8 +311,8 @@ button.map-btn {
     .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
     .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
     
-    /* 確保帳戶欄在手機不爆 */
-    .auth-box { flex-wrap: wrap; padding: 10px; }
+    /* 帳戶文字縮小 */
+    .auth-hint { font-size: 12px; }
 }
 
 .top-info {
@@ -458,7 +466,7 @@ button.map-btn {
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* --- Modal Styles --- */
+/* --- Modal --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -470,9 +478,9 @@ button.map-btn {
 }
 .modal-content {
     background: #fff;
-    width: 95%; /* 手機版加寬 */
+    width: 90%;
     max-width: 500px;
-    max-height: 85vh;
+    max-height: 80vh;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     display: flex;
@@ -498,29 +506,27 @@ button.map-btn {
 
 .search-input {
     width: 100%;
-    padding: 10px; /* 加大點擊區 */
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
     box-sizing: border-box;
 }
 
-/* --- 4. 分類濾鏡滑動修復 --- */
+/* 分類濾鏡 */
 .category-filters {
     display: flex;
     gap: 8px;
-    overflow-x: auto; /* 必須 */
-    overflow-y: hidden;
-    padding: 5px 2px; /* 留點空間給陰影 */
-    white-space: nowrap; /* 必須：不換行 */
+    overflow-x: auto;
+    padding: 2px 0;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
     width: 100%; 
-    -webkit-overflow-scrolling: touch; /* iOS 順滑 */
-    scrollbar-width: none; /* Firefox 隱藏捲軸 */
 }
-.category-filters::-webkit-scrollbar { display: none; } /* Chrome/Safari 隱藏捲軸 */
+.category-filters::-webkit-scrollbar { display: none; }
 
 .filter-chip {
-    padding: 8px 16px; /* 加大點擊區 */
+    padding: 8px 16px; 
     border-radius: 20px;
     border: 1px solid #ddd;
     background: #fff;
@@ -528,7 +534,7 @@ button.map-btn {
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
-    flex-shrink: 0; /* 核心：防止按鈕被壓縮 */
+    flex-shrink: 0; 
     white-space: nowrap;
 }
 .filter-chip:hover { background: #f0f0f0; }
