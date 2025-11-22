@@ -51,9 +51,9 @@
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('solar')">西曆</div>
-            <div class="tab" onclick="switchTab('lunar')">農曆</div>
-            <div class="tab" onclick="switchTab('ganzhi')">干支</div>
+            <div class="tab active" onclick="switchTab('solar')">公曆輸入</div>
+            <div class="tab" onclick="switchTab('lunar')">農曆輸入</div>
+            <div class="tab" onclick="switchTab('ganzhi')">干支輸入</div>
         </div>
 
         <div class="input-row">
@@ -63,11 +63,11 @@
             <span>分類：</span>
             <select id="tagsInput" style="width: 100px;">
                 <option value="客戸">客戸</option>
-                <option value="自己">自己</option>
-                <option value="家人">家人</option>
                 <option value="朋友">朋友</option>
+                <option value="家人">家人</option>
+                <option value="自己">自己</option>
                 <option value="名人">名人</option>
-                <option value="案例">案例</option>
+                <option value="研究案例">研究案例</option>
             </select>
 
             <select id="gender" style="width: 100px;">
@@ -121,7 +121,7 @@
         <div class="tst-section">
             <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
             <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="地點 (如: 香港)" style="flex:1;">
+                <input type="text" id="locationName" placeholder="地點（如：香港），按搜尋定位經度" style="flex:1;">
                 <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
             </div>
             
@@ -139,7 +139,7 @@
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
         <div style="margin-top:15px; text-align:center;">
-            <button class="action-btn" onclick="startNewChart()">開始排盤</button>
+            <button class="action-btn" onclick="startNewChart()">開始新排盤</button>
         </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
@@ -155,7 +155,7 @@
             <div class="info-item"><span class="info-label">出生地點:</span><span class="info-val" id="dispLoc">-</span></div>
         </div>
         <div class="info-col">
-            <div class="info-item"><span class="info-label">西曆:</span><span class="info-val" id="dispSolar">-</span></div>
+            <div class="info-item"><span class="info-label">公曆:</span><span class="info-val" id="dispSolar">-</span></div>
             <div class="info-item"><span class="info-label">農曆:</span><span class="info-val" id="dispLunar">-</span></div>
             <div class="info-item"><span class="info-label">真太陽時:</span><span class="info-val" id="dispTST">-</span></div>
         </div>
@@ -199,11 +199,11 @@
                 <div class="category-filters">
                     <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
                     <button class="filter-chip" onclick="filterCategory('客戸')">客戸</button>
-                    <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
-                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
                     <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
+                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
+                    <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
                     <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
+                    <button class="filter-chip" onclick="filterCategory('研究案例')">研究案例</button>
                 </div>
             </div>
             <div id="chartList" class="chart-list">
@@ -245,18 +245,21 @@
         let allCharts = []; 
         let currentCategory = '全部';
 
+        // --- 登入 ---
         if (btnLogin) {
             btnLogin.addEventListener('click', () => {
                 signInWithPopup(auth, provider).catch((error) => alert(error.message));
             });
         }
 
+        // --- 登出 ---
         if (btnLogout) {
             btnLogout.addEventListener('click', () => {
                 signOut(auth).then(() => { location.reload(); });
             });
         }
 
+        // --- 儲存排盤 (修改：移除更新邏輯，一律新增) ---
         if (btnSave) {
             btnSave.addEventListener('click', async () => {
                 if (!window.currentBaziData) return alert("請先排盤後再儲存。");
@@ -273,24 +276,23 @@
                     btnSave.innerText = "處理中...";
                     btnSave.disabled = true;
 
-                    if (window.currentDocId) {
-                        await setDoc(doc(db, "charts", window.currentDocId), dataToSave, { merge: true });
-                        alert("✅ 更新成功！");
-                    } else {
-                        const docRef = await addDoc(collection(db, "charts"), dataToSave);
-                        window.currentDocId = docRef.id;
-                        alert("✅ 儲存成功！");
-                    }
+                    // 【修改】移除更新檢查，直接使用 addDoc 新增
+                    const docRef = await addDoc(collection(db, "charts"), dataToSave);
+                    // 不再記錄 ID，保持按鈕為「儲存排盤」
+                    alert("✅ 儲存成功！");
+
                 } catch (e) {
                     console.error(e);
                     alert("儲存失敗");
                 } finally {
-                    btnSave.innerText = window.currentDocId ? "更新排盤" : "儲存排盤";
+                    // 【修改】按鈕文字永遠是「儲存排盤」
+                    btnSave.innerText = "儲存排盤";
                     btnSave.disabled = false;
                 }
             });
         }
 
+        // --- 我的排盤 (打開列表) ---
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
                 if (!currentUser) return;
@@ -334,9 +336,42 @@
             });
         }
 
+        // --- 渲染列表 (修改：性別顯示男/女) ---
+        function renderChartList(charts) {
+            chartList.innerHTML = '';
+            if (charts.length === 0) {
+                chartList.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">沒有符合的資料</p>';
+                return;
+            }
+
+            charts.forEach(data => {
+                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
+                const div = document.createElement('div');
+                div.className = 'chart-item';
+                const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
+                
+                // 【修改】性別顯示改為 男/女
+                const genderStr = data.gender === 1 ? '男' : '女';
+
+                div.innerHTML = `
+                    <div class="chart-info">
+                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${genderStr})</span></div>
+                        <div class="chart-detail">${data.birthDate}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
+                `;
+                
+                div.querySelector('.chart-info').addEventListener('click', () => {
+                    loadChartData(data);
+                    modal.style.display = 'none';
+                });
+
+                chartList.appendChild(div);
+            });
+        }
+
         function applyFilters() {
             const term = searchInput.value.toLowerCase();
-            
             const filtered = allCharts.filter(c => {
                 const nameMatch = (c.name || '').toLowerCase().includes(term);
                 const yearMatch = (c.birthDate || '').includes(term);
@@ -344,7 +379,6 @@
                 const isCategoryMatch = (currentCategory === '全部') || (c.tags === currentCategory);
                 return isSearchMatch && isCategoryMatch;
             });
-            
             renderChartList(filtered);
         }
 
@@ -365,36 +399,7 @@
             applyFilters();
         });
 
-        function renderChartList(charts) {
-            chartList.innerHTML = '';
-            if (charts.length === 0) {
-                chartList.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">沒有符合的資料</p>';
-                return;
-            }
-
-            charts.forEach(data => {
-                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
-                const div = document.createElement('div');
-                div.className = 'chart-item';
-                const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
-                
-                div.innerHTML = `
-                    <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${data.gender === 1 ? '乾' : '坤'})</span></div>
-                        <div class="chart-detail">${data.birthDate}</div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
-                `;
-                
-                div.querySelector('.chart-info').addEventListener('click', () => {
-                    loadChartData(data);
-                    modal.style.display = 'none';
-                });
-
-                chartList.appendChild(div);
-            });
-        }
-
+        // --- 載入排盤 (修改：不設定 currentDocId) ---
         function loadChartData(data) {
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
@@ -408,8 +413,11 @@
             const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
             document.getElementById('birthDate').value = isoTime;
 
-            window.currentDocId = data.id;
-            if(btnSave) btnSave.innerText = "更新排盤"; 
+            // 【修改】不再設定 window.currentDocId，這樣按儲存時就會視為新盤
+            // window.currentDocId = data.id; (已移除)
+            
+            // 確保按鈕文字是「儲存排盤」
+            if(btnSave) btnSave.innerText = "儲存排盤"; 
 
             window.initChart();
         }
@@ -419,10 +427,6 @@
             if(!confirm("確定要刪除嗎？")) return;
             try {
                 await deleteDoc(doc(db, "charts", docId));
-                if (window.currentDocId === docId) {
-                    window.currentDocId = null;
-                    btnSave.innerText = "儲存排盤";
-                }
                 const idx = allCharts.findIndex(c => c.id === docId);
                 if (idx > -1) {
                     allCharts.splice(idx, 1);
