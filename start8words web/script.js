@@ -1,5 +1,5 @@
 // ==========================================
-// 1. 全域變數設定 (強制掛載到 window)
+// 1. 全域變數設定
 // ==========================================
 window.map = null;
 window.marker = null;
@@ -11,11 +11,10 @@ window.currentBaziData = null;
 window.currentDocId = null;
 
 // ==========================================
-// 2. 頁面載入後初始化
+// 2. 頁面載入初始化
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM Ready");
-
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
@@ -67,13 +66,16 @@ function populateGZ(idPrefix) {
 // ==========================================
 // 3. 介面互動函數
 // ==========================================
+
 window.switchTab = function(mode) {
     window.currentInputMode = mode;
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     try { if(event && event.target) event.target.classList.add('active'); } catch(e){}
+    
     const pSolar = document.getElementById('panelSolar');
     const pLunar = document.getElementById('panelLunar');
     const pGZ = document.getElementById('panelGanZhi');
+    
     if(pSolar) pSolar.style.display = mode === 'solar' ? 'flex' : 'none';
     if(pLunar) pLunar.style.display = mode === 'lunar' ? 'flex' : 'none';
     if(pGZ) pGZ.style.display = mode === 'ganzhi' ? 'flex' : 'none';
@@ -146,7 +148,7 @@ function updateLocation(lat, lon) {
 }
 
 // ==========================================
-// 4. 排盤核心邏輯
+// 4. 排盤核心邏輯 (修正版)
 // ==========================================
 
 function getEquationOfTime(date) {
@@ -163,7 +165,7 @@ const LOOKUP_HIDDEN = {'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙
 
 let state = { birthSolar: null, baseDayGan: null, daYuns: [], selDaYunIdx: 0, selYear: null, selMonth: null, selDay: null, selHour: null };
 
-// --- 開始新排盤 (入口) ---
+// --- 開始新排盤 ---
 window.startNewChart = function() {
     window.currentDocId = null; 
     const btn = document.getElementById('btnSave');
@@ -184,8 +186,6 @@ window.startNewChart = function() {
 // --- 排盤主程式 ---
 window.initChart = function() {
     if (typeof Solar === 'undefined') return alert("Library error: Lunar.js not loaded");
-
-    // 清空舊資料
     window.currentBaziData = null;
 
     try {
@@ -197,8 +197,8 @@ window.initChart = function() {
         const longitude = parseFloat(document.getElementById('longitude').value);
         
         // 獲取子時模式
-        const zishiModeEl = document.querySelector('input[name="zishiMode"]:checked');
-        const zishiMode = zishiModeEl ? zishiModeEl.value : '23'; // 預設 23
+        const zishiEl = document.querySelector('input[name="zishiMode"]:checked');
+        const zishiMode = zishiEl ? zishiEl.value : '23';
 
         const elName = document.getElementById('dispName'); if(elName) elName.innerText = name;
         const elGender = document.getElementById('dispGender'); if(elGender) elGender.innerText = genderText;
@@ -224,36 +224,86 @@ window.initChart = function() {
             alert("干支功能暫未連接"); return;
         }
 
-        // 2. 真太陽時
+        // 2. 真太陽時計算
         let calculatingSolar = window.originSolar; 
         let tstDisplay = "否 (平太陽時)";
+        
+        // 構建一個可操作的 JS Date 對象 (用於計算)
+        let calcDate = new Date(
+            window.originSolar.getYear(), 
+            window.originSolar.getMonth() - 1, 
+            window.originSolar.getDay(), 
+            window.originSolar.getHour(), 
+            window.originSolar.getMinute()
+        );
 
         if (useTST) {
             const stdMeridian = 120; 
             const diffDeg = longitude - stdMeridian;
             const meanOffsetMin = diffDeg * 4; 
-            
-            let tempDate = new Date(
-                window.originSolar.getYear(), 
-                window.originSolar.getMonth() - 1, 
-                window.originSolar.getDay(), 
-                window.originSolar.getHour(), 
-                window.originSolar.getMinute()
-            );
-            const eotMin = getEquationOfTime(tempDate);
+            const eotMin = getEquationOfTime(calcDate);
             const totalOffset = meanOffsetMin + eotMin;
 
-            let nativeDate = new Date(tempDate.getTime());
-            nativeDate.setMinutes(nativeDate.getMinutes() + totalOffset);
+            // 應用時差
+            calcDate.setMinutes(calcDate.getMinutes() + totalOffset);
             
-            calculatingSolar = Solar.fromDate(nativeDate);
+            calculatingSolar = Solar.fromDate(calcDate);
             
-            const m = nativeDate.getMinutes();
+            const m = calcDate.getMinutes();
             const mStr = m < 10 ? "0"+m : m;
-            tstDisplay = `是 (${nativeDate.getHours()}:${mStr})`;
+            tstDisplay = `是 (${calcDate.getHours()}:${mStr})`;
         }
 
-        // 3. 儀表板
+        // 3. 八字邏輯 (核心修改)
+        let isNightRat = false;
+        let finalBaziSolar = calculatingSolar;
+        let displayBazi = null; // 最終顯示用的 Lunar/EightChar
+        
+        // 獲取計算後的時辰 (0-23)
+        let h = calcDate.getHours();
+
+        // --- 子時換日判斷 ---
+        if (h === 23) {
+            if (zishiMode === '23') {
+                // 23:00 換日 (傳統)：
+                // 強制將日期 +1 天，時間設為 00:xx
+                // 這樣 Lunar.getEightChar 就一定會給出第二天的日柱
+                let nextDay = new Date(calcDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                nextDay.setHours(0); 
+                finalBaziSolar = Solar.fromDate(nextDay);
+                tstDisplay += " [23:00換日]";
+            } else {
+                // 00:00 換日 (早晚子)：
+                // 保持原日期 (即當天)，時柱是子時。
+                // Lunar 庫預設 23:00 給出的八字，日柱通常是當天 (視版本而定)，
+                // 但為了保險，我們不變動日期，並標記為夜子
+                finalBaziSolar = Solar.fromDate(calcDate);
+                isNightRat = true;
+                tstDisplay += " [夜子不換日]";
+            }
+        } else {
+            // 非 23:00，正常處理
+            finalBaziSolar = Solar.fromDate(calcDate);
+        }
+        
+        // 產生八字
+        state.birthSolar = finalBaziSolar; // 用於大運
+        const bazi = state.birthSolar.getLunar().getEightChar();
+        state.baseDayGan = bazi.getDayGan();
+
+        // 顯示標題
+        let timeTitle = '時柱';
+        if (isNightRat) timeTitle = '時柱 (夜子)';
+
+        // 渲染
+        // 注意：如果是夜子時，時干支可能需要特別處理 (雖然 Lunar 庫通常正確)
+        renderMainPillar('baseHour', bazi.getTimeGan(), bazi.getTimeZhi(), timeTitle, false, '', true); 
+        renderMainPillar('baseDay', bazi.getDayGan(), bazi.getDayZhi(), '日柱', true, '');
+        renderMainPillar('baseMonth', bazi.getMonthGan(), bazi.getMonthZhi(), '月柱', false, '');
+        renderMainPillar('baseYear', bazi.getYearGan(), bazi.getYearZhi(), '年柱', false, '');
+
+        // 填充儀表板
         const sY = window.originSolar.getYear();
         const sM = window.originSolar.getMonth();
         const sD = window.originSolar.getDay();
@@ -270,68 +320,16 @@ window.initChart = function() {
         window.toggleMap(true);
         if (!window.isInputsCollapsed) window.toggleInputs();
 
-        // 4. 八字計算 (處理子時)
-        state.birthSolar = calculatingSolar; 
-        
-        // --- 子時邏輯 ---
-        let defaultBazi = state.birthSolar.getLunar().getEightChar();
-        let finalDayGan = defaultBazi.getDayGan();
-        let finalDayZhi = defaultBazi.getDayZhi();
-        let finalTimeGan = defaultBazi.getTimeGan();
-        let finalTimeZhi = defaultBazi.getTimeZhi();
-        let isNightRat = false;
-
-        // 判斷是否為 23:00 - 00:00
-        if (calculatingSolar.getHour() === 23) {
-            if (zishiMode === '00') {
-                // 00:00 換日模式：需要退回「今天」
-                // 方法：將時間減去 2 小時，取得「今天」的干支
-                // 但時柱干支要保持「明天早子時」的 (因為五鼠遁通常夜子時同早子時)
-                let d = new Date(calculatingSolar.getYear(), calculatingSolar.getMonth()-1, calculatingSolar.getDay(), calculatingSolar.getHour(), calculatingSolar.getMinute());
-                d.setHours(d.getHours() - 2); // 退回 21:xx
-                let prevSolar = Solar.fromDate(d);
-                let prevBazi = prevSolar.getLunar().getEightChar();
-                
-                // 日柱改用今天的
-                finalDayGan = prevBazi.getDayGan();
-                finalDayZhi = prevBazi.getDayZhi();
-                // 月/年柱如果剛好跨節氣，通常晚子時算今天，所以理論上也要用 prevBazi 的月年
-                // 這裡簡單處理，全部柱身除了時柱外，都用 prevBazi
-                state.birthSolar = prevSolar; // 用於大運計算 (確保順逆正確)
-                
-                // 時柱保持 defaultBazi (因為 23:00 在曆法庫通常已算作明天的子時，即丙子等)
-                // 這樣就做到了：日柱是今天，時柱是夜子(同明早子)
-                isNightRat = true;
-            }
-            // 23:00 換日模式：不用動，library 預設就是這樣
-        } else if (calculatingSolar.getHour() === 0) {
-            // 早子時 (永遠是新的一天)
-        }
-
-        // 重新獲取調整後的 bazi (因為 state.birthSolar 可能變了)
-        let displayBazi = state.birthSolar.getLunar().getEightChar();
-        
-        // 設置日主 (用於十神計算)
-        state.baseDayGan = finalDayGan;
-
-        // 顯示標題 (加入夜子時提示)
-        let timeTitle = '時柱';
-        if (isNightRat) timeTitle = '時柱 (夜子)';
-        
-        // 渲染 (手動傳入干支，因為可能混合了兩天的資料)
-        renderMainPillar('baseHour', finalTimeGan, finalTimeZhi, timeTitle, false, '', true); 
-        renderMainPillar('baseDay', finalDayGan, finalDayZhi, '日柱', true, '');
-        renderMainPillar('baseMonth', displayBazi.getMonthGan(), displayBazi.getMonthZhi(), '月柱', false, '');
-        renderMainPillar('baseYear', displayBazi.getYearGan(), displayBazi.getYearZhi(), '年柱', false, '');
-
-        const yun = displayBazi.getYun(parseInt(genderVal));
+        // 大運流年
+        const yun = bazi.getYun(parseInt(genderVal));
         state.daYuns = yun.getDaYun();
         
-        const now = new Date();
-        state.selYear = now.getFullYear();
-        state.selMonth = now.getMonth() + 1;
-        state.selDay = now.getDate();
-        state.selHour = now.getHours();
+        // 預設選現在
+        const today = new Date();
+        state.selYear = today.getFullYear();
+        state.selMonth = today.getMonth() + 1;
+        state.selDay = today.getDate();
+        state.selHour = today.getHours();
 
         // 定位大運
         let birthYear = state.birthSolar.getYear();
@@ -354,7 +352,7 @@ window.initChart = function() {
         updateActiveDisplay();
         window.scrollTo(0, 0);
 
-        // 5. 準備儲存資料 (使用原始時間)
+        // 5. 儲存資料
         window.currentBaziData = {
             name: document.getElementById('nameInput').value || "未命名",
             gender: parseInt(document.getElementById('gender').value),
@@ -364,13 +362,12 @@ window.initChart = function() {
             location: document.getElementById('locationName').value,
             useTST: document.getElementById('useTST').checked,
             tags: document.getElementById('tagsInput') ? document.getElementById('tagsInput').value : '客戸', 
-            // 新增：儲存 Zishi 設定
-            zishiMode: zishiMode,
+            zishiMode: zishiMode, // 記得存這個設定
             bazi: {
-                year: displayBazi.getYearGan() + displayBazi.getYearZhi(),
-                month: displayBazi.getMonthGan() + displayBazi.getMonthZhi(),
-                day: finalDayGan + finalDayZhi,
-                hour: finalTimeGan + finalTimeZhi
+                year: bazi.getYearGan() + bazi.getYearZhi(),
+                month: bazi.getMonthGan() + bazi.getMonthZhi(),
+                day: bazi.getDayGan() + bazi.getDayZhi(),
+                hour: bazi.getTimeGan() + bazi.getTimeZhi()
             }
         };
 
@@ -381,7 +378,7 @@ window.initChart = function() {
 }
 
 // ==========================================
-// 5. 輔助函數 (保持不變)
+// 5. 輔助函數
 // ==========================================
 function getShiShen(targetGan, isDayPillarStem) {
     if (!state.baseDayGan || !targetGan) return '';
@@ -572,6 +569,8 @@ function renderRailsCascadeFromHour() { renderHourRail(); updateActiveDisplay();
 function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
     const dy = state.daYuns[state.selDaYunIdx];
+    if (!dy) return;
+    
     const dyGZ = dy.getGanZhi();
     let dyStartAge = dy.getStartAge();
     let dyStartYear = dy.getStartYear();
@@ -588,7 +587,9 @@ function updateActiveDisplay() {
     renderMainPillar('activeYear', bazi.getYearGan(), bazi.getYearZhi(), '流年', false, yearInfo);
 
     const prevJie = activeLunar.getPrevJie(true);
-    const monthInfo = `${prevJie.getName()}\n${prevJie.getSolar().getDay()}/${prevJie.getSolar().getMonth()}`;
+    const jieName = prevJie.getName();
+    const jieDate = prevJie.getSolar();
+    const monthInfo = `${jieName}\n${jieDate.getDay()}/${jieDate.getMonth()}`;
     renderMainPillar('activeMonth', bazi.getMonthGan(), bazi.getMonthZhi(), '流月', false, monthInfo);
 
     const lunarDayStr = activeLunar.getDayInChinese();
