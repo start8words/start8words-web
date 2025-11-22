@@ -48,9 +48,9 @@
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('solar')">公曆輸入</div>
-            <div class="tab" onclick="switchTab('lunar')">農曆輸入</div>
-            <div class="tab" onclick="switchTab('ganzhi')">干支輸入</div>
+            <div class="tab active" onclick="switchTab('solar')">西曆</div>
+            <div class="tab" onclick="switchTab('lunar')">農曆</div>
+            <div class="tab" onclick="switchTab('ganzhi')">干支</div>
         </div>
 
         <div class="input-row">
@@ -59,12 +59,12 @@
             
             <span>分類：</span>
             <select id="tagsInput" style="width: 100px;">
-                <option value="客戶">客戶</option>
-                <option value="朋友">朋友</option>
-                <option value="家人">家人</option>
                 <option value="自己">自己</option>
+                <option value="家人">家人</option>
+                <option value="朋友">朋友</option>
+                <option value="客戶">客戶</option>
                 <option value="名人">名人</option>
-                <option value="研究案例">研究案例</option>
+                <option value="案例">案例</option>
             </select>
 
             <select id="gender" style="width: 100px;">
@@ -118,8 +118,8 @@
         <div class="tst-section">
             <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
             <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="地點（如：香港），按搜尋定位經度" style="flex:1;">
-                <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
+                <input type="text" id="locationName" placeholder="輸入地點(如：香港)，點選定位" style="flex:1;">
+                <button class="map-btn" onclick="searchLocation()" style="width:60px;">定位</button>
             </div>
             
             <div class="tst-bottom-row">
@@ -150,7 +150,7 @@
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
         <div style="margin-top:15px; text-align:center;">
-            <button class="action-btn" onclick="startNewChart()">開始新排盤</button>
+            <button class="action-btn" onclick="startNewChart()">即時排盤</button>
         </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
@@ -209,12 +209,12 @@
                 
                 <div class="category-filters">
                     <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
-                    <button class="filter-chip" onclick="filterCategory('客戶')">客戶</button>
-                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
-                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
                     <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
+                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
+                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
+                    <button class="filter-chip" onclick="filterCategory('客戶')">客戶</button>
                     <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-                    <button class="filter-chip" onclick="filterCategory('研究案例')">研究案例</button>
+                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
                 </div>
             </div>
             <div id="chartList" class="chart-list">
@@ -233,7 +233,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=6.0"></script>
+    <script src="script.js?v=7.0"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -270,17 +270,10 @@
             });
         }
 
-        // --- ★ 全局自動儲存功能 (優化版) ---
         window.handleAutoSave = async () => {
-            if (!window.currentBaziData) {
-                console.log("No bazi data to save");
-                return;
-            }
+            if (!window.currentBaziData) return;
             const user = auth.currentUser;
-            if (!user) {
-                console.log("User not logged in, skip save");
-                return;
-            }
+            if (!user) return;
 
             const dataToSave = {
                 userId: user.uid,
@@ -315,8 +308,6 @@
             
             window.currentDocId = null;
         }
-
-        // 移除 saveChartCheck 的 change 監聽器，避免誤觸儲存
 
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
@@ -429,12 +420,11 @@
             document.getElementById('useTST').checked = data.useTST || false;
             
             const tagsSelect = document.getElementById('tagsInput');
-            // 統一使用 "客戶"
-            if (tagsSelect) tagsSelect.value = data.tags || '客戶';
+            // 這裡也將 fallback 設為 '自己'，確保一致
+            if (tagsSelect) tagsSelect.value = data.tags || '自己';
 
             if (saveChartCheck) saveChartCheck.checked = false;
             
-            // 恢復子時設定
             if (data.zishiMode) {
                 const radios = document.getElementsByName('zishiMode');
                 for (let r of radios) {
