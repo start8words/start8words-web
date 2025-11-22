@@ -11,7 +11,7 @@
     --color-wood: #2e7d32;
     --color-fire: #d32f2f;
     --color-earth: #795548;
-    --color-metal: #b08d00;
+    --color-metal: #d1a906;
     --color-water: #1565c0;
     
     /* 十神顏色 */
@@ -598,3 +598,5 @@ button.map-btn {
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+
