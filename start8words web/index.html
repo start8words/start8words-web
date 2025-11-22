@@ -42,7 +42,6 @@
             
             <div style="display: flex; gap: 8px;">
                 <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
-                <button id="btnSave" class="map-btn" style="width: auto; background-color: #4caf50;">儲存排盤</button>
                 <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
             </div>
         </div>
@@ -131,6 +130,10 @@
                 
                 <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
                     <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
+                </label>
+
+                <label id="lblSaveChart" class="disabled-label" style="font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:15px; transition: all 0.3s;">
+                    <input type="checkbox" id="saveChartCheck" disabled style="width:auto; margin:0;"> 保存命盤
                 </label>
             </div>
         </div>
@@ -229,8 +232,11 @@
 
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
-        const btnSave = document.getElementById('btnSave');
         const btnMyCharts = document.getElementById('btnMyCharts');
+        
+        // 新增：獲取保存勾選框元素
+        const saveChartCheck = document.getElementById('saveChartCheck');
+        const lblSaveChart = document.getElementById('lblSaveChart');
         
         const userProfile = document.getElementById('userProfile');
         const userAvatar = document.getElementById('userAvatar');
@@ -259,40 +265,35 @@
             });
         }
 
-        // --- 儲存排盤 (修改：移除更新邏輯，一律新增) ---
-        if (btnSave) {
-            btnSave.addEventListener('click', async () => {
-                if (!window.currentBaziData) return alert("請先排盤後再儲存。");
-                if (!currentUser) return alert("請先登入。");
+        // --- ★ 全局自動儲存功能 (供 script.js 呼叫) ---
+        window.handleAutoSave = async () => {
+            if (!window.currentBaziData) return; // 防錯
+            if (!currentUser) return; // 再次確認
 
-                const dataToSave = {
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    ...window.currentBaziData,
-                    timestamp: new Date()
-                };
+            const dataToSave = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                ...window.currentBaziData,
+                timestamp: new Date()
+            };
 
-                try {
-                    btnSave.innerText = "處理中...";
-                    btnSave.disabled = true;
+            try {
+                // 顯示儲存中狀態 (可選，這裡用 console log 或小提示)
+                console.log("Saving chart...");
+                
+                // 直接新增
+                await addDoc(collection(db, "charts"), dataToSave);
+                
+                // 成功提示 (使用 setTimeout 避免阻擋介面渲染)
+                setTimeout(() => alert("✅ 命盤已自動保存！"), 100);
 
-                    // 【修改】移除更新檢查，直接使用 addDoc 新增
-                    const docRef = await addDoc(collection(db, "charts"), dataToSave);
-                    // 不再記錄 ID，保持按鈕為「儲存排盤」
-                    alert("✅ 儲存成功！");
+            } catch (e) {
+                console.error(e);
+                alert("自動保存失敗");
+            }
+        };
 
-                } catch (e) {
-                    console.error(e);
-                    alert("儲存失敗");
-                } finally {
-                    // 【修改】按鈕文字永遠是「儲存排盤」
-                    btnSave.innerText = "儲存排盤";
-                    btnSave.disabled = false;
-                }
-            });
-        }
-
-        // --- 我的排盤 (打開列表) ---
+        // --- 我的排盤列表 ---
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
                 if (!currentUser) return;
@@ -336,40 +337,6 @@
             });
         }
 
-        // --- 渲染列表 (修改：性別顯示男/女) ---
-        function renderChartList(charts) {
-            chartList.innerHTML = '';
-            if (charts.length === 0) {
-                chartList.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">沒有符合的資料</p>';
-                return;
-            }
-
-            charts.forEach(data => {
-                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
-                const div = document.createElement('div');
-                div.className = 'chart-item';
-                const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
-                
-                // 【修改】性別顯示改為 男/女
-                const genderStr = data.gender === 1 ? '男' : '女';
-
-                div.innerHTML = `
-                    <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${genderStr})</span></div>
-                        <div class="chart-detail">${data.birthDate}</div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
-                `;
-                
-                div.querySelector('.chart-info').addEventListener('click', () => {
-                    loadChartData(data);
-                    modal.style.display = 'none';
-                });
-
-                chartList.appendChild(div);
-            });
-        }
-
         function applyFilters() {
             const term = searchInput.value.toLowerCase();
             const filtered = allCharts.filter(c => {
@@ -399,7 +366,40 @@
             applyFilters();
         });
 
-        // --- 載入排盤 (修改：不設定 currentDocId) ---
+        function renderChartList(charts) {
+            chartList.innerHTML = '';
+            if (charts.length === 0) {
+                chartList.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">沒有符合的資料</p>';
+                return;
+            }
+
+            charts.forEach(data => {
+                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
+                const div = document.createElement('div');
+                div.className = 'chart-item';
+                const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
+                
+                // 性別
+                const genderStr = data.gender === 1 ? '男' : '女';
+
+                div.innerHTML = `
+                    <div class="chart-info">
+                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${genderStr})</span></div>
+                        <div class="chart-detail">${data.birthDate}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
+                `;
+                
+                div.querySelector('.chart-info').addEventListener('click', () => {
+                    loadChartData(data);
+                    modal.style.display = 'none';
+                });
+
+                chartList.appendChild(div);
+            });
+        }
+
+        // --- 載入排盤 (更新：載入時不勾選保存，避免重複存) ---
         function loadChartData(data) {
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
@@ -409,16 +409,14 @@
             const tagsSelect = document.getElementById('tagsInput');
             if (tagsSelect) tagsSelect.value = data.tags || '客戸';
 
+            // 載入舊盤時，不應該自動勾選保存，以免用戶只是看看又存了一次
+            if (saveChartCheck) saveChartCheck.checked = false;
+
             window.switchTab('solar'); 
             const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
             document.getElementById('birthDate').value = isoTime;
 
-            // 【修改】不再設定 window.currentDocId，這樣按儲存時就會視為新盤
-            // window.currentDocId = data.id; (已移除)
-            
-            // 確保按鈕文字是「儲存排盤」
-            if(btnSave) btnSave.innerText = "儲存排盤"; 
-
+            window.currentDocId = data.id;
             window.initChart();
         }
 
@@ -427,6 +425,9 @@
             if(!confirm("確定要刪除嗎？")) return;
             try {
                 await deleteDoc(doc(db, "charts", docId));
+                if (window.currentDocId === docId) {
+                    window.currentDocId = null;
+                }
                 const idx = allCharts.findIndex(c => c.id === docId);
                 if (idx > -1) {
                     allCharts.splice(idx, 1);
@@ -441,6 +442,7 @@
             document.getElementById('chartModal').style.display = 'none';
         }
 
+        // --- 監聽登入狀態 (控制勾選框) ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -450,10 +452,31 @@
                     if(userName) userName.innerText = user.displayName;
                     if(userAvatar) userAvatar.src = user.photoURL;
                 }
+                
+                // ★ 登入後：啟用勾選框
+                if(saveChartCheck) {
+                    saveChartCheck.disabled = false;
+                    saveChartCheck.checked = true; // 預設勾選 (貼心功能)
+                }
+                if(lblSaveChart) {
+                    lblSaveChart.classList.remove('disabled-label');
+                    lblSaveChart.style.color = 'var(--active-border)';
+                    lblSaveChart.style.cursor = 'pointer';
+                }
+
             } else {
                 currentUser = null;
                 if(loggedOutUI) loggedOutUI.style.display = 'flex';
                 if(userProfile) userProfile.style.display = 'none';
+                
+                // ★ 登出後：禁用勾選框
+                if(saveChartCheck) {
+                    saveChartCheck.disabled = true;
+                    saveChartCheck.checked = false;
+                }
+                if(lblSaveChart) {
+                    lblSaveChart.classList.add('disabled-label');
+                }
             }
         });
     </script>
