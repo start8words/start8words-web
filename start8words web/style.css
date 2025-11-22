@@ -596,3 +596,14 @@ button.map-btn {
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+/* --- 新增：禁用狀態的標籤樣式 --- */
+.disabled-label {
+    color: #999 !important; /* 灰色 */
+    cursor: not-allowed !important; /* 禁止符號 */
+    opacity: 0.6;
+}
+
+/* 確保 checkbox 在禁用時也不會有互動感 */
+.disabled-label input {
+    cursor: not-allowed;
+}
