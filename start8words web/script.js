@@ -1,26 +1,25 @@
 // ==========================================
-// 全域變數宣告 (必須放在最頂部)
+// 全域變數設定 (強制掛載到 window)
 // ==========================================
-let map = null;
-let marker = null;
-let currentInputMode = 'solar'; // 修正錯誤的核心變數
-let isTimeHidden = false; 
-let isInputsCollapsed = false; 
-let originSolar = null; // 暫存原始輸入時間
+window.map = null;
+window.marker = null;
+window.currentInputMode = 'solar'; // 修正核心：確保全域可見
+window.isTimeHidden = false; 
+window.isInputsCollapsed = false; 
 
 // ==========================================
-// 初始化頁面設定 (時間、選單)
+// 初始化頁面 (時間、下拉選單)
 // ==========================================
 
-// 1. 預設時間為現在 (修正時區)
+// 1. 預設時間
 const now = new Date();
 const offset = now.getTimezoneOffset() * 60000;
 const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
 
+// 確保元素存在才賦值，防止報錯
 const elBirthDate = document.getElementById('birthDate');
 if(elBirthDate) elBirthDate.value = localISOTime;
 
-// 農曆預設
 const elLunarYear = document.getElementById('lunarYear');
 if(elLunarYear) elLunarYear.value = now.getFullYear();
 
@@ -58,12 +57,13 @@ function populateGZ(idPrefix) {
 }
 populateGZ('gzYear'); populateGZ('gzMonth'); populateGZ('gzDay'); populateGZ('gzHour');
 
+
 // ==========================================
-// 介面互動函數 (掛載到 window 以便 HTML 呼叫)
+// 介面互動函數 (全部掛載到 window)
 // ==========================================
 
 window.switchTab = function(mode) {
-    currentInputMode = mode; // 更新全域變數
+    window.currentInputMode = mode; // 更新全域變數
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
     
@@ -79,17 +79,17 @@ window.switchTab = function(mode) {
 window.toggleInputs = function() {
     const wrapper = document.getElementById('inputWrapper');
     const bar = document.getElementById('toggleBar');
-    if (isInputsCollapsed) {
+    if (window.isInputsCollapsed) {
         wrapper.classList.remove('collapsed');
         bar.innerText = '▼ 收起輸入區';
     } else {
         wrapper.classList.add('collapsed');
         bar.innerText = '▲ 展開輸入區';
     }
-    isInputsCollapsed = !isInputsCollapsed;
+    window.isInputsCollapsed = !window.isInputsCollapsed;
 }
 
-// --- 地圖相關函數 ---
+// --- 地圖功能 ---
 
 window.toggleMap = function(forceClose) {
     const container = document.getElementById('mapContainer');
@@ -104,7 +104,7 @@ window.toggleMap = function(forceClose) {
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'block';
         btn.innerText = '📍 摺疊地圖';
-        if (!map) initMap();
+        if (!window.map) initMap();
     } else {
         container.style.display = 'none';
         btn.innerText = '📍 開啟地圖設定地點';
@@ -112,15 +112,14 @@ window.toggleMap = function(forceClose) {
 }
 
 function initMap() {
-    if(typeof L === 'undefined') return; // 確保 Leaflet 已載入
-    map = L.map('mapContainer').setView([22.3193, 114.1694], 10);
+    if(typeof L === 'undefined') return; 
+    window.map = L.map('mapContainer').setView([22.3193, 114.1694], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-    map.on('click', function(e) { updateLocation(e.latlng.lat, e.latlng.lng); });
+    }).addTo(window.map);
+    window.map.on('click', function(e) { updateLocation(e.latlng.lat, e.latlng.lng); });
 }
 
-// 修正搜尋功能 ReferenceError
 window.searchLocation = function() {
     const query = document.getElementById('locationName').value;
     if (!query) return;
@@ -132,7 +131,7 @@ window.searchLocation = function() {
                 const lat = parseFloat(data[0].lat);
                 const lon = parseFloat(data[0].lon);
                 updateLocation(lat, lon);
-                if(map) map.setView([lat, lon], 13);
+                if(window.map) window.map.setView([lat, lon], 13);
             } else { 
                 alert("找不到該地點"); 
             }
@@ -142,11 +141,12 @@ window.searchLocation = function() {
 
 function updateLocation(lat, lon) {
     document.getElementById('longitude').value = lon.toFixed(4);
-    if (map) {
-        if (marker) map.removeLayer(marker);
-        marker = L.marker([lat, lon]).addTo(map);
+    if (window.map) {
+        if (window.marker) window.map.removeLayer(window.marker);
+        window.marker = L.marker([lat, lon]).addTo(window.map);
     }
 }
+
 
 // ==========================================
 // 八字核心邏輯
@@ -160,7 +160,7 @@ function getEquationOfTime(date) {
     return eot; 
 }
 
-// 顏色與文字配置
+// 配置常數
 const WUXING_COLOR = {
     '甲': 'var(--color-wood)', '乙': 'var(--color-wood)', '寅': 'var(--color-wood)', '卯': 'var(--color-wood)',
     '丙': 'var(--color-fire)', '丁': 'var(--color-fire)', '巳': 'var(--color-fire)', '午': 'var(--color-fire)',
@@ -185,6 +185,7 @@ const LOOKUP_HIDDEN = {
     '酉': ['辛'], '戌': ['戊','辛','丁'], '亥': ['壬','甲']
 };
 
+// 狀態變數
 let state = {
     birthSolar: null,
     baseDayGan: null, 
@@ -196,12 +197,13 @@ let state = {
     selHour: null,
 };
 
+
 // --- 開始新排盤 (入口函數) ---
 window.startNewChart = function() {
     window.currentDocId = null; // 清空 ID，代表新紀錄
     
     // 呼叫排盤主程式
-    initChart(); 
+    window.initChart(); 
     
     // 自動儲存檢查
     const saveCheck = document.getElementById('saveChartCheck');
@@ -216,11 +218,13 @@ window.startNewChart = function() {
     }
 }
 
+
 // --- 排盤主程式 ---
 window.initChart = function() {
     if (typeof Solar === 'undefined') return alert("Library error");
 
     try {
+        // 1. 獲取UI資料
         const name = document.getElementById('nameInput').value || "未命名";
         const genderVal = document.getElementById('gender').value;
         const genderText = genderVal == "1" ? "男 (乾造)" : "女 (坤造)";
@@ -233,14 +237,15 @@ window.initChart = function() {
         const elGender = document.getElementById('dispGender'); if(elGender) elGender.innerText = genderText;
         const elLoc = document.getElementById('dispLoc'); if(elLoc) elLoc.innerText = location;
 
-        // 1. 獲取「原始輸入時間」(originSolar)
-        // 確保使用全域變數 currentInputMode
-        if (currentInputMode === 'solar') {
+        // 2. 獲取「原始輸入時間」(originSolar)
+        let originSolar = null;
+
+        if (window.currentInputMode === 'solar') {
             const dateStr = document.getElementById('birthDate').value;
             if(!dateStr) return alert("請輸入日期");
             originSolar = Solar.fromDate(new Date(dateStr));
         } 
-        else if (currentInputMode === 'lunar') {
+        else if (window.currentInputMode === 'lunar') {
             const y = parseInt(document.getElementById('lunarYear').value);
             const m = parseInt(document.getElementById('lunarMonth').value);
             const d = parseInt(document.getElementById('lunarDay').value);
@@ -249,7 +254,7 @@ window.initChart = function() {
             const lunar = Lunar.fromYmdHms(y, m, d, h, 0, 0);
             originSolar = lunar.getSolar();
         }
-        else if (currentInputMode === 'ganzhi') {
+        else if (window.currentInputMode === 'ganzhi') {
             // 干支反推邏輯
             const yg = document.getElementById('gzYearGan').value;
             const yz = document.getElementById('gzYearZhi').value;
@@ -294,7 +299,7 @@ window.initChart = function() {
             }
         }
 
-        // 2. 計算真太陽時 (用於排盤)
+        // 3. 計算真太陽時 (用于排盘)
         let calculatingSolar = originSolar; 
         let tstDisplay = "否 (平太陽時)";
 
@@ -320,7 +325,7 @@ window.initChart = function() {
             tstDisplay = `是 (${nativeDate.getHours()}:${mStr})`;
         }
 
-        // 3. 填充儀表板 (顯示原始時間)
+        // 4. 填充儀表板 (使用原始時間顯示)
         const sY = originSolar.getYear();
         const sM = originSolar.getMonth();
         const sD = originSolar.getDay();
@@ -336,9 +341,9 @@ window.initChart = function() {
         document.getElementById('infoDashboard').style.display = 'grid';
 
         toggleMap(true);
-        if (!isInputsCollapsed) toggleInputs();
+        if (!window.isInputsCollapsed) toggleInputs();
 
-        // 4. 執行八字計算
+        // 5. 執行八字計算
         state.birthSolar = calculatingSolar; 
         const bazi = state.birthSolar.getLunar().getEightChar();
         state.baseDayGan = bazi.getDayGan();
@@ -376,7 +381,7 @@ window.initChart = function() {
         
         window.scrollTo(0, 0);
 
-        // 5. 準備儲存資料 (使用原始輸入時間)
+        // 6. 準備儲存資料 (使用原始輸入時間)
         window.currentBaziData = {
             name: document.getElementById('nameInput').value || "未命名",
             gender: parseInt(document.getElementById('gender').value),
@@ -384,7 +389,7 @@ window.initChart = function() {
             birthDate: originSolar.toYmdHms(), // 存原始時間
             
             lunarDate: lObj.toString(),
-            inputMode: currentInputMode,
+            inputMode: window.currentInputMode,
             location: document.getElementById('locationName').value,
             useTST: document.getElementById('useTST').checked,
             tags: document.getElementById('tagsInput') ? document.getElementById('tagsInput').value : '客戸', 
@@ -403,7 +408,7 @@ window.initChart = function() {
 }
 
 // ==========================================
-// 輔助函數 (十神、顯示、眼仔)
+// 輔助函數
 // ==========================================
 
 function getShiShen(targetGan, isDayPillarStem) {
@@ -427,11 +432,11 @@ function getShiShen(targetGan, isDayPillarStem) {
 function getShortShiShen(fullShiShen) { return SHISHEN_SHORT[fullShiShen] || ''; }
 
 window.toggleTimeVisibility = function() {
-    isTimeHidden = !isTimeHidden;
+    window.isTimeHidden = !window.isTimeHidden;
     const contentDiv = document.getElementById('pillarContent_baseHour');
     const eyeIcon = document.getElementById('eyeIcon');
     
-    if (isTimeHidden) {
+    if (window.isTimeHidden) {
         contentDiv.style.display = 'none';
         eyeIcon.innerText = '🔒';
         if (!document.getElementById('maskText')) {
@@ -586,6 +591,9 @@ function renderMonthRail() {
         };
         
         if(m === state.selMonth && y === state.selYear) el.classList.add('active');
+        else if (m === state.selMonth && Math.abs(y - state.selYear) <= 1) {
+        }
+
         box.appendChild(el);
     }
     setTimeout(() => centerActiveItem(box), 0);
