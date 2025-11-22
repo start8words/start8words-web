@@ -135,6 +135,17 @@
                 </label>
             </div>
         </div>
+      <div class="input-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+    <span style="font-size:13px; color:#555; font-weight:bold;">子時處理：</span>
+    
+    <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <input type="radio" name="zishiMode" value="23" checked> 23:00 換日
+    </label>
+
+    <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px; margin-left: 15px;">
+        <input type="radio" name="zishiMode" value="00"> 00:00 換日 (早晚子)
+    </label>
+</div>
 
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
@@ -471,6 +482,7 @@
     </script>
 </body>
 </html>
+
 
 
 
