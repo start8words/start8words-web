@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=5.0">
+    <link rel="stylesheet" href="style.css?v=6.0">
 </head>
 <body>
 
@@ -60,8 +60,8 @@
             <span>分類：</span>
             <select id="tagsInput" style="width: 100px;">
                 <option value="自己">自己</option>
-                <option value="朋友">朋友</option>
                 <option value="家人">家人</option>
+                <option value="朋友">朋友</option>
                 <option value="客戶">客戶</option>
                 <option value="名人">名人</option>
                 <option value="案例">案例</option>
@@ -210,8 +210,8 @@
                 <div class="category-filters">
                     <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
                     <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
-                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
                     <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
+                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
                     <button class="filter-chip" onclick="filterCategory('客戶')">客戶</button>
                     <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
                     <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
@@ -233,7 +233,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=6.0"></script>
+    <script src="script.js?v=7.0"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -270,7 +270,6 @@
             });
         }
 
-        // --- ★ 全局自動儲存功能 (優化版) ---
         window.handleAutoSave = async () => {
             if (!window.currentBaziData) return;
             const user = auth.currentUser;
@@ -287,7 +286,6 @@
                 await addDoc(collection(db, "charts"), dataToSave);
                 setTimeout(() => {
                     alert("✅ 命盤已自動保存！");
-                    // 儲存後重置輸入區 (符合你的要求)
                     resetInputs();
                 }, 100);
             } catch (e) {
@@ -296,10 +294,8 @@
             }
         };
         
-        // 輔助：重置輸入區
         function resetInputs() {
             document.getElementById('nameInput').value = '';
-            // 日期設回現在
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
             const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
@@ -310,18 +306,7 @@
             document.getElementById('useTST').checked = false;
             if (saveChartCheck) saveChartCheck.checked = false;
             
-            // 重置 ID，斷開連結
             window.currentDocId = null;
-        }
-
-        if (saveChartCheck) {
-            saveChartCheck.addEventListener('change', async (e) => {
-                if (e.target.checked) {
-                    if (window.currentBaziData && currentUser) {
-                        window.handleAutoSave();
-                    }
-                }
-            });
         }
 
         if (btnMyCharts) {
@@ -428,18 +413,18 @@
             });
         }
 
-        // --- 載入排盤 (載入後重置輸入區，只供查看) ---
         function loadChartData(data) {
-            // 1. 填入資料
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
             document.getElementById('locationName').value = data.location || '';
             document.getElementById('useTST').checked = data.useTST || false;
             
             const tagsSelect = document.getElementById('tagsInput');
-            if (tagsSelect) tagsSelect.value = data.tags || '客戸';
+            // 這裡也將 fallback 設為 '自己'，確保一致
+            if (tagsSelect) tagsSelect.value = data.tags || '自己';
+
+            if (saveChartCheck) saveChartCheck.checked = false;
             
-            // 2. 處理子時模式
             if (data.zishiMode) {
                 const radios = document.getElementsByName('zishiMode');
                 for (let r of radios) {
@@ -451,12 +436,8 @@
             const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
             document.getElementById('birthDate').value = isoTime;
 
-            // 3. 排盤
             window.currentDocId = data.id;
             window.initChart();
-            
-            // 4. ★ 關鍵：排盤後立即重置輸入區 (恢復預設) ★
-            resetInputs();
         }
 
         window.deleteChart = async (e, docId) => {
@@ -514,4 +495,3 @@
     </script>
 </body>
 </html>
-
