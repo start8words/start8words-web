@@ -28,7 +28,6 @@
     </div>
 
     <div id="auth-container" class="auth-box">
-        
         <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
             <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
@@ -45,7 +44,6 @@
                 <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
             </div>
         </div>
-
     </div>
 
     <div class="control-wrapper" id="inputWrapper">
@@ -234,7 +232,6 @@
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
         
-        // 新增：獲取保存勾選框元素
         const saveChartCheck = document.getElementById('saveChartCheck');
         const lblSaveChart = document.getElementById('lblSaveChart');
         
@@ -265,38 +262,46 @@
             });
         }
 
-        // --- ★ 全局自動儲存功能 (供 script.js 呼叫) ---
+        // --- ★ 全局自動儲存功能 (優化版) ---
         window.handleAutoSave = async () => {
-            if (!window.currentBaziData) return; // 防錯
-            if (!currentUser) return; // 再次確認
+            // 1. 檢查資料
+            if (!window.currentBaziData) {
+                console.log("No bazi data to save");
+                return;
+            }
+            // 2. 檢查用戶 (使用 auth.currentUser 最穩陣)
+            const user = auth.currentUser;
+            if (!user) {
+                console.log("User not logged in, skip save");
+                return;
+            }
 
             const dataToSave = {
-                userId: currentUser.uid,
-                userEmail: currentUser.email,
+                userId: user.uid,
+                userEmail: user.email,
                 ...window.currentBaziData,
                 timestamp: new Date()
             };
 
             try {
-                // 顯示儲存中狀態 (可選，這裡用 console log 或小提示)
-                console.log("Saving chart...");
-                
-                // 直接新增
+                // 3. 新增資料
                 await addDoc(collection(db, "charts"), dataToSave);
                 
-                // 成功提示 (使用 setTimeout 避免阻擋介面渲染)
-                setTimeout(() => alert("✅ 命盤已自動保存！"), 100);
+                // 4. 成功提示
+                setTimeout(() => {
+                    alert("✅ 命盤已自動保存！");
+                }, 100);
 
             } catch (e) {
-                console.error(e);
-                alert("自動保存失敗");
+                console.error("Auto save failed:", e);
+                alert("自動保存失敗: " + e.message);
             }
         };
 
-        // --- 我的排盤列表 ---
+        // --- 我的排盤 (打開列表) ---
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
-                if (!currentUser) return;
+                if (!auth.currentUser) return;
                 modal.style.display = 'flex'; 
                 chartList.innerHTML = '<p style="text-align:center; padding:20px;">載入中...</p>';
                 
@@ -306,7 +311,7 @@
                 try {
                     const q = query(
                         collection(db, "charts"), 
-                        where("userId", "==", currentUser.uid),
+                        where("userId", "==", auth.currentUser.uid),
                         orderBy("timestamp", "desc")
                     );
                     
@@ -328,11 +333,7 @@
 
                 } catch (e) {
                     console.error(e);
-                    if(e.message && e.message.includes("requires an index")) {
-                        alert("系統索引建立中，請稍後再試。");
-                    } else {
-                        chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
-                    }
+                    chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
                 }
             });
         }
@@ -379,7 +380,6 @@
                 div.className = 'chart-item';
                 const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
                 
-                // 性別
                 const genderStr = data.gender === 1 ? '男' : '女';
 
                 div.innerHTML = `
@@ -399,7 +399,6 @@
             });
         }
 
-        // --- 載入排盤 (更新：載入時不勾選保存，避免重複存) ---
         function loadChartData(data) {
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
@@ -409,7 +408,6 @@
             const tagsSelect = document.getElementById('tagsInput');
             if (tagsSelect) tagsSelect.value = data.tags || '客戸';
 
-            // 載入舊盤時，不應該自動勾選保存，以免用戶只是看看又存了一次
             if (saveChartCheck) saveChartCheck.checked = false;
 
             window.switchTab('solar'); 
@@ -425,9 +423,7 @@
             if(!confirm("確定要刪除嗎？")) return;
             try {
                 await deleteDoc(doc(db, "charts", docId));
-                if (window.currentDocId === docId) {
-                    window.currentDocId = null;
-                }
+                window.currentDocId = null;
                 const idx = allCharts.findIndex(c => c.id === docId);
                 if (idx > -1) {
                     allCharts.splice(idx, 1);
@@ -442,7 +438,6 @@
             document.getElementById('chartModal').style.display = 'none';
         }
 
-        // --- 監聽登入狀態 (控制勾選框) ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -452,24 +447,18 @@
                     if(userName) userName.innerText = user.displayName;
                     if(userAvatar) userAvatar.src = user.photoURL;
                 }
-                
-                // ★ 登入後：啟用勾選框
                 if(saveChartCheck) {
                     saveChartCheck.disabled = false;
-                    saveChartCheck.checked = true; // 預設勾選 (貼心功能)
                 }
                 if(lblSaveChart) {
                     lblSaveChart.classList.remove('disabled-label');
                     lblSaveChart.style.color = 'var(--active-border)';
                     lblSaveChart.style.cursor = 'pointer';
                 }
-
             } else {
                 currentUser = null;
                 if(loggedOutUI) loggedOutUI.style.display = 'flex';
                 if(userProfile) userProfile.style.display = 'none';
-                
-                // ★ 登出後：禁用勾選框
                 if(saveChartCheck) {
                     saveChartCheck.disabled = true;
                     saveChartCheck.checked = false;
