@@ -64,7 +64,7 @@
                 <option value="家人">家人</option>
                 <option value="自己">自己</option>
                 <option value="名人">名人</option>
-                <option value="研究案例">研究案例</option>
+                <option value="案例">案例</option>
             </select>
 
             <select id="gender" style="width: 100px;">
@@ -150,7 +150,7 @@
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
         <div style="margin-top:15px; text-align:center;">
-    <button class="action-btn" onclick="window.startNewChart()">開始新排盤</button>
+    <button class="action-btn" onclick="window.startNewChart()">即時排盤</button>
 </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
@@ -214,7 +214,7 @@
                     <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
                     <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
                     <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-                    <button class="filter-chip" onclick="filterCategory('研究案例')">研究案例</button>
+                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
                 </div>
             </div>
             <div id="chartList" class="chart-list">
@@ -233,7 +233,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=5.0"></script>
+    <script src="script.js?v=6.0"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -481,6 +481,7 @@
     </script>
 </body>
 </html>
+
 
 
 
