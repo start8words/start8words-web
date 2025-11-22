@@ -1,5 +1,5 @@
 // ==========================================
-// 全域變數設定 (強制掛載到 window)
+// 全域變數設定
 // ==========================================
 window.map = null;
 window.marker = null;
@@ -7,28 +7,26 @@ window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
 window.originSolar = null;
-window.currentBaziData = null; // 確保這個變數存在
+window.currentBaziData = null;
 window.currentDocId = null;
 
 // ==========================================
-// 1. 初始化頁面 (等待 DOM 載入完成)
+// 初始化
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Script loaded, initializing...");
+    console.log("DOM Ready, initializing...");
 
-    // 設定預設時間
     const now = new Date();
+    // 修正時區顯示問題，轉為本地 ISO 字串
     const offset = now.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
     
     const elBirthDate = document.getElementById('birthDate');
     if(elBirthDate) elBirthDate.value = localISOTime;
 
-    // 農曆預設
     const elLunarYear = document.getElementById('lunarYear');
     if(elLunarYear) elLunarYear.value = now.getFullYear();
 
-    // 填充農曆選單
     const lunarMonths = document.getElementById('lunarMonth');
     if(lunarMonths) {
         lunarMonths.innerHTML = '';
@@ -52,11 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 填充干支
-    populateGZ('gzYear'); 
-    populateGZ('gzMonth'); 
-    populateGZ('gzDay'); 
-    populateGZ('gzHour');
+    populateGZ('gzYear'); populateGZ('gzMonth'); populateGZ('gzDay'); populateGZ('gzHour');
 });
 
 function populateGZ(idPrefix) {
@@ -72,7 +66,7 @@ function populateGZ(idPrefix) {
 }
 
 // ==========================================
-// 2. 介面互動函數 (掛載到 window)
+// 介面互動
 // ==========================================
 
 window.switchTab = function(mode) {
@@ -105,13 +99,11 @@ window.toggleInputs = function() {
 window.toggleMap = function(forceClose) {
     const container = document.getElementById('mapContainer');
     const btn = document.getElementById('btnToggleMap');
-    
     if (forceClose === true) {
         if(container) container.style.display = 'none';
         if(btn) btn.innerText = '📍 開啟地圖設定地點';
         return;
     }
-    
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'block';
         btn.innerText = '📍 摺疊地圖';
@@ -136,7 +128,6 @@ function initMap() {
 window.searchLocation = function() {
     const query = document.getElementById('locationName').value;
     if (!query) return;
-    
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
@@ -159,14 +150,13 @@ function updateLocation(lat, lon) {
 }
 
 // ==========================================
-// 3. 排盤核心邏輯
+// 核心邏輯
 // ==========================================
 
 function getEquationOfTime(date) {
     const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
     const b = 2 * Math.PI * (dayOfYear - 81) / 365;
-    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
-    return eot; 
+    return 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
 }
 
 const WUXING_COLOR = {'甲':'var(--color-wood)','乙':'var(--color-wood)','寅':'var(--color-wood)','卯':'var(--color-wood)','丙':'var(--color-fire)','丁':'var(--color-fire)','巳':'var(--color-fire)','午':'var(--color-fire)','戊':'var(--color-earth)','己':'var(--color-earth)','辰':'var(--color-earth)','戌':'var(--color-earth)','丑':'var(--color-earth)','未':'var(--color-earth)','庚':'var(--color-metal)','辛':'var(--color-metal)','申':'var(--color-metal)','酉':'var(--color-metal)','壬':'var(--color-water)','癸':'var(--color-water)','亥':'var(--color-water)','子':'var(--color-water)'};
@@ -177,28 +167,22 @@ const LOOKUP_HIDDEN = {'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙
 
 let state = { birthSolar: null, baseDayGan: null, daYuns: [], selDaYunIdx: 0, selYear: null, selMonth: null, selDay: null, selHour: null };
 
-// --- 開始新排盤 ---
 window.startNewChart = function() {
     window.currentDocId = null; 
+    const btn = document.getElementById('btnSave');
+    if(btn) btn.innerText = "儲存排盤"; 
     window.initChart(); 
     
-    // 自動儲存檢查
     const saveCheck = document.getElementById('saveChartCheck');
     if (saveCheck && saveCheck.checked) {
-        // 延遲確保資料已準備好
         setTimeout(() => {
-            if (typeof window.handleAutoSave === 'function') {
-                window.handleAutoSave(); 
-            } else {
-                console.log("AutoSave function not ready yet");
-            }
-        }, 500);
+            if (typeof window.handleAutoSave === 'function') window.handleAutoSave(); 
+        }, 200);
     }
 }
 
-// --- 排盤主程式 ---
 window.initChart = function() {
-    if (typeof Solar === 'undefined') return alert("Library error");
+    if (typeof Solar === 'undefined') return alert("Library error: Lunar.js not loaded");
 
     try {
         const name = document.getElementById('nameInput').value || "未命名";
@@ -208,7 +192,6 @@ window.initChart = function() {
         const useTST = document.getElementById('useTST').checked;
         const longitude = parseFloat(document.getElementById('longitude').value);
 
-        // 更新儀表板 (安全檢查)
         const elName = document.getElementById('dispName'); if(elName) elName.innerText = name;
         const elGender = document.getElementById('dispGender'); if(elGender) elGender.innerText = genderText;
         const elLoc = document.getElementById('dispLoc'); if(elLoc) elLoc.innerText = location;
@@ -229,9 +212,11 @@ window.initChart = function() {
             const lunar = Lunar.fromYmdHms(y, m, d, h, 0, 0);
             window.originSolar = lunar.getSolar();
         }
-        // ... (干支反推邏輯省略以節省空間，可保留你原有的)
+        else if (window.currentInputMode === 'ganzhi') {
+            alert("干支功能暫未連接"); return;
+        }
 
-        // 計算真太陽時
+        // 2. 真太陽時計算 (修正 Month 0 問題)
         let calculatingSolar = window.originSolar; 
         let tstDisplay = "否 (平太陽時)";
 
@@ -239,19 +224,37 @@ window.initChart = function() {
             const stdMeridian = 120; 
             const diffDeg = longitude - stdMeridian;
             const meanOffsetMin = diffDeg * 4; 
-            let tempDate = new Date(window.originSolar.getYear(), window.originSolar.getMonth()-1, window.originSolar.getDay(), window.originSolar.getHour(), window.originSolar.getMinute());
+            
+            // 注意：Solar.getYear() 等返回的是自然年/月，但在 new Date() 中月份需要 -1
+            // 我們直接從 originSolar 轉回原生 Date 對象進行計算，最安全
+            // Solar.fromDate(date) -> 內部的 date 是標準 JS Date
+            
+            // 這裡我們從 originSolar 獲取年月日時
+            const oY = window.originSolar.getYear();
+            const oM = window.originSolar.getMonth(); // 1-12
+            const oD = window.originSolar.getDay();
+            const oH = window.originSolar.getHour();
+            const oMin = window.originSolar.getMinute();
+
+            // 建立一個臨時 Date 用於計算 EoT (月份要 -1)
+            let tempDate = new Date(oY, oM - 1, oD, oH, oMin);
+            
             const eotMin = getEquationOfTime(tempDate);
             const totalOffset = meanOffsetMin + eotMin;
+
+            // 應用偏移
             let nativeDate = new Date(tempDate.getTime());
             nativeDate.setMinutes(nativeDate.getMinutes() + totalOffset);
             
+            // 轉回 Solar
             calculatingSolar = Solar.fromDate(nativeDate);
+            
             const m = nativeDate.getMinutes();
             const mStr = m < 10 ? "0"+m : m;
             tstDisplay = `是 (${nativeDate.getHours()}:${mStr})`;
         }
 
-        // 顯示時間 (原始)
+        // 顯示
         const sY = window.originSolar.getYear();
         const sM = window.originSolar.getMonth();
         const sD = window.originSolar.getDay();
@@ -274,7 +277,7 @@ window.initChart = function() {
         window.toggleMap(true);
         if (!window.isInputsCollapsed) window.toggleInputs();
 
-        // 排盤
+        // 3. 八字計算
         state.birthSolar = calculatingSolar; 
         const bazi = state.birthSolar.getLunar().getEightChar();
         state.baseDayGan = bazi.getDayGan();
@@ -286,13 +289,36 @@ window.initChart = function() {
 
         const yun = bazi.getYun(parseInt(genderVal));
         state.daYuns = yun.getDaYun();
+        
+        const now = new Date();
+        state.selYear = now.getFullYear();
+        state.selMonth = now.getMonth() + 1;
+        state.selDay = now.getDate();
+        state.selHour = now.getHours();
 
-        // 更新軌道
+        // 定位大運
+        let birthYear = state.birthSolar.getYear();
+        let foundIndex = 0;
+        // 這裡加個保護，防止 daYuns 為空
+        if (state.daYuns && state.daYuns.length > 0) {
+            for(let i=0; i<state.daYuns.length; i++) {
+                const dy = state.daYuns[i];
+                let startY = dy.getStartYear();
+                if(startY < 1000) startY += birthYear;
+                if(state.selYear >= startY) foundIndex = i;
+                else break;
+            }
+        }
+        state.selDaYunIdx = Math.min(foundIndex, 11);
+
+        document.getElementById('topDisplay').style.display = 'flex';
+        document.getElementById('rails').style.display = 'flex';
+
         renderRails();
         updateActiveDisplay();
         window.scrollTo(0, 0);
 
-        // 準備儲存資料 (掛載到 window)
+        // 4. 資料準備
         window.currentBaziData = {
             name: document.getElementById('nameInput').value || "未命名",
             gender: parseInt(document.getElementById('gender').value),
@@ -316,11 +342,9 @@ window.initChart = function() {
     }
 }
 
-// ... 輔助函數 (getShiShen, toggleTimeVisibility, renderMainPillar, renderRails 等)
-// 請保留你原有 script.js 後半部的渲染邏輯，這裡為了篇幅省略，
-// 但請確保它們都在，並且沒有被包裹在其他函數內。
-// ...
-
+// ==========================================
+// 輔助函數
+// ==========================================
 function getShiShen(targetGan, isDayPillarStem) {
     if (!state.baseDayGan || !targetGan) return '';
     if (isDayPillarStem) return '日主';
@@ -355,15 +379,20 @@ window.toggleTimeVisibility = function() {
             mask.className = 'lucky-mask';
             mask.innerText = '吉時';
             parent.appendChild(mask);
-        } else {
-            parent.querySelector('#maskText').style.display = 'flex';
-        }
+        } else { parent.querySelector('#maskText').style.display = 'flex'; }
     } else {
         contentDiv.style.display = 'flex';
         eyeIcon.innerText = '👁';
         const mask = document.getElementById('maskText');
         if(mask) mask.style.display = 'none';
     }
+}
+
+function centerActiveItem(container) {
+    const active = container.querySelector('.active');
+    if (!active) return;
+    const scrollLeft = active.offsetLeft - (container.clientWidth / 2) + (active.clientWidth / 2);
+    container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
 }
 
 function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = false) {
@@ -391,9 +420,19 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
 
-// 為了縮短篇幅，請確保 renderRails, renderRailPillar, createRailEl, updateActiveDisplay, centerActiveItem, highlightSelection 
-// 這些函數都完整保留在 script.js 尾部。
-// ... (請保留原有的渲染函數) ...
+function renderRailPillar(gan, zhi, title, infoText) {
+    const ganSS = getShortShiShen(getShiShen(gan, false));
+    const zhiMainGan = (LOOKUP_HIDDEN[zhi] || [])[0];
+    const zhiSS = zhiMainGan ? getShortShiShen(getShiShen(zhiMainGan, false)) : '';
+    return `<div class="rail-info">${infoText}</div><div class="title-text">${title}</div><div class="rail-row-inner"><span class="rail-char" style="color:${WUXING_COLOR[gan]}">${gan}</span><span class="rail-ss">${ganSS}</span></div><div class="rail-row-inner"><span class="rail-char" style="color:${WUXING_COLOR[zhi]}">${zhi}</span><span class="rail-ss">${zhiSS}</span></div>`;
+}
+
+function createRailEl(gan, zhi, title, infoText) {
+    const div = document.createElement('div');
+    div.className = 'pillar rail selectable';
+    div.innerHTML = renderRailPillar(gan, zhi, title, infoText);
+    return div;
+}
 
 function renderRails() {
     renderDaYunRail(); renderYearRail(); renderMonthRail(); renderDayRail(); renderHourRail();
@@ -418,9 +457,7 @@ function renderDaYunRail() {
     }
     setTimeout(() => centerActiveItem(container), 0);
 }
-// ... (renderYearRail 等其他軌道函數保持不變) ...
-
-function renderYearRail() { /* ...請保留原有代碼... */ 
+function renderYearRail() {
     const box = document.getElementById('yearRail'); box.innerHTML = '';
     const dy = state.daYuns[state.selDaYunIdx];
     let startY = dy.getStartYear();
@@ -439,8 +476,7 @@ function renderYearRail() { /* ...請保留原有代碼... */
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
-
-function renderMonthRail() { /* ...請保留原有代碼... */
+function renderMonthRail() {
     const box = document.getElementById('monthRail'); box.innerHTML = '';
     const startYear = state.selYear;
     for (let i = 0; i < 12; i++) {
@@ -457,8 +493,7 @@ function renderMonthRail() { /* ...請保留原有代碼... */
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
-
-function renderDayRail() { /* ...請保留原有代碼... */
+function renderDayRail() {
     const box = document.getElementById('dayRail'); box.innerHTML = '';
     const days = SolarUtil.getDaysOfMonth(state.selYear, state.selMonth);
     if(state.selDay > days) state.selDay = 1;
@@ -473,8 +508,7 @@ function renderDayRail() { /* ...請保留原有代碼... */
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
-
-function renderHourRail() { /* ...請保留原有代碼... */
+function renderHourRail() {
     const box = document.getElementById('hourRail'); box.innerHTML = '';
     const zhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
     for(let i=0; i<12; i++) {
@@ -490,15 +524,18 @@ function renderHourRail() { /* ...請保留原有代碼... */
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
-
 function renderRailsCascadeFromYear() { renderYearRail(); renderMonthRail(); renderDayRail(); renderHourRail(); updateActiveDisplay(); }
 function renderRailsCascadeFromMonth() { renderMonthRail(); renderDayRail(); renderHourRail(); updateActiveDisplay(); }
 function renderRailsCascadeFromDay() { renderDayRail(); renderHourRail(); updateActiveDisplay(); }
 function renderRailsCascadeFromHour() { renderHourRail(); updateActiveDisplay(); }
 
-function updateActiveDisplay() { /* ...請保留原有代碼... */
+function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
     const dy = state.daYuns[state.selDaYunIdx];
+    
+    // 加個保護，防止 dy undefined
+    if (!dy) return;
+
     const dyGZ = dy.getGanZhi();
     let dyStartAge = dy.getStartAge();
     let dyStartYear = dy.getStartYear();
@@ -515,9 +552,7 @@ function updateActiveDisplay() { /* ...請保留原有代碼... */
     renderMainPillar('activeYear', bazi.getYearGan(), bazi.getYearZhi(), '流年', false, yearInfo);
 
     const prevJie = activeLunar.getPrevJie(true);
-    const jieName = prevJie.getName();
-    const jieDate = prevJie.getSolar();
-    const monthInfo = `${jieName}\n${jieDate.getDay()}/${jieDate.getMonth()}`;
+    const monthInfo = `${prevJie.getName()}\n${prevJie.getSolar().getDay()}/${prevJie.getSolar().getMonth()}`;
     renderMainPillar('activeMonth', bazi.getMonthGan(), bazi.getMonthZhi(), '流月', false, monthInfo);
 
     const lunarDayStr = activeLunar.getDayInChinese();
@@ -527,20 +562,6 @@ function updateActiveDisplay() { /* ...請保留原有代碼... */
     const timeZhi = bazi.getTimeZhi();
     const timeRange = ZHI_TIME[timeZhi] + "時";
     renderMainPillar('activeHour', bazi.getTimeGan(), timeZhi, '流時', false, timeRange);
-}
-
-function renderRailPillar(gan, zhi, title, infoText) {
-    const ganSS = getShortShiShen(getShiShen(gan, false));
-    const zhiMainGan = (LOOKUP_HIDDEN[zhi] || [])[0];
-    const zhiSS = zhiMainGan ? getShortShiShen(getShiShen(zhiMainGan, false)) : '';
-    return `<div class="rail-info">${infoText}</div><div class="title-text">${title}</div><div class="rail-row-inner"><span class="rail-char" style="color:${WUXING_COLOR[gan]}">${gan}</span><span class="rail-ss">${ganSS}</span></div><div class="rail-row-inner"><span class="rail-char" style="color:${WUXING_COLOR[zhi]}">${zhi}</span><span class="rail-ss">${zhiSS}</span></div>`;
-}
-
-function createRailEl(gan, zhi, title, infoText) {
-    const div = document.createElement('div');
-    div.className = 'pillar rail selectable';
-    div.innerHTML = renderRailPillar(gan, zhi, title, infoText);
-    return div;
 }
 
 function highlightSelection(id, idx) {
