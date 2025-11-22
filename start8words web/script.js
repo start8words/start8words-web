@@ -3,7 +3,7 @@
 // ==========================================
 window.map = null;
 window.marker = null;
-window.currentInputMode = 'solar'; // 核心變數
+window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
 window.originSolar = null;
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 填充干支下拉
+    // 填充干支
     populateGZ('gzYear'); 
     populateGZ('gzMonth'); 
     populateGZ('gzDay'); 
@@ -70,17 +70,19 @@ function populateGZ(idPrefix) {
 }
 
 // ==========================================
-// 3. 介面互動函數 (強制掛載 window)
+// 3. 介面互動函數 (全部強制 window.)
 // ==========================================
 
 window.switchTab = function(mode) {
-    window.currentInputMode = mode; // 【修正】使用 window.currentInputMode
+    window.currentInputMode = mode; // 強制使用 window
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     
     // 安全獲取 event
-    if(typeof event !== 'undefined' && event.target) {
-        event.target.classList.add('active');
-    }
+    try {
+        if(window.event && window.event.target) {
+            window.event.target.classList.add('active');
+        }
+    } catch(e) {}
     
     const pSolar = document.getElementById('panelSolar');
     const pLunar = document.getElementById('panelLunar');
@@ -173,7 +175,6 @@ function getEquationOfTime(date) {
     return eot; 
 }
 
-// Config
 const WUXING_COLOR = {'甲':'var(--color-wood)','乙':'var(--color-wood)','寅':'var(--color-wood)','卯':'var(--color-wood)','丙':'var(--color-fire)','丁':'var(--color-fire)','巳':'var(--color-fire)','午':'var(--color-fire)','戊':'var(--color-earth)','己':'var(--color-earth)','辰':'var(--color-earth)','戌':'var(--color-earth)','丑':'var(--color-earth)','未':'var(--color-earth)','庚':'var(--color-metal)','辛':'var(--color-metal)','申':'var(--color-metal)','酉':'var(--color-metal)','壬':'var(--color-water)','癸':'var(--color-water)','亥':'var(--color-water)','子':'var(--color-water)'};
 const GAN_LIST = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const SHISHEN_SHORT = {'比肩':'比','劫財':'劫','食神':'食','傷官':'傷','偏財':'才','正財':'財','七殺':'殺','正官':'官','偏印':'梟','正印':'印','日主':'主'};
@@ -188,6 +189,7 @@ window.startNewChart = function() {
     const btn = document.getElementById('btnSave');
     if(btn) btn.innerText = "儲存排盤"; 
 
+    // 呼叫 initChart
     window.initChart(); 
     
     const saveCheck = document.getElementById('saveChartCheck');
@@ -220,7 +222,7 @@ window.initChart = function() {
 
         window.originSolar = null;
 
-        // 【修正】使用 window.currentInputMode
+        // 1. 獲取時間 - 強制使用 window.currentInputMode
         if (window.currentInputMode === 'solar') {
             const dateStr = document.getElementById('birthDate').value;
             if(!dateStr) return alert("請輸入日期");
@@ -248,15 +250,13 @@ window.initChart = function() {
             const diffDeg = longitude - stdMeridian;
             const meanOffsetMin = diffDeg * 4; 
             
-            // 修正 Month 0 問題：new Date() 月份是 0-11，但 Solar.getMonth() 是 1-12
             let tempDate = new Date(
                 window.originSolar.getYear(), 
-                window.originSolar.getMonth() - 1, // 修正：減 1
+                window.originSolar.getMonth() - 1, // 月份修正
                 window.originSolar.getDay(), 
                 window.originSolar.getHour(), 
                 window.originSolar.getMinute()
             );
-            
             const eotMin = getEquationOfTime(tempDate);
             const totalOffset = meanOffsetMin + eotMin;
 
@@ -307,6 +307,7 @@ window.initChart = function() {
         state.selDay = now.getDate();
         state.selHour = now.getHours();
 
+        // 定位大運
         let birthYear = state.birthSolar.getYear();
         let foundIndex = 0;
         if (state.daYuns && state.daYuns.length > 0) {
@@ -325,6 +326,7 @@ window.initChart = function() {
 
         renderRails();
         updateActiveDisplay();
+        
         window.scrollTo(0, 0);
 
         // 5. 準備儲存資料
@@ -333,7 +335,7 @@ window.initChart = function() {
             gender: parseInt(document.getElementById('gender').value),
             birthDate: window.originSolar.toYmdHms(), 
             lunarDate: lObj.toString(),
-            inputMode: window.currentInputMode, // 使用 window.currentInputMode
+            inputMode: window.currentInputMode,
             location: document.getElementById('locationName').value,
             useTST: document.getElementById('useTST').checked,
             tags: document.getElementById('tagsInput') ? document.getElementById('tagsInput').value : '客戸', 
@@ -352,7 +354,7 @@ window.initChart = function() {
 }
 
 // ==========================================
-// 輔助函數
+// 5. 輔助渲染與邏輯
 // ==========================================
 
 function getShiShen(targetGan, isDayPillarStem) {
@@ -379,9 +381,11 @@ window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
     const contentDiv = document.getElementById('pillarContent_baseHour');
     const eyeIcon = document.getElementById('eyeIcon');
+    
     if (window.isTimeHidden) {
         contentDiv.style.display = 'none';
         eyeIcon.innerText = '🔒';
+        // 尋找父層添加遮罩
         const parent = contentDiv.parentElement;
         if (!parent.querySelector('#maskText')) {
             const mask = document.createElement('div');
@@ -389,7 +393,9 @@ window.toggleTimeVisibility = function() {
             mask.className = 'lucky-mask';
             mask.innerText = '吉時';
             parent.appendChild(mask);
-        } else { parent.querySelector('#maskText').style.display = 'flex'; }
+        } else {
+            parent.querySelector('#maskText').style.display = 'flex';
+        }
     } else {
         contentDiv.style.display = 'flex';
         eyeIcon.innerText = '👁';
@@ -402,12 +408,16 @@ function centerActiveItem(container) {
     const active = container.querySelector('.active');
     if (!active) return;
     const scrollLeft = active.offsetLeft - (container.clientWidth / 2) + (active.clientWidth / 2);
-    container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    container.scrollTo({
+        left: scrollLeft,
+        behavior: 'smooth'
+    });
 }
 
 function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = false) {
     const el = document.getElementById(id);
     if (!el) return;
+    
     const shishen = getShiShen(gan, isDayPillar);
     const shishenClass = (shishen === '日主') ? 'shishen-top dm' : 'shishen-top';
     const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
@@ -417,8 +427,11 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         const color = WUXING_COLOR[hGan] || '#333';
         cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
     });
+
     const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
+    
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
+    
     const contentHtml = `
         <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
             <div class="${shishenClass}">${shishen}</div>
@@ -427,6 +440,7 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
             <div class="canggan-box">${cangganHtml}</div>
         </div>
     `;
+
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
 
@@ -451,6 +465,10 @@ function renderDaYunRail() {
     const container = document.getElementById('dayunRail');
     container.innerHTML = '';
     let birthYear = state.birthSolar.getYear();
+    if (!state.daYuns || state.daYuns.length === 0) {
+        container.innerHTML = '<div style="font-size:12px;color:#999;">無大運資料</div>';
+        return;
+    }
     for(let i=0; i<state.daYuns.length && i<12; i++) {
         const dy = state.daYuns[i];
         const gz = dy.getGanZhi(); 
@@ -470,6 +488,8 @@ function renderDaYunRail() {
 function renderYearRail() {
     const box = document.getElementById('yearRail'); box.innerHTML = '';
     const dy = state.daYuns[state.selDaYunIdx];
+    if(!dy) return;
+
     let startY = dy.getStartYear();
     let birthYear = state.birthSolar.getYear();
     if(startY < 1000) startY += birthYear;
@@ -542,6 +562,9 @@ function renderRailsCascadeFromHour() { renderHourRail(); updateActiveDisplay();
 function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
     const dy = state.daYuns[state.selDaYunIdx];
+    
+    if (!dy) return;
+
     const dyGZ = dy.getGanZhi();
     let dyStartAge = dy.getStartAge();
     let dyStartYear = dy.getStartYear();
