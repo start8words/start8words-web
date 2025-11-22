@@ -358,11 +358,21 @@ window.initChart = function() {
     }
 }
 
+// --- 修改：開始新排盤 (含自動儲存邏輯) ---
 window.startNewChart = function() {
+    // 1. 清空當前紀錄 ID (代表這是一張新單)
     window.currentDocId = null; 
-    const btn = document.getElementById('btnSave');
-    if(btn) btn.innerText = "儲存排盤"; 
+    
+    // 2. 執行排盤運算
     initChart(); 
+    
+    // 3. 檢查是否需要自動儲存
+    const saveCheck = document.getElementById('saveChartCheck');
+    
+    // 如果勾選框存在、已勾選、且 Firebase 儲存功能已就緒
+    if (saveCheck && saveCheck.checked && typeof window.handleAutoSave === 'function') {
+        window.handleAutoSave(); // 呼叫 index.html 裡的儲存函數
+    }
 }
 
 function getShiShen(targetGan, isDayPillarStem) {
@@ -635,4 +645,5 @@ function highlightSelection(id, idx) {
     const c = document.getElementById(id).children;
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
+
 }
