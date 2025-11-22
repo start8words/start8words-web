@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
 
@@ -48,9 +48,9 @@
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('solar')">公曆輸入</div>
-            <div class="tab" onclick="switchTab('lunar')">農曆輸入</div>
-            <div class="tab" onclick="switchTab('ganzhi')">干支輸入</div>
+            <div class="tab active" onclick="switchTab('solar')">西曆</div>
+            <div class="tab" onclick="switchTab('lunar')">農曆</div>
+            <div class="tab" onclick="switchTab('ganzhi')">干支</div>
         </div>
 
         <div class="input-row">
@@ -59,12 +59,12 @@
             
             <span>分類：</span>
             <select id="tagsInput" style="width: 100px;">
-                <option value="客戸">客戸</option>
+                <option value="自己">自己</option>
                 <option value="朋友">朋友</option>
                 <option value="家人">家人</option>
-                <option value="自己">自己</option>
+                <option value="客戶">客戶</option>
                 <option value="名人">名人</option>
-                <option value="研究案例">研究案例</option>
+                <option value="案例">案例</option>
             </select>
 
             <select id="gender" style="width: 100px;">
@@ -118,8 +118,8 @@
         <div class="tst-section">
             <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
             <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="地點（如：香港），按搜尋定位經度" style="flex:1;">
-                <button class="map-btn" onclick="searchLocation()" style="width:60px;">搜尋</button>
+                <input type="text" id="locationName" placeholder="輸入地點(如：香港)，點選定位" style="flex:1;">
+                <button class="map-btn" onclick="searchLocation()" style="width:60px;">定位</button>
             </div>
             
             <div class="tst-bottom-row">
@@ -134,14 +134,24 @@
                     <input type="checkbox" id="saveChartCheck" disabled style="width:auto; margin:0;"> 保存命盤
                 </label>
             </div>
+
+            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed #ddd; width:100%;">
+                <span style="font-size:12px; color:#555; font-weight:bold;">子時處理：</span>
+                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                    <input type="radio" name="zishiMode" value="23" checked style="width:auto; margin:0;"> 23:00 換日
+                </label>
+                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                    <input type="radio" name="zishiMode" value="00" style="width:auto; margin:0;"> 00:00 換日
+                </label>
+            </div>
         </div>
 
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
         <div style="margin-top:15px; text-align:center;">
-    <button class="action-btn" onclick="window.startNewChart()">開始新排盤</button>
-</div>
+            <button class="action-btn" onclick="startNewChart()">即時排盤</button>
+        </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
 
@@ -199,12 +209,12 @@
                 
                 <div class="category-filters">
                     <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
-                    <button class="filter-chip" onclick="filterCategory('客戸')">客戸</button>
+                    <button class="filter-chip" onclick="filterCategory('客戸')">自己</button>
                     <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
                     <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
-                    <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
+                    <button class="filter-chip" onclick="filterCategory('自己')">客戶</button>
                     <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-                    <button class="filter-chip" onclick="filterCategory('研究案例')">研究案例</button>
+                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
                 </div>
             </div>
             <div id="chartList" class="chart-list">
@@ -223,7 +233,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=4.0"></script>
+    <script src="script.js?v=6.0"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -248,14 +258,12 @@
         let allCharts = []; 
         let currentCategory = '全部';
 
-        // --- 登入 ---
         if (btnLogin) {
             btnLogin.addEventListener('click', () => {
                 signInWithPopup(auth, provider).catch((error) => alert(error.message));
             });
         }
 
-        // --- 登出 ---
         if (btnLogout) {
             btnLogout.addEventListener('click', () => {
                 signOut(auth).then(() => { location.reload(); });
@@ -264,17 +272,9 @@
 
         // --- ★ 全局自動儲存功能 (優化版) ---
         window.handleAutoSave = async () => {
-            // 1. 檢查資料
-            if (!window.currentBaziData) {
-                console.log("No bazi data to save");
-                return;
-            }
-            // 2. 檢查用戶 (使用 auth.currentUser 最穩陣)
+            if (!window.currentBaziData) return;
             const user = auth.currentUser;
-            if (!user) {
-                console.log("User not logged in, skip save");
-                return;
-            }
+            if (!user) return;
 
             const dataToSave = {
                 userId: user.uid,
@@ -284,21 +284,46 @@
             };
 
             try {
-                // 3. 新增資料
                 await addDoc(collection(db, "charts"), dataToSave);
-                
-                // 4. 成功提示
                 setTimeout(() => {
                     alert("✅ 命盤已自動保存！");
+                    // 儲存後重置輸入區 (符合你的要求)
+                    resetInputs();
                 }, 100);
-
             } catch (e) {
                 console.error("Auto save failed:", e);
                 alert("自動保存失敗: " + e.message);
             }
         };
+        
+        // 輔助：重置輸入區
+        function resetInputs() {
+            document.getElementById('nameInput').value = '';
+            // 日期設回現在
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+            document.getElementById('birthDate').value = localISOTime;
+            
+            document.getElementById('locationName').value = '';
+            document.getElementById('longitude').value = '120.0';
+            document.getElementById('useTST').checked = false;
+            if (saveChartCheck) saveChartCheck.checked = false;
+            
+            // 重置 ID，斷開連結
+            window.currentDocId = null;
+        }
 
-        // --- 我的排盤 (打開列表) ---
+        if (saveChartCheck) {
+            saveChartCheck.addEventListener('change', async (e) => {
+                if (e.target.checked) {
+                    if (window.currentBaziData && currentUser) {
+                        window.handleAutoSave();
+                    }
+                }
+            });
+        }
+
         if (btnMyCharts) {
             btnMyCharts.addEventListener('click', async () => {
                 if (!auth.currentUser) return;
@@ -333,7 +358,11 @@
 
                 } catch (e) {
                     console.error(e);
-                    chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
+                    if(e.message && e.message.includes("requires an index")) {
+                        alert("系統索引建立中，請稍後再試。");
+                    } else {
+                        chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
+                    }
                 }
             });
         }
@@ -399,7 +428,9 @@
             });
         }
 
+        // --- 載入排盤 (載入後重置輸入區，只供查看) ---
         function loadChartData(data) {
+            // 1. 填入資料
             document.getElementById('nameInput').value = data.name || '';
             document.getElementById('gender').value = data.gender;
             document.getElementById('locationName').value = data.location || '';
@@ -407,15 +438,25 @@
             
             const tagsSelect = document.getElementById('tagsInput');
             if (tagsSelect) tagsSelect.value = data.tags || '客戸';
-
-            if (saveChartCheck) saveChartCheck.checked = false;
+            
+            // 2. 處理子時模式
+            if (data.zishiMode) {
+                const radios = document.getElementsByName('zishiMode');
+                for (let r of radios) {
+                    if (r.value === data.zishiMode) r.checked = true;
+                }
+            }
 
             window.switchTab('solar'); 
             const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
             document.getElementById('birthDate').value = isoTime;
 
+            // 3. 排盤
             window.currentDocId = data.id;
             window.initChart();
+            
+            // 4. ★ 關鍵：排盤後立即重置輸入區 (恢復預設) ★
+            resetInputs();
         }
 
         window.deleteChart = async (e, docId) => {
@@ -423,7 +464,9 @@
             if(!confirm("確定要刪除嗎？")) return;
             try {
                 await deleteDoc(doc(db, "charts", docId));
-                window.currentDocId = null;
+                if (window.currentDocId === docId) {
+                    window.currentDocId = null;
+                }
                 const idx = allCharts.findIndex(c => c.id === docId);
                 if (idx > -1) {
                     allCharts.splice(idx, 1);
@@ -471,6 +514,3 @@
     </script>
 </body>
 </html>
-
-
-
