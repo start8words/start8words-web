@@ -30,7 +30,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* 限制最大寬度容器 */
 .app-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -49,28 +48,31 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 1. 帳戶管理欄 (修正白底框) --- */
+/* --- 1. 帳戶管理欄 (白色底框) --- */
 .auth-box {
+    background-color: #ffffff !important; /* 強制白色 */
     background: var(--panel-bg);
-    padding: 15px 20px; /* 加大間距 */
+    padding: 15px 20px;
     border-radius: 12px;
-    border: 1px solid var(--border); /* 確保有邊框 */
+    border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-top: 15px;
+    margin-top: 0; /* 緊貼標題 */
+    margin-bottom: 15px;
     display: flex;
-    flex-direction: column; /* 確保內容垂直堆疊 */
+    align-items: center;
+    justify-content: center;
     gap: 10px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* 登入提示文字 */
+/* 登入提示 */
 .auth-hint {
     font-size: 14px;
     color: #555;
     font-weight: 500;
     text-align: left;
-    flex: 1; /* 佔據左側空間 */
+    flex: 1;
 }
 
 /* --- 輸入控制區 --- */
@@ -311,7 +313,7 @@ button.map-btn {
     .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
     
     /* 帳戶欄調整 */
-    .auth-box { padding: 10px; margin-top: 10px; }
+    .auth-box { padding: 10px; }
     .auth-hint { font-size: 12px; }
 }
 
@@ -596,14 +598,3 @@ button.map-btn {
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-/* --- 新增：禁用狀態的標籤樣式 --- */
-.disabled-label {
-    color: #999 !important; /* 灰色 */
-    cursor: not-allowed !important; /* 禁止符號 */
-    opacity: 0.6;
-}
-
-/* 確保 checkbox 在禁用時也不會有互動感 */
-.disabled-label input {
-    cursor: not-allowed;
-}
