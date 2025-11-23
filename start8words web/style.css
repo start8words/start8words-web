@@ -599,19 +599,17 @@ button.map-btn {
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
-    /* --- 新增：十二長生標籤樣式 --- */
-.zhangsheng-badge {
-    font-size: 12px;
-    color: #ffffff;
-    background-color: #78909c; /* 專業的灰藍色 */
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 6px;       /* 與上方藏干拉開一點距離 */
+/* --- 修改後：十二長生樣式 (文字版 + 虛線) --- */
+.zhangsheng-text {
+    font-size: 12px;        /* 維持現狀大小 */
+    color: #888;            /* 灰色文字，不搶眼 */
+    width: 100%;            /* 寬度撐滿，為了讓虛線畫滿整格 */
+    text-align: center;     /* 文字置中 */
+    padding-top: 5px;       /* 文字與上方虛線的距離 */
+    margin-top: 5px;        /* 虛線與上方藏干的距離 */
+    border-top: 1px dashed #eee; /* 灰色虛線分隔 */
     font-weight: normal;
-    letter-spacing: 1px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    line-height: 1.4;
 }
+
 
 
