@@ -425,14 +425,13 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
     });
 
-    // 3. 【新增】計算十二長生 (日干 對 地支)
+    // 3. 【修正後】計算十二長生 (日干 對 地支)
     let zhangshengText = '';
     try {
-        // 確保有日主資料且 library 可用
-        if (state.baseDayGan && zhi && typeof Lunar !== 'undefined') {
-            // 使用 lunar-javascript 的 Gan.fromName() 和 Zhi.fromName()
-            const dmGan = Lunar.Gan.fromName(state.baseDayGan);
-            const pillarZhi = Lunar.Zhi.fromName(zhi);
+        // 修正重點：檢查 Gan 和 Zhi 是否存在，並直接呼叫，不要加 Lunar. 前綴
+        if (state.baseDayGan && zhi && typeof Gan !== 'undefined' && typeof Zhi !== 'undefined') {
+            const dmGan = Gan.fromName(state.baseDayGan);   // 原本寫 Lunar.Gan.fromName
+            const pillarZhi = Zhi.fromName(zhi);            // 原本寫 Lunar.Zhi.fromName
             zhangshengText = dmGan.getZhangSheng(pillarZhi);
         }
     } catch (e) {
@@ -608,4 +607,5 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
+
 
