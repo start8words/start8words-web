@@ -484,7 +484,7 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
     
     // 顯示標籤
-    const zsHtml = zhangshengText ? `<div class="zhangsheng-badge">${zhangshengText}</div>` : '';
+    const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
 
     const contentHtml = `
         <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
@@ -648,6 +648,7 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
+
 
 
 
