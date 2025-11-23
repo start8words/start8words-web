@@ -411,8 +411,12 @@ function centerActiveItem(container) {
 function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = false) {
     const el = document.getElementById(id);
     if (!el) return;
+
+    // 1. 計算十神
     const shishen = getShiShen(gan, isDayPillar);
     const shishenClass = (shishen === '日主') ? 'shishen-top dm' : 'shishen-top';
+    
+    // 2. 處理藏干
     const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
     let cangganHtml = '';
     hiddenGans.forEach(hGan => {
@@ -420,19 +424,39 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         const color = WUXING_COLOR[hGan] || '#333';
         cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
     });
+
+    // 3. 【新增】計算十二長生 (日干 對 地支)
+    let zhangshengText = '';
+    try {
+        // 確保有日主資料且 library 可用
+        if (state.baseDayGan && zhi && typeof Lunar !== 'undefined') {
+            // 使用 lunar-javascript 的 Gan.fromName() 和 Zhi.fromName()
+            const dmGan = Lunar.Gan.fromName(state.baseDayGan);
+            const pillarZhi = Lunar.Zhi.fromName(zhi);
+            zhangshengText = dmGan.getZhangSheng(pillarZhi);
+        }
+    } catch (e) {
+        console.error("長生計算錯誤", e);
+    }
+
+    // 4. 組裝 HTML
     const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
+    
+    // 如果計算出長生，就顯示標籤
+    const zsHtml = zhangshengText ? `<div class="zhangsheng-badge">${zhangshengText}</div>` : '';
+
     const contentHtml = `
         <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
             <div class="${shishenClass}">${shishen}</div>
             <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
             <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
             <div class="canggan-box">${cangganHtml}</div>
-        </div>
+            ${zsHtml} </div>
     `;
+    
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
-
 function renderRailPillar(gan, zhi, title, infoText) {
     const ganSS = getShortShiShen(getShiShen(gan, false));
     const zhiMainGan = (LOOKUP_HIDDEN[zhi] || [])[0];
@@ -584,3 +608,4 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
+
