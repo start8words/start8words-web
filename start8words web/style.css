@@ -308,6 +308,20 @@ button.map-btn {
     .canggan-box { gap: 1px; padding-top: 2px; }
     .canggan-row { gap: 2px; font-size: 11px !important; }
     .canggan-shishen { font-size: 10px !important; transform: scale(0.95); }
+    /* --- 新增：十二長生標籤樣式 --- */
+.zhangsheng-badge {
+    font-size: 12px;
+    color: #ffffff;
+    background-color: #78909c; /* 專業的灰藍色 */
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 6px;       /* 與上方藏干拉開一點距離 */
+    font-weight: normal;
+    letter-spacing: 1px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    line-height: 1.4;
+}
     .lucky-mask { font-size: 16px; letter-spacing: 3px; top: 30px; }
     .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
     .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
@@ -598,5 +612,6 @@ button.map-btn {
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
 
 
