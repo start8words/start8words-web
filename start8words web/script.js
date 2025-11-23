@@ -376,6 +376,53 @@ function getShiShen(targetGan, isDayPillarStem) {
     if ((targetEl + 2) % 5 === dayEl) return samePol ? '七殺' : '正官';
     return '';
 }
+// --- 十二長生計算輔助函數 ---
+function getZhangSheng(gan, zhi) {
+    if (!gan || !zhi) return '';
+    
+    // 定義十二長生順序
+    const ZS_ORDER = ['長生', '沐浴', '冠帶', '臨官', '帝旺', '衰', '病', '死', '墓', '絕', '胎', '養'];
+    // 定義地支順序
+    const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    
+    // 定義十天干的長生起點與順逆 (true=順行, false=逆行)
+    // 甲亥順，乙午逆，丙戊寅順，丁己酉逆，庚巳順，辛子逆，壬申順，癸卯逆
+    const GAN_RULES = {
+        '甲': { start: '亥', forward: true },
+        '乙': { start: '午', forward: false },
+        '丙': { start: '寅', forward: true },
+        '戊': { start: '寅', forward: true }, // 土水同宮或土隨火，此处採用火土同宮
+        '丁': { start: '酉', forward: false },
+        '己': { start: '酉', forward: false },
+        '庚': { start: '巳', forward: true },
+        '辛': { start: '子', forward: false },
+        '壬': { start: '申', forward: true },
+        '癸': { start: '卯', forward: false }
+    };
+
+    const rule = GAN_RULES[gan];
+    if (!rule) return '';
+
+    const startIdx = ZHI_ORDER.indexOf(rule.start);
+    const targetIdx = ZHI_ORDER.indexOf(zhi);
+    
+    if (startIdx === -1 || targetIdx === -1) return '';
+
+    let offset;
+    if (rule.forward) {
+        // 順行：(目標 - 起點)
+        offset = targetIdx - startIdx;
+    } else {
+        // 逆行：(起點 - 目標)
+        offset = startIdx - targetIdx;
+    }
+
+    // 處理負數，確保在 0-11 之間
+    if (offset < 0) offset += 12;
+    offset = offset % 12;
+
+    return ZS_ORDER[offset];
+}
 function getShortShiShen(fullShiShen) { return SHISHEN_SHORT[fullShiShen] || ''; }
 
 window.toggleTimeVisibility = function() {
@@ -411,8 +458,12 @@ function centerActiveItem(container) {
 function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = false) {
     const el = document.getElementById(id);
     if (!el) return;
+
+    // 1. 計算十神
     const shishen = getShiShen(gan, isDayPillar);
     const shishenClass = (shishen === '日主') ? 'shishen-top dm' : 'shishen-top';
+    
+    // 2. 處理藏干
     const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
     let cangganHtml = '';
     hiddenGans.forEach(hGan => {
@@ -420,19 +471,32 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         const color = WUXING_COLOR[hGan] || '#333';
         cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
     });
+
+    // 3. 【最終修正版】計算十二長生
+    let zhangshengText = '';
+    // 確保有日主 (state.baseDayGan) 和該柱地支 (zhi)
+    if (state.baseDayGan && zhi) {
+        zhangshengText = getZhangSheng(state.baseDayGan, zhi);
+    }
+
+    // 4. 組裝 HTML
     const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
+    
+    // 顯示標籤
+    const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
+
     const contentHtml = `
         <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
             <div class="${shishenClass}">${shishen}</div>
             <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
             <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
             <div class="canggan-box">${cangganHtml}</div>
-        </div>
+            ${zsHtml} </div>
     `;
+    
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
-
 function renderRailPillar(gan, zhi, title, infoText) {
     const ganSS = getShortShiShen(getShiShen(gan, false));
     const zhiMainGan = (LOOKUP_HIDDEN[zhi] || [])[0];
@@ -584,3 +648,7 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
+
+
+
+

@@ -292,6 +292,8 @@ button.map-btn {
     padding: 5px 0;
     position: relative;
     flex-shrink: 0;
+    position: relative;
+    padding-bottom: 30px;
 }
 
 /* 手機版調整 */
@@ -299,7 +301,7 @@ button.map-btn {
     body { padding: 5px; }
     .main-display { gap: 5px; justify-content: flex-start; }
     .group-container { flex: 0 0 auto; justify-content: flex-start; }
-    .pillar.main { width: 50px; min-width: 50px; min-height: 180px; padding: 4px 0; }
+    .pillar.main { width: 50px; min-width: 50px; min-height: 210px; padding: 4px 0 30px 0; }
     .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
     .title-text { font-size: 12px !important; margin-bottom: 1px; }
     .shishen-top { font-size: 11px !important; height: 14px; margin-bottom: 1px; }
@@ -598,5 +600,28 @@ button.map-btn {
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+/* --- 修改後：十二長生樣式 (文字版 + 虛線) --- */
+.zhangsheng-text {
+    position: absolute;     /* 【關鍵】絕對定位 */
+    bottom: 0;              /* 強制貼在底部 */
+    left: 0;                /* 左邊對齊 */
+    width: 100%;            /* 寬度撐滿整個格子 */
+    
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    
+    padding-top: 6px;       /* 調整虛線與文字的距離 */
+    padding-bottom: 6px;    /* 調整文字與底部的距離 */
+    
+    border-top: 1px dashed #eee; /* 虛線分隔 */
+    background-color: #fff;      /* 背景白色，避免與上方內容重疊時變透明 */
+    border-radius: 0 0 6px 6px;  /* 如果格子有圓角，這裡也要修圓角 */
+    font-weight: normal;
+}
+
+
+
 
 
