@@ -301,7 +301,7 @@ button.map-btn {
     body { padding: 5px; }
     .main-display { gap: 5px; justify-content: flex-start; }
     .group-container { flex: 0 0 auto; justify-content: flex-start; }
-    .pillar.main { width: 50px; min-width: 50px; min-height: 180px; padding: 4px 0; }
+    .pillar.main { width: 50px; min-width: 50px; min-height: 210px; padding: 4px 0 30px 0; }
     .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
     .title-text { font-size: 12px !important; margin-bottom: 1px; }
     .shishen-top { font-size: 11px !important; height: 14px; margin-bottom: 1px; }
@@ -620,6 +620,7 @@ button.map-btn {
     border-radius: 0 0 6px 6px;  /* 如果格子有圓角，這裡也要修圓角 */
     font-weight: normal;
 }
+
 
 
 
