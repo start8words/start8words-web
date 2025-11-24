@@ -620,6 +620,66 @@ button.map-btn {
     border-radius: 0 0 6px 6px;  /* 如果格子有圓角，這裡也要修圓角 */
     font-weight: normal;
 }
+/* --- 新增：神煞系統樣式 --- */
+
+/* 1. 神煞列表容器 */
+.shensha-list {
+    display: flex; /* 預設顯示 (Flex布局) */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dotted #eee;
+    transition: all 0.3s ease;
+}
+
+/* 2. 隱藏狀態 */
+.shensha-list.hidden {
+    display: none;
+}
+
+/* 3. 單個神煞標籤 */
+.shensha-tag {
+    font-size: 11px;
+    color: #555; /* 統一顏色 */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 1px 3px;
+    background-color: #fcfcfc;
+    white-space: nowrap;
+    transform: scale(0.95); /* 稍微縮小一點以適應手機 */
+}
+
+/* 4. 原局標籤內的開關按鈕 */
+.shensha-toggle-btn {
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px; /* 在直排文字下方 */
+    color: var(--active-border);
+    border: 1px solid var(--active-border);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    writing-mode: horizontal-tb; /* 強制按鈕內文字橫向 */
+}
+
+.shensha-toggle-btn:hover {
+    background-color: var(--active-border);
+    color: white;
+}
+
+/* 調整 pillar.main 的 padding，預留空間給神煞 */
+.pillar.main {
+    padding-bottom: 5px; /* 稍微減少底部留白，因為內容變多了 */
+    height: auto; /* 允許高度自動撐開 */
+    min-height: 240px; /* 稍微加高最小高度 */
+}
 
 
 
