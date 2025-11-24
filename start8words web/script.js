@@ -377,21 +377,29 @@ function getShiShen(targetGan, isDayPillarStem) {
     if ((targetEl + 2) % 5 === dayEl) return samePol ? '七殺' : '正官';
     return '';
 }
+// 強制掛載到 window，確保 HTML onclick 呼叫得到
 window.toggleShenShaAll = function() {
+    // 1. 切換狀態變數
     window.isShenShaVisible = !window.isShenShaVisible;
     
-    // 【修改】只切換 .shensha-list (神煞列表)，不切換整個底部
-    // 這樣十二長生就會保留
+    // 2. 選取所有「神煞列表」 (注意：不是選 pillar-bottom-section，因為我們要保留長生)
     const lists = document.querySelectorAll('.shensha-list');
+    
     lists.forEach(el => {
-        if (window.isShenShaVisible) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (window.isShenShaVisible) {
+            el.classList.remove('hidden');
+            el.style.display = 'flex'; // 強制顯示
+        } else {
+            el.classList.add('hidden');
+            el.style.display = 'none'; // 強制隱藏
+        }
     });
 
-    // 更新按鈕圖標
+    // 3. 更新按鈕圖標
     const btn = document.getElementById('btnToggleShenSha');
     if(btn) {
-        btn.innerText = window.isShenShaVisible ? '▼' : '◀'; // 或用其他符號表示展開/收起
+        btn.innerHTML = window.isShenShaVisible ? '▼' : '◀'; // 用 innerHTML 確保符號正確
+        // 當隱藏時，按鈕可能需要稍微改變位置或顏色提示，這裡暫時只改符號
     }
 }
 // --- 十二長生計算輔助函數 ---
@@ -785,6 +793,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
