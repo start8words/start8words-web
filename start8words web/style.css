@@ -139,7 +139,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
-    align-items: stretch; /* 讓所有 group 等高 */
+    align-items: stretch; 
     justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
@@ -158,16 +158,15 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
 
-/* --- 原局與隱藏鍵定位修正 --- */
+/* --- 原局與隱藏鍵定位修正 (可在此調整位置) --- */
 .group-label {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     
-    /* 【定位重點】：65px 讓「原局」文字上移，對齊天干 */
-    /* 計算基礎：TopInfo(35) + Title(33) - 些微調整 = ~65px */
-    padding-top: 65px; 
+    /* --- [自定義] 這裡控制「原局」文字的上下位置 --- */
+    padding-top: 68px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -199,12 +198,13 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【定位重點】：110px 讓按鈕對齊十二長生 */
-    margin-top: 110px; 
+    /* --- [自定義] 這裡控制「按鈕」的上下位置 --- */
+    margin-top: 112px; 
+    
     margin-right: -1px;
 }
 
-/* --- 柱子結構優化 --- */
+/* --- 柱子結構 --- */
 .pillar.main {
     display: flex;
     flex-direction: column;
@@ -217,16 +217,17 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     position: relative;
     overflow: hidden;
     
-    /* 【重要修正】強制最小高度，解決空大運塌陷 */
+    /* 取消強制最小高度，讓它自然伸縮 */
     height: auto; 
-    min-height: 380px; 
     
     flex-shrink: 0;
 }
 
 /* 頂部資訊區 */
 .top-info {
-    min-height: 35px;
+    /* 稍微加高，給眼仔留空間 */
+    min-height: 38px; 
+    
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -255,29 +256,29 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: #999; }
 
-/* 內容區：Flex Grow 確保撐滿 */
+/* 內容區 */
 .pillar-content-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    flex-grow: 1; /* 重要：讓內容撐滿柱子高度 */
+    /* 移除 flex-grow，避免在空柱時過度拉伸 */
 }
 
-/* 十神、天干、地支的高度固定，確保對齊 */
+/* 十神、天干、地支 */
 .shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
-/* 藏干區：固定高度 */
+/* 藏干區 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     width: 100%;
-    min-height: 60px; /* 固定高度，對齊下方的長生 */
+    min-height: 60px; 
     justify-content: flex-start;
     margin-bottom: 5px;
     padding-top: 5px;
@@ -287,10 +288,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .canggan-char { font-weight: bold; }
 .canggan-shishen { color: #777; font-size: 12px; }
 
-/* 【修正】眼仔按鈕：往上移，避免壓到標題 */
+/* 眼仔按鈕 (位置修正) */
 .eye-btn {
     position: absolute;
-    top: 6px; /* 改為 6px，放在最頂部空白處 */
+    top: 4px; /* 上移到空白處 */
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
@@ -312,15 +313,15 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     width: 100%;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* 【重要】填滿剩餘高度 */
     
-    /* 【修正】增加最小高度，確保空柱子也有灰色底 */
-    min-height: 120px; 
+    /* 讓灰色背景填滿剩餘高度 */
+    flex-grow: 1; 
     
     background-color: #fafafa;
     border-top: 1px dashed #eee;
     border-radius: 0 0 6px 6px;
-    justify-content: flex-start; /* 內容靠上 */
+    justify-content: flex-start;
+    padding-bottom: 5px; /* 稍微留白 */
 }
 
 /* 十二長生 */
@@ -368,17 +369,18 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
 .pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
 
-/* 【修正】Rail Info：強制換行，改回兩行顯示 */
+/* 【修正】Rail Info：強制換行，Flex Column 垂直置中 */
 .rail-info { 
     font-size: 11px; 
     color: #666; 
     text-align: center; 
     
-    /* 移除 Flex，改用 Block 讓 \n 生效 */
-    display: block; 
-    white-space: pre-wrap; /* 允許換行 */
-    line-height: 1.2; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
     
+    line-height: 1.2; 
     height: 30px; 
     width: 100%; 
     border-bottom: 1px dashed #eee; 
@@ -432,7 +434,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .app-footer a:hover { color: #E1306C; }
 
-/* 【修正】IG Icon 大小鎖定為 16px */
 .ig-icon { width: 16px !important; height: 16px !important; fill: currentColor; }
 
 ::-webkit-scrollbar { height: 4px; }
