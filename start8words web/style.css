@@ -165,9 +165,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: flex-start;
     
-    /* 【定位重點】：88px 讓文字對齊天干地支 */
-    /* 計算：TopInfo(35) + Title(33) + ShiShen(20) = 88px */
-    padding-top: 88px; 
+    /* 【定位重點】：90px 讓「原局」文字頂部對齊「天干」頂部 */
+    /* 計算基礎：TopInfo(35) + Title(33) + ShiShen(18) + Gap = ~90px */
+    padding-top: 90px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -199,9 +199,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【定位重點】：108px 讓按鈕對齊十二長生 */
-    /* 計算：Gan(33) + Zhi(33) + Canggan(60) - 調整值 */
-    margin-top: 108px; 
+    /* 【定位重點】：135px 讓按鈕對齊十二長生 */
+    /* 計算基礎：Gan(32) + Zhi(38) + Canggan(60) + Gaps = ~135px */
+    margin-top: 135px; 
     margin-right: -1px;
 }
 
@@ -221,7 +221,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     flex-shrink: 0;
 }
 
-/* 頂部資訊區 (對齊眼仔) */
+/* 頂部資訊區 */
 .top-info {
     min-height: 35px;
     display: flex;
@@ -261,19 +261,20 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     flex-grow: 1; /* 重要：讓內容撐滿柱子高度 */
 }
 
+/* 十神、天干、地支的高度固定，確保對齊 */
 .shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
-/* 藏干區：固定高度以對齊十二長生 */
+/* 藏干區：固定高度 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     width: 100%;
-    min-height: 60px; /* 固定高度 */
+    min-height: 60px; /* 固定高度，對齊下方的長生 */
     justify-content: flex-start;
     margin-bottom: 5px;
     padding-top: 5px;
@@ -333,9 +334,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     flex-direction: column;
     align-items: center;
     width: 100%;
-    padding-bottom: 8px;
+    padding-bottom: 2px;
     background-color: transparent;
-    gap: 2px;
+    gap: 1px;
 }
 .shensha-list.hidden { display: none; }
 .shensha-tag {
@@ -383,3 +384,33 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .chart-info { flex: 1; }
 .chart-name { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 4px; }
 .chart-tags span { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+.chart-detail { font-size: 12px; color: #666; margin-top: 2px; }
+.delete-btn { padding: 6px 10px; background: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
+
+/* --- Footer --- */
+.app-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    width: 100%;
+}
+.app-footer a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+.app-footer a:hover { color: #E1306C; }
+
+/* 【修正】IG Icon 大小鎖定為 16px */
+.ig-icon { width: 16px !important; height: 16px !important; fill: currentColor; }
+
+::-webkit-scrollbar { height: 4px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
