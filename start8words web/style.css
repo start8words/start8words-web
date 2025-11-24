@@ -263,25 +263,29 @@ button.map-btn {
     border: 1px solid var(--border);
     background: var(--panel-bg);     
 }
-
+/* 左側「原局」標籤容器 */
 .group-label {
-    /* 保持原有的 Flex 設定 */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* 讓內容從頂部開始 */
-    padding-top: 40px; /* 調整這數字，讓「原局」二字大概在干支中間 */
+    justify-content: flex-start; /* 【關鍵】取消置中，改為從上往下排 */
     
-    /* 其他樣式保持不變... */
+    /* 【關鍵】用 padding-top 精準控制位置
+       這個數值(75px)是為了讓文字剛好落在 天干 與 地支 之間。
+       如果覺得太高或太低，微調這個數字即可。 */
+    padding-top: 75px; 
+    
     writing-mode: vertical-rl;
     text-align: center;
     font-size: 12px;
     color: #999;
     font-weight: bold;
     letter-spacing: 2px;
+    
     border-right: 1px solid #eee;
     margin-right: 2px;
-    width: 20px;
+    width: 24px; /* 稍微加寬一點點，避免按鈕被擠壓 */
+    flex-shrink: 0; /* 防止被壓縮 */
 }
 
 .pillar.main {
@@ -665,7 +669,7 @@ button.map-btn {
 }
 /* --- 新增：神煞系統樣式 --- */
 
-/* 1. 神煞列表容器 */
+/* 神煞列表容器 */
 .shensha-list {
     display: flex; /* 預設顯示 (Flex布局) */
     flex-wrap: wrap;
@@ -678,12 +682,12 @@ button.map-btn {
     transition: all 0.3s ease;
 }
 
-/* 2. 隱藏狀態 */
+/* 隱藏狀態 */
 .shensha-list.hidden {
     display: none;
 }
 
-/* 3. 單個神煞標籤 */
+/* 單個神煞標籤 */
 .shensha-tag {
     font-size: 11px;
     color: #555; /* 統一顏色 */
@@ -695,26 +699,30 @@ button.map-btn {
     transform: scale(0.95); /* 稍微縮小一點以適應手機 */
 }
 
-/* 4. 原局標籤內的開關按鈕 */
+/* 隱藏/展開按鈕 */
 .shensha-toggle-btn {
     cursor: pointer;
     font-size: 12px;
     color: var(--active-border);
     border: 1px solid var(--active-border);
-    border-radius: 50%;
+    
+    /* 【關鍵】解決變形問題：強制設定寬高，並不允許壓縮 */
     width: 18px;
     height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 50%;
+    
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【關鍵修改】用 margin-top 把按鈕硬推下去 
-       計算邏輯：TopInfo + Title + Gan + Zhi + Canggan(60px) ≈ 160px-180px
-       試試看 165px，應該會剛好對齊十二長生 */
-    margin-top: 165px; 
-    margin-right: -2px; /* 微調水平位置 */
+    /* 位置調整：放在文字的「正下方」(因為是直排，所以是左側或下方)
+       由於上面的 padding-top 已經定位了文字，這裡給一點 margin 讓它跟文字分開 */
+    margin-top: 8px; 
+    margin-right: -1px; /* 微調水平置中 */
 }
 
 .shensha-toggle-btn:hover {
@@ -747,34 +755,53 @@ button.map-btn {
    新增：神煞系統與底部固定區塊樣式
    ========================================= */
 
-/* 包裹長生和神煞的容器 */
+/* 底部絕對定位容器 (包裹長生+神煞) */
 .pillar-bottom-section {
     width: 100%;
     display: flex;
-    flex-direction: column; /* 垂直排列 */
-    margin-top: 5px;        /* 與藏干保持距離 */
+    flex-direction: column;
+    margin-top: 5px;
+    
+    /* 【關鍵】整個底部區塊加上淺灰色背景 */
+    background-color: #fafafa; 
+    
+    /* 確保背景色填滿底部圓角 */
+    border-radius: 0 0 6px 6px; 
+    
+    /* 上方加一條分隔線，區隔藏干與底部區域 */
+    border-top: 1px dashed #eee; 
+    
+    /* 確保它會撐開高度 */
+    flex-grow: 1;
 }
 
-/* 十二長生 (固定在神煞上方) */
+/* 十二長生 */
 .zhangsheng-text {
     position: relative;
     width: 100%;
     text-align: center;
     font-size: 12px;
     color: #888;
-    padding: 4px 0;
-    border-top: 1px dashed #eee; /* 分隔線 */
-    background-color: #fff;
+    padding: 6px 0; /* 稍微增加舒適度 */
+    
+    /* 【關鍵】移除這裡的 border-top，因為已經移到 container 去了 */
+    border-top: none; 
+    background-color: transparent; /* 透明，顯示父容器的灰色 */
 }
-/* 神煞列表 (位於長生下方) */
+/* 神煞列表 */
 .shensha-list {
     display: flex;
-    flex-direction: column; /* 垂直堆疊 */
+    flex-direction: column;
     align-items: center;
     width: 100%;
-    background-color: #fafafa;
+    padding-bottom: 8px;
     
-    /* 動畫過渡效果 (選用) */
+    /* 【關鍵】背景設為透明 (或是同樣的灰色) */
+    background-color: transparent;
+    
+    /* 【關鍵】移除虛線！解決「驛馬」上面的線條問題 */
+    border-top: none; 
+    
     transition: all 0.3s ease;
 }
 
@@ -782,6 +809,7 @@ button.map-btn {
 .shensha-list.hidden {
     display: none;
 }
+
 
 
 
