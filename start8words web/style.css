@@ -165,9 +165,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: flex-start;
     
-    /* 【定位重點】：90px 讓「原局」文字頂部對齊「天干」頂部 */
-    /* 計算基礎：TopInfo(35) + Title(33) + ShiShen(18) + Gap = ~90px */
-    padding-top: 90px; 
+    /* 【定位重點】：65px 讓「原局」文字上移，對齊天干 */
+    /* 計算基礎：TopInfo(35) + Title(33) - 些微調整 = ~65px */
+    padding-top: 65px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -199,9 +199,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【定位重點】：135px 讓按鈕對齊十二長生 */
-    /* 計算基礎：Gan(32) + Zhi(38) + Canggan(60) + Gaps = ~135px */
-    margin-top: 135px; 
+    /* 【定位重點】：110px 讓按鈕對齊十二長生 */
+    margin-top: 110px; 
     margin-right: -1px;
 }
 
@@ -217,7 +216,11 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border-radius: 6px;
     position: relative;
     overflow: hidden;
+    
+    /* 【重要修正】強制最小高度，解決空大運塌陷 */
     height: auto; 
+    min-height: 380px; 
+    
     flex-shrink: 0;
 }
 
@@ -284,10 +287,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .canggan-char { font-weight: bold; }
 .canggan-shishen { color: #777; font-size: 12px; }
 
-/* 眼仔按鈕 */
+/* 【修正】眼仔按鈕：往上移，避免壓到標題 */
 .eye-btn {
     position: absolute;
-    top: 22px; 
+    top: 6px; /* 改為 6px，放在最頂部空白處 */
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
@@ -310,6 +313,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     display: flex;
     flex-direction: column;
     flex-grow: 1; /* 【重要】填滿剩餘高度 */
+    
+    /* 【修正】增加最小高度，確保空柱子也有灰色底 */
+    min-height: 120px; 
+    
     background-color: #fafafa;
     border-top: 1px dashed #eee;
     border-radius: 0 0 6px 6px;
@@ -360,7 +367,24 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
 .pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
-.rail-info { font-size: 11px; color: #666; text-align: center; white-space: pre-line; line-height: 1.1; height: 26px; display: flex; align-items: flex-end; justify-content: center; width: 100%; border-bottom: 1px dashed #eee; margin-bottom: 3px; padding-bottom: 1px; }
+
+/* 【修正】Rail Info：強制換行，改回兩行顯示 */
+.rail-info { 
+    font-size: 11px; 
+    color: #666; 
+    text-align: center; 
+    
+    /* 移除 Flex，改用 Block 讓 \n 生效 */
+    display: block; 
+    white-space: pre-wrap; /* 允許換行 */
+    line-height: 1.2; 
+    
+    height: 30px; 
+    width: 100%; 
+    border-bottom: 1px dashed #eee; 
+    margin-bottom: 3px; 
+    padding-top: 2px;
+}
 .rail-row-inner { display: flex; align-items: baseline; gap: 2px; }
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
