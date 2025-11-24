@@ -380,17 +380,16 @@ function getShiShen(targetGan, isDayPillarStem) {
 window.toggleShenShaAll = function() {
     window.isShenShaVisible = !window.isShenShaVisible;
     
-    // 1. 切換顯示狀態
-    const lists = document.querySelectorAll('.shensha-list');
-    lists.forEach(el => {
+    // 改為選取新的底部容器 class
+    const bottoms = document.querySelectorAll('.pillar-bottom-section');
+    bottoms.forEach(el => {
         if (window.isShenShaVisible) el.classList.remove('hidden');
         else el.classList.add('hidden');
     });
 
-    // 2. 更新按鈕圖標
     const btn = document.getElementById('btnToggleShenSha');
     if(btn) {
-        btn.innerText = window.isShenShaVisible ? '▼' : '◀'; // 或用其他符號
+        btn.innerText = window.isShenShaVisible ? '▼' : '◀';
     }
 }
 // --- 十二長生計算輔助函數 ---
@@ -780,6 +779,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
