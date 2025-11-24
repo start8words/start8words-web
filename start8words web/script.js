@@ -9,6 +9,7 @@ window.isInputsCollapsed = false;
 window.originSolar = null;
 window.currentBaziData = null;
 window.currentDocId = null;
+window.isShenShaVisible = true; // 預設顯示神煞
 
 // ==========================================
 // 2. 頁面載入初始化
@@ -376,6 +377,22 @@ function getShiShen(targetGan, isDayPillarStem) {
     if ((targetEl + 2) % 5 === dayEl) return samePol ? '七殺' : '正官';
     return '';
 }
+window.toggleShenShaAll = function() {
+    window.isShenShaVisible = !window.isShenShaVisible;
+    
+    // 1. 切換顯示狀態
+    const lists = document.querySelectorAll('.shensha-list');
+    lists.forEach(el => {
+        if (window.isShenShaVisible) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+    });
+
+    // 2. 更新按鈕圖標
+    const btn = document.getElementById('btnToggleShenSha');
+    if(btn) {
+        btn.innerText = window.isShenShaVisible ? '▼' : '◀'; // 或用其他符號
+    }
+}
 // --- 十二長生計算輔助函數 ---
 function getZhangSheng(gan, zhi) {
     if (!gan || !zhi) return '';
@@ -455,6 +472,7 @@ function centerActiveItem(container) {
     container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
 }
 
+// --- 修改後的 renderMainPillar ---
 function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = false) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -472,27 +490,66 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
     });
 
-    // 3. 【最終修正版】計算十二長生
+    // 3. 計算十二長生
     let zhangshengText = '';
-    // 確保有日主 (state.baseDayGan) 和該柱地支 (zhi)
     if (state.baseDayGan && zhi) {
         zhangshengText = getZhangSheng(state.baseDayGan, zhi);
     }
 
-    // 4. 組裝 HTML
+    // 4. 【新增】計算神煞
+    // 為了計算神煞，我們需要日干(state.baseDayGan)、日支、年支
+    // 我們可以從 state.birthSolar 反推，或者從傳入的數據判斷
+    // 因為 renderMainPillar 是通用函數，有時候是渲染原局，有時候是流年
+    // 這裡我們簡單處理：如果 state 有原局數據，就用來算神煞
+    
+    let shenshaHtml = '';
+    // 確保有足夠資訊計算神煞 (需要日干、日支、年支)
+    // 注意：如果是「原局」渲染，我們可以直接取用。如果是「流年」，也通常以原局日干為主。
+    if (state.baseDayGan && state.birthSolar) {
+        // 獲取原局八字物件以取得年支/日支
+        const baziObj = state.birthSolar.getLunar().getEightChar();
+        const dGan = baziObj.getDayGan();
+        const dZhi = baziObj.getDayZhi();
+        const yZhi = baziObj.getYearZhi();
+        
+        const shenshaList = getShenSha(zhi, dGan, dZhi, yZhi);
+        
+        // 產生神煞 HTML
+        const visibilityClass = window.isShenShaVisible ? '' : 'hidden';
+        let tags = shenshaList.map(s => `<span class="shensha-tag">${s}</span>`).join('');
+        // 如果沒有神煞，保留一個空 div 或顯示「-」
+        if(shenshaList.length === 0) tags = ''; // 或顯示空
+        
+        shenshaHtml = `<div class="shensha-list ${visibilityClass}">${tags}</div>`;
+    }
+
+    // 5. 組裝 HTML
     const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
-    
-    // 顯示標籤
     const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
 
+    // 注意：將 shenshaHtml 放在 contentHtml 的最後面 (在十二長生下方，或者上方)
+    // 根據你的需求：放在十二長生下方 -> 由於十二長生我是用 absolute bottom 定位的
+    // 如果要把神煞放在最底下，我們需要調整一下結構。
+    // 建議：將十二長生移入 flex flow 中，或者將神煞放在 pillarContent 的最底部
+    
+    // 【調整結構以容納神煞】：
+    // 這裡我們稍微改一下 CSS 結構，不使用 absolute positioning for zhangsheng (如果之前是absolute的話)
+    // 查看你的 CSS，.zhangsheng-text 是 absolute bottom: 0。
+    // 為了讓神煞能排在它下面，或者一起排版，我們在內容底部加入 padding 讓神煞顯示
+    // 或者：直接把神煞放在 .zhangsheng-text 下面？不，這樣會重疊。
+    
+    // **修正方案**：我們把 shenshaHtml 放在 pillarContent 的最後，並調整 CSS 讓 zhangsheng 不再 absolute，或是調整 margin。
+    // 但為了不破壞你原本的 layout，我建議把神煞放在 "canggan-box" 下面，"zhangsheng-text" 上面。
+    // 或者，神煞放在最底，zhangsheng 往上推。
+    
+    // 讓我們嘗試放在 canggan-box 下方：
     const contentHtml = `
-        <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-            <div class="${shishenClass}">${shishen}</div>
+        <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%; padding-bottom: 25px;"> <div class="${shishenClass}">${shishen}</div>
             <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
             <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
             <div class="canggan-box">${cangganHtml}</div>
-            ${zsHtml} </div>
+            ${shenshaHtml} ${zsHtml} </div>
     `;
     
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
@@ -723,6 +780,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
