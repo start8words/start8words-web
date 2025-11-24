@@ -336,14 +336,18 @@ button.map-btn {
     font-weight: 500;
 }
 
-.title-text { font-size: 13px; color: #999; margin-bottom: 2px; font-weight: bold; }
-.shishen-top {
-    font-size: 13px;
-    color: var(--color-shishen);
-    height: 18px;
-    margin-bottom: 2px;
-    font-weight: bold;
-    white-space: nowrap;
+.title-text { 
+    font-size: 13px; 
+    color: #333; 
+    font-weight: bold; 
+    margin-bottom: 2px; 
+    
+    /* 新增：灰色背景條與圓角 */
+    background-color: #f0f0f0; 
+    width: 100%; 
+    padding: 6px 0; 
+    border-bottom: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
 }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 
@@ -603,21 +607,20 @@ button.map-btn {
 
 /* --- 修改後：十二長生樣式 (文字版 + 虛線) --- */
 .zhangsheng-text {
-    position: absolute;     /* 【關鍵】絕對定位 */
-    bottom: 0;              /* 強制貼在底部 */
-    left: 0;                /* 左邊對齊 */
-    width: 100%;            /* 寬度撐滿整個格子 */
+    /* 修改：取消 absolute，改為 relative */
+    position: relative;     
+    width: 100%;
     
     font-size: 12px;
     color: #888;
     text-align: center;
     
-    padding-top: 6px;       /* 調整虛線與文字的距離 */
-    padding-bottom: 6px;    /* 調整文字與底部的距離 */
+    padding-top: 6px;       
+    padding-bottom: 6px;    
     
-    border-top: 1px dashed #eee; /* 虛線分隔 */
-    background-color: #fff;      /* 背景白色，避免與上方內容重疊時變透明 */
-    border-radius: 0 0 6px 6px;  /* 如果格子有圓角，這裡也要修圓角 */
+    border-top: 1px dashed #eee; 
+    background-color: transparent; /* 背景改透明 */
+    border-radius: 0;
     font-weight: normal;
 }
 /* --- 新增：神煞系統樣式 --- */
@@ -676,10 +679,98 @@ button.map-btn {
 
 /* 調整 pillar.main 的 padding，預留空間給神煞 */
 .pillar.main {
-    padding-bottom: 5px; /* 稍微減少底部留白，因為內容變多了 */
-    height: auto; /* 允許高度自動撐開 */
-    min-height: 240px; /* 稍微加高最小高度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px; 
+    min-width: 90px;
+    
+    /* 修改：加高高度 */
+    min-height: 340px; 
+    height: auto;
+    
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 5px 0;
+    
+    /* 必須保留 relative */
+    position: relative; 
+    flex-shrink: 0;
+    
+    /* 修改：底部留白加多，預防內容被遮住 */
+    padding-bottom: 110px; 
+    overflow: hidden; 
 }
+/* =========================================
+   新增：神煞系統與底部固定區塊樣式
+   ========================================= */
+
+/* 1. 底部絕對定位容器 (包裹長生+神煞) */
+.pillar-bottom-section {
+    position: absolute; /* 絕對定位，釘死在底部 */
+    bottom: 0;          
+    left: 0;
+    width: 100%;
+    
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    justify-content: flex-end;
+    
+    background-color: #fff; /* 白底，遮住下面的邊框 */
+    transition: opacity 0.3s ease;
+    z-index: 5; /* 確保在最上層 */
+}
+
+/* 隱藏狀態 */
+.pillar-bottom-section.hidden {
+    display: none;
+}
+
+/* 2. 神煞列表 (垂直堆疊) */
+.shensha-list {
+    display: flex;
+    flex-direction: column; /* 上下堆疊 */
+    align-items: center;
+    gap: 0;                 /* 緊密排列 */
+    width: 100%;
+    padding-bottom: 8px;    /* 底部留空隙 */
+    background-color: #fafafa; /* 微微灰色背景 */
+    border-top: 1px dotted #e0e0e0;
+}
+
+/* 3. 神煞標籤 (大字體) */
+.shensha-tag {
+    font-size: 14px;  /* 字體較大 */
+    color: #333;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+    padding: 2px 0;
+}
+
+/* 4. 原局標籤內的開關按鈕 */
+.shensha-toggle-btn {
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+    color: var(--active-border);
+    border: 1px solid var(--active-border);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    writing-mode: horizontal-tb;
+}
+
+.shensha-toggle-btn:hover {
+    background-color: var(--active-border);
+    color: white;
+}
+
 
 
 
