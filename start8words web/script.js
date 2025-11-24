@@ -522,33 +522,31 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         shenshaHtml = `<div class="shensha-list ${visibilityClass}">${tags}</div>`;
     }
 
+    // ... (前面代碼不變) ...
+
     // 5. 組裝 HTML
     const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
     const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
 
-    // 注意：將 shenshaHtml 放在 contentHtml 的最後面 (在十二長生下方，或者上方)
-    // 根據你的需求：放在十二長生下方 -> 由於十二長生我是用 absolute bottom 定位的
-    // 如果要把神煞放在最底下，我們需要調整一下結構。
-    // 建議：將十二長生移入 flex flow 中，或者將神煞放在 pillarContent 的最底部
-    
-    // 【調整結構以容納神煞】：
-    // 這裡我們稍微改一下 CSS 結構，不使用 absolute positioning for zhangsheng (如果之前是absolute的話)
-    // 查看你的 CSS，.zhangsheng-text 是 absolute bottom: 0。
-    // 為了讓神煞能排在它下面，或者一起排版，我們在內容底部加入 padding 讓神煞顯示
-    // 或者：直接把神煞放在 .zhangsheng-text 下面？不，這樣會重疊。
-    
-    // **修正方案**：我們把 shenshaHtml 放在 pillarContent 的最後，並調整 CSS 讓 zhangsheng 不再 absolute，或是調整 margin。
-    // 但為了不破壞你原本的 layout，我建議把神煞放在 "canggan-box" 下面，"zhangsheng-text" 上面。
-    // 或者，神煞放在最底，zhangsheng 往上推。
-    
-    // 讓我們嘗試放在 canggan-box 下方：
+    // 判斷當前是否應該顯示 (用於初始化時設定 class)
+    const visibilityClass = window.isShenShaVisible ? '' : 'hidden';
+
+    // 【關鍵修改】：建立一個 footer 包裹 長生 + 神煞
+    // 這樣它們就會一起被絕對定位在底部，並且一起被隱藏
+    const footerHtml = `
+        <div class="pillar-bottom-section ${visibilityClass}">
+            ${zsHtml}       ${shenshaHtml}  </div>
+    `;
+
     const contentHtml = `
-        <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%; padding-bottom: 25px;"> <div class="${shishenClass}">${shishen}</div>
+        <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+            <div class="${shishenClass}">${shishen}</div>
             <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
             <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
             <div class="canggan-box">${cangganHtml}</div>
-            ${shenshaHtml} ${zsHtml} </div>
+            
+            ${footerHtml} </div>
     `;
     
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
@@ -779,6 +777,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
