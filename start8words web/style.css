@@ -336,18 +336,31 @@ button.map-btn {
     font-weight: 500;
 }
 
-.title-text { 
-    font-size: 13px; 
-    color: #333; 
-    font-weight: bold; 
-    margin-bottom: 2px; 
-    
-    /* 新增：灰色背景條與圓角 */
-    background-color: #f0f0f0; 
-    width: 100%; 
-    padding: 6px 0; 
+/* 通用標題基礎 (不帶背景) */
+.title-text {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: #333;
+    width: 100%;
+    text-align: center; /* 確保文字水平置中 */
+}
+
+/* 只在「主顯示區」的柱子標題加灰色背景 */
+.pillar.main .title-text {
+    background-color: #f0f0f0;
+    padding: 6px 0;
     border-bottom: 1px solid #ddd;
     border-radius: 4px 4px 0 0;
+}
+
+/* 確保下方的 Rail (大運/流年) 沒有背景 */
+.pillar.rail .title-text {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 5px;
+    color: #999; /* 稍微淡一點 */
 }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 
@@ -369,23 +382,40 @@ button.map-btn {
 
 .eye-btn {
     position: absolute;
-    top: -12px;
+    /* 調整 Top 讓它位於「歲數/年份」文字的中間或上方 */
+    top: 5px; 
+    
+    /* 水平置中 */
     left: 50%;
     transform: translateX(-50%);
+    
     background: #fff;
     border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     border: 1px solid #ccc;
     z-index: 20;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
-
+/* 調整頂部資訊區塊，為眼仔留位 */
+.top-info {
+    min-height: 28px; /* 確保有足夠高度放眼仔 */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* 文字靠下 */
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    color: #666;
+    padding-bottom: 4px;
+    padding-top: 10px; /* 頂部留空給眼仔 */
+}
 .lucky-mask {
     position: absolute;
     top: 32px;
@@ -676,99 +706,66 @@ button.map-btn {
     background-color: var(--active-border);
     color: white;
 }
-
-/* 調整 pillar.main 的 padding，預留空間給神煞 */
 .pillar.main {
+    /* 移除 min-height，讓它隨內容縮放 */
+    height: auto; 
+    min-height: auto; 
+    
+    /* 移除 padding-bottom，因為不再需要預留絕對定位的空間 */
+    padding-bottom: 10px; 
+    
     display: flex;
     flex-direction: column;
     align-items: center;
+    
+    /* 保持原有樣式 */
     width: 90px; 
     min-width: 90px;
-    
-    /* 修改：加高高度 */
-    min-height: 340px; 
-    height: auto;
-    
     background: #fff;
     border: 1px solid #eee;
     border-radius: 6px;
-    padding: 5px 0;
-    
-    /* 必須保留 relative */
-    position: relative; 
+    position: relative;
     flex-shrink: 0;
-    
-    /* 修改：底部留白加多，預防內容被遮住 */
-    padding-bottom: 110px; 
-    overflow: hidden; 
+    overflow: hidden;
 }
 /* =========================================
    新增：神煞系統與底部固定區塊樣式
    ========================================= */
 
-/* 1. 底部絕對定位容器 (包裹長生+神煞) */
+/* 包裹長生和神煞的容器 */
 .pillar-bottom-section {
-    position: absolute; /* 絕對定位，釘死在底部 */
-    bottom: 0;          
-    left: 0;
     width: 100%;
-    
     display: flex;
     flex-direction: column; /* 垂直排列 */
-    justify-content: flex-end;
-    
-    background-color: #fff; /* 白底，遮住下面的邊框 */
-    transition: opacity 0.3s ease;
-    z-index: 5; /* 確保在最上層 */
+    margin-top: 5px;        /* 與藏干保持距離 */
 }
 
-/* 隱藏狀態 */
-.pillar-bottom-section.hidden {
-    display: none;
-}
-
-/* 2. 神煞列表 (垂直堆疊) */
-.shensha-list {
-    display: flex;
-    flex-direction: column; /* 上下堆疊 */
-    align-items: center;
-    gap: 0;                 /* 緊密排列 */
-    width: 100%;
-    padding-bottom: 8px;    /* 底部留空隙 */
-    background-color: #fafafa; /* 微微灰色背景 */
-    border-top: 1px dotted #e0e0e0;
-}
-
-/* 3. 神煞標籤 (大字體) */
-.shensha-tag {
-    font-size: 14px;  /* 字體較大 */
-    color: #333;
-    font-weight: 500;
+/* 十二長生 (固定在神煞上方) */
+.zhangsheng-text {
+    position: relative;
     width: 100%;
     text-align: center;
-    padding: 2px 0;
-}
-
-/* 4. 原局標籤內的開關按鈕 */
-.shensha-toggle-btn {
-    cursor: pointer;
     font-size: 12px;
-    margin-top: 5px;
-    color: var(--active-border);
-    border: 1px solid var(--active-border);
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
+    color: #888;
+    padding: 4px 0;
+    border-top: 1px dashed #eee; /* 分隔線 */
+    background-color: #fff;
+}
+/* 神煞列表 (位於長生下方) */
+.shensha-list {
     display: flex;
+    flex-direction: column; /* 垂直堆疊 */
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    writing-mode: horizontal-tb;
+    width: 100%;
+    background-color: #fafafa;
+    
+    /* 動畫過渡效果 (選用) */
+    transition: all 0.3s ease;
 }
 
-.shensha-toggle-btn:hover {
-    background-color: var(--active-border);
-    color: white;
+/* 隱藏神煞時的樣式 */
+.shensha-list.hidden {
+    display: none;
 }
 
 
