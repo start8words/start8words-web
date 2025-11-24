@@ -648,7 +648,81 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
+// --- 新增：神煞計算核心邏輯 ---
+function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
+    if (!pillarZhi || !dayGan) return [];
+    
+    const list = [];
+    const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    
+    // 1. 天乙貴人 (以日干為主，口訣：甲戊庚牛羊，乙己鼠猴鄉...)
+    const nobleMap = {
+        '甲': ['丑','未'], '戊': ['丑','未'], '庚': ['丑','未'],
+        '乙': ['子','申'], '己': ['子','申'],
+        '丙': ['亥','酉'], '丁': ['亥','酉'],
+        '壬': ['巳','卯'], '癸': ['巳','卯'],
+        '辛': ['午','寅']
+    };
+    if (nobleMap[dayGan] && nobleMap[dayGan].includes(pillarZhi)) list.push('天乙');
 
+    // 2. 驛馬 (以年支 或 日支查，申子辰馬在寅...)
+    // 簡單判斷：申子辰->寅, 寅午戌->申, 亥卯未->巳, 巳酉丑->亥
+    const checkYiMa = (baseZhi) => {
+        if (['申','子','辰'].includes(baseZhi) && pillarZhi === '寅') return true;
+        if (['寅','午','戌'].includes(baseZhi) && pillarZhi === '申') return true;
+        if (['亥','卯','未'].includes(baseZhi) && pillarZhi === '巳') return true;
+        if (['巳','酉','丑'].includes(baseZhi) && pillarZhi === '亥') return true;
+        return false;
+    };
+    if (checkYiMa(dayZhi) || checkYiMa(yearZhi)) list.push('驛馬');
+
+    // 3. 桃花 (以年支 或 日支查，申子辰在酉...)
+    const checkTaoHua = (baseZhi) => {
+        if (['申','子','辰'].includes(baseZhi) && pillarZhi === '酉') return true;
+        if (['寅','午','戌'].includes(baseZhi) && pillarZhi === '卯') return true;
+        if (['亥','卯','未'].includes(baseZhi) && pillarZhi === '子') return true;
+        if (['巳','酉','丑'].includes(baseZhi) && pillarZhi === '午') return true;
+        return false;
+    };
+    if (checkTaoHua(dayZhi) || checkTaoHua(yearZhi)) list.push('桃花');
+
+    // 4. 文昌貴人 (以日干查，甲巳乙午丙戊申...)
+    const wenChangMap = {'甲':'巳', '乙':'午', '丙':'申', '戊':'申', '丁':'酉', '己':'酉', '庚':'亥', '辛':'子', '壬':'寅', '癸':'卯'};
+    if (wenChangMap[dayGan] === pillarZhi) list.push('文昌');
+
+    // 5. 羊刃 (以日干查，甲卯乙寅...) *這裡採陽干帝旺，陰干冠帶或帝旺的通俗用法，此處暫用帝旺*
+    const yangRenMap = {'甲':'卯', '乙':'寅', '丙':'午', '戊':'午', '丁':'巳', '己':'巳', '庚':'酉', '辛':'申', '壬':'子', '癸':'亥'};
+    // 注意：陰干羊刃有爭議，此處使用常見對沖定義 (如乙祿在卯，刃在寅)
+    if (yangRenMap[dayGan] === pillarZhi) list.push('羊刃');
+
+    // 6. 祿神 (以日干查，甲祿在寅...)
+    const luMap = {'甲':'寅', '乙':'卯', '丙':'巳', '戊':'巳', '丁':'午', '己':'午', '庚':'申', '辛':'酉', '壬':'亥', '癸':'子'};
+    if (luMap[dayGan] === pillarZhi) list.push('祿神');
+
+    // 7. 空亡 (以日柱查，旬空)
+    // 計算日柱的旬空：(日支數 - 日干數) 如果小於0加12。
+    // 甲(0)子(0) -> 0 -> 戌亥空
+    const GAN_IDX = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ZHI_IDX = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    
+    if (dayGan && dayZhi) {
+        const gIdx = GAN_IDX.indexOf(dayGan);
+        const zIdx = ZHI_IDX.indexOf(dayZhi);
+        const diff = zIdx - gIdx;
+        const empty1 = (diff - 2 + 12) % 12; // 空亡支1
+        const empty2 = (diff - 1 + 12) % 12; // 空亡支2
+        // 因為 (Zhi - Gan) 得到的是旬首的前兩位是空亡
+        // 修正算法：旬首是 (Zhi - Gan)，該旬結束後的兩位是空亡
+        // 簡單算法：(Zhi - Gan + 10) % 12 和 (Zhi - Gan + 11) % 12
+        const k1 = (zIdx - gIdx + 10 + 12) % 12;
+        const k2 = (zIdx - gIdx + 11 + 12) % 12;
+        
+        const pZhiIdx = ZHI_IDX.indexOf(pillarZhi);
+        if (pZhiIdx === k1 || pZhiIdx === k2) list.push('空亡');
+    }
+
+    return list;
+}
 
 
 
