@@ -265,18 +265,23 @@ button.map-btn {
 }
 
 .group-label {
+    /* 保持原有的 Flex 設定 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* 讓內容從頂部開始 */
+    padding-top: 40px; /* 調整這數字，讓「原局」二字大概在干支中間 */
+    
+    /* 其他樣式保持不變... */
     writing-mode: vertical-rl;
     text-align: center;
     font-size: 12px;
     color: #999;
     font-weight: bold;
     letter-spacing: 2px;
-    padding: 0 2px;
     border-right: 1px solid #eee;
     margin-right: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 20px;
 }
 
 .pillar.main {
@@ -371,8 +376,17 @@ button.map-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     width: 100%;
+    
+    /* 【關鍵修改】設定最小高度！
+       一行藏干約 18px，3行約 54px，加上 margin 抓 60px。
+       這樣無論藏干有幾個，這個盒子的高度都一樣，
+       保證下面的十二長生起點一致。 */
+    min-height: 60px; 
+    justify-content: flex-start; /* 內容從上開始排 */
+    
+    margin-bottom: 5px;
     padding-top: 5px;
     border-top: 1px dashed #eee;
 }
@@ -382,13 +396,11 @@ button.map-btn {
 
 .eye-btn {
     position: absolute;
-    /* 調整 Top 讓它位於「歲數/年份」文字的中間或上方 */
-    top: 5px; 
+    /* 【關鍵修改】原本是 top: 5px，改大數字讓它往下移，貼近「時柱」 */
+    top: 22px; 
     
-    /* 水平置中 */
     left: 50%;
     transform: translateX(-50%);
-    
     background: #fff;
     border-radius: 50%;
     width: 20px;
@@ -402,19 +414,17 @@ button.map-btn {
     z-index: 20;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
-/* 調整頂部資訊區塊，為眼仔留位 */
+/* 配合眼仔調整頂部資訊區的高度 */
 .top-info {
-    min-height: 28px; /* 確保有足夠高度放眼仔 */
+    min-height: 35px; /* 稍微加高，容納下移的眼仔 */
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* 文字靠下 */
+    justify-content: flex-start; /* 文字靠上 */
     align-items: center;
     width: 100%;
-    text-align: center;
     font-size: 11px;
     color: #666;
-    padding-bottom: 4px;
-    padding-top: 10px; /* 頂部留空給眼仔 */
+    padding-top: 2px;
 }
 .lucky-mask {
     position: absolute;
@@ -689,17 +699,22 @@ button.map-btn {
 .shensha-toggle-btn {
     cursor: pointer;
     font-size: 12px;
-    margin-top: 5px; /* 在直排文字下方 */
     color: var(--active-border);
     border: 1px solid var(--active-border);
     border-radius: 50%;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    writing-mode: horizontal-tb; /* 強制按鈕內文字橫向 */
+    writing-mode: horizontal-tb;
+    
+    /* 【關鍵修改】用 margin-top 把按鈕硬推下去 
+       計算邏輯：TopInfo + Title + Gan + Zhi + Canggan(60px) ≈ 160px-180px
+       試試看 165px，應該會剛好對齊十二長生 */
+    margin-top: 165px; 
+    margin-right: -2px; /* 微調水平位置 */
 }
 
 .shensha-toggle-btn:hover {
@@ -767,6 +782,7 @@ button.map-btn {
 .shensha-list.hidden {
     display: none;
 }
+
 
 
 
