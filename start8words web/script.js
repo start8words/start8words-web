@@ -380,16 +380,18 @@ function getShiShen(targetGan, isDayPillarStem) {
 window.toggleShenShaAll = function() {
     window.isShenShaVisible = !window.isShenShaVisible;
     
-    // 改為選取新的底部容器 class
-    const bottoms = document.querySelectorAll('.pillar-bottom-section');
-    bottoms.forEach(el => {
+    // 【修改】只切換 .shensha-list (神煞列表)，不切換整個底部
+    // 這樣十二長生就會保留
+    const lists = document.querySelectorAll('.shensha-list');
+    lists.forEach(el => {
         if (window.isShenShaVisible) el.classList.remove('hidden');
         else el.classList.add('hidden');
     });
 
+    // 更新按鈕圖標
     const btn = document.getElementById('btnToggleShenSha');
     if(btn) {
-        btn.innerText = window.isShenShaVisible ? '▼' : '◀';
+        btn.innerText = window.isShenShaVisible ? '▼' : '◀'; // 或用其他符號表示展開/收起
     }
 }
 // --- 十二長生計算輔助函數 ---
@@ -522,21 +524,26 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         shenshaHtml = `<div class="shensha-list ${visibilityClass}">${tags}</div>`;
     }
 
-    // ... (前面代碼不變) ...
+    // ... (前段代碼不變) ...
 
     // 5. 組裝 HTML
-    const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
+    // 這裡我們把「眼仔」放在最外層，利用 CSS 的 absolute 進行定位
     const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
+    const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
+    
+    // 十二長生 (永遠顯示)
     const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
-
-    // 判斷當前是否應該顯示 (用於初始化時設定 class)
+    
+    // 神煞列表 (根據變數決定是否隱藏)
     const visibilityClass = window.isShenShaVisible ? '' : 'hidden';
+    const shenshaContainerHtml = `<div class="shensha-list ${visibilityClass}">${shenshaHtml}</div>`;
 
-    // 【關鍵修改】：建立一個 footer 包裹 長生 + 神煞
-    // 這樣它們就會一起被絕對定位在底部，並且一起被隱藏
+    // 底部區塊結構：長生在先，神煞在後 (自然堆疊)
     const footerHtml = `
-        <div class="pillar-bottom-section ${visibilityClass}">
-            ${zsHtml}       ${shenshaHtml}  </div>
+        <div class="pillar-bottom-section">
+            ${zsHtml}
+            ${shenshaContainerHtml}
+        </div>
     `;
 
     const contentHtml = `
@@ -544,11 +551,12 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
             <div class="${shishenClass}">${shishen}</div>
             <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
             <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
-            <div class="canggan-box">${cangganHtml}</div>
+            <div class="canggan-box" style="margin-bottom: 2px;">${cangganHtml}</div>
             
             ${footerHtml} </div>
     `;
     
+    // 把眼仔 (eyeHtml) 放在最前面，CSS 會把它定好位
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
 function renderRailPillar(gan, zhi, title, infoText) {
@@ -777,6 +785,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
