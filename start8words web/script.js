@@ -379,27 +379,25 @@ function getShiShen(targetGan, isDayPillarStem) {
 }
 // 強制掛載到 window，確保 HTML onclick 呼叫得到
 window.toggleShenShaAll = function() {
-    // 1. 切換狀態變數
     window.isShenShaVisible = !window.isShenShaVisible;
     
-    // 2. 選取所有「神煞列表」 (注意：不是選 pillar-bottom-section，因為我們要保留長生)
     const lists = document.querySelectorAll('.shensha-list');
-    
     lists.forEach(el => {
+        // 使用 CSS class 切換比較乾淨，或者直接 style
         if (window.isShenShaVisible) {
             el.classList.remove('hidden');
-            el.style.display = 'flex'; // 強制顯示
+            el.style.display = 'flex';
         } else {
             el.classList.add('hidden');
-            el.style.display = 'none'; // 強制隱藏
+            el.style.display = 'none';
         }
     });
 
-    // 3. 更新按鈕圖標
     const btn = document.getElementById('btnToggleShenSha');
     if(btn) {
-        btn.innerHTML = window.isShenShaVisible ? '▼' : '◀'; // 用 innerHTML 確保符號正確
-        // 當隱藏時，按鈕可能需要稍微改變位置或顏色提示，這裡暫時只改符號
+        // 【關鍵】展開時(Visible=true) 顯示「▲」(收起的意思)
+        //       隱藏時(Visible=false) 顯示「▼」(展開的意思)
+        btn.innerText = window.isShenShaVisible ? '▲' : '▼'; 
     }
 }
 // --- 十二長生計算輔助函數 ---
@@ -455,22 +453,46 @@ window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
     const contentDiv = document.getElementById('pillarContent_baseHour');
     const eyeIcon = document.getElementById('eyeIcon');
+    
+    if (!contentDiv) return;
+
+    // 取得或建立遮罩容器
+    // 這次我們把遮罩放在 contentDiv 裡面，或者作為 contentDiv 的兄弟元素
+    // 為了排版方便，我們直接操作 contentDiv 的顯示內容，或者用一個覆蓋層
+    
+    // 更好的做法：在 renderMainPillar 時就預留遮罩層
+    // 但為了不大幅改動結構，我們這裡動態插入
+    
+    let mask = document.getElementById('luckyMask');
+    
     if (window.isTimeHidden) {
-        contentDiv.style.display = 'none';
+        contentDiv.style.visibility = 'hidden'; // 隱藏內容但保留佔位 (Layout不變)
         eyeIcon.innerText = '🔒';
-        const parent = contentDiv.parentElement;
-        if (!parent.querySelector('#maskText')) {
-            const mask = document.createElement('div');
-            mask.id = 'maskText';
-            mask.className = 'lucky-mask';
-            mask.innerText = '吉時';
-            parent.appendChild(mask);
-        } else { parent.querySelector('#maskText').style.display = 'flex'; }
+        
+        if (!mask) {
+            mask = document.createElement('div');
+            mask.id = 'luckyMask';
+            mask.className = 'mask-container'; // 使用 CSS 定義的 class
+            
+            // 【關鍵】模擬干支結構
+            // 由於 top-info (35px) + title (33px) = 68px
+            // 我們把 mask 往上推一點，或者直接 relative 定位
+            // 最簡單是：mask 放在 contentDiv 同層，position absolute top: 68px
+            mask.style.top = '68px'; 
+            mask.style.height = 'calc(100% - 68px)';
+            
+            mask.innerHTML = `
+                <div class="mask-gan">吉</div>
+                <div class="mask-zhi">時</div>
+            `;
+            contentDiv.parentElement.appendChild(mask);
+        }
+        mask.style.display = 'flex';
+        
     } else {
-        contentDiv.style.display = 'flex';
+        contentDiv.style.visibility = 'visible';
         eyeIcon.innerText = '👁';
-        const mask = document.getElementById('maskText');
-        if(mask) mask.style.display = 'none';
+        if (mask) mask.style.display = 'none';
     }
 }
 
@@ -679,8 +701,30 @@ function renderRailsCascadeFromHour() { renderHourRail(); updateActiveDisplay();
 
 function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
+    
+    // --- 處理大運 (DaYun) ---
     const dy = state.daYuns[state.selDaYunIdx];
-    if (!dy) return;
+    
+    if (dy) {
+        // 有大運資料：正常渲染
+        const dyGZ = dy.getGanZhi();
+        let dyStartAge = dy.getStartAge();
+        let dyStartYear = dy.getStartYear();
+        if(dyStartYear < 1000) dyStartYear += birthYear;
+        const dyInfo = `${dyStartAge}歲起\n${dyStartYear}年`;
+        
+        renderMainPillar('activeDaYun', dyGZ.charAt(0), dyGZ.charAt(1), '大運', false, dyInfo);
+    } else {
+        // 【關鍵】沒有大運資料 (例如起運前)：渲染空柱子
+        // 傳入空字串給 gan/zhi，但保留標題，這樣排版才會跟隔壁一樣高
+        renderMainPillar('activeDaYun', '&nbsp;', '&nbsp;', '大運', false, '未起運');
+        
+        // 額外微調：如果是空的，可能需要把神煞也清空，
+        // 但 renderMainPillar 內部的神煞計算會因為沒有干支而回傳空，所以應該沒問題。
+        // 重點是 HTML 結構存在，CSS 就能撐開高度。
+    }
+
+    // ... (後面的流年流月代碼保持不變) ...
     
     const dyGZ = dy.getGanZhi();
     let dyStartAge = dy.getStartAge();
@@ -792,6 +836,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
