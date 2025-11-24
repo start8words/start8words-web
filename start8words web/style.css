@@ -48,15 +48,13 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 1. 帳戶管理欄 (白色底框) --- */
+/* --- 帳戶管理欄 --- */
 .auth-box {
-    background-color: #ffffff !important; /* 強制白色 */
-    background: var(--panel-bg);
+    background-color: #ffffff;
     padding: 15px 20px;
     border-radius: 12px;
     border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-top: 0; /* 緊貼標題 */
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -65,15 +63,7 @@ body {
     width: 100%;
     box-sizing: border-box;
 }
-
-/* 登入提示 */
-.auth-hint {
-    font-size: 14px;
-    color: #555;
-    font-weight: 500;
-    text-align: left;
-    flex: 1;
-}
+.auth-hint { font-size: 14px; color: #555; font-weight: 500; text-align: left; flex: 1; }
 
 /* --- 輸入控制區 --- */
 .control-wrapper {
@@ -87,7 +77,6 @@ body {
     border-bottom-right-radius: 0;
     transition: all 0.3s ease;
 }
-
 .control-wrapper.collapsed { display: none; }
 
 .toggle-bar {
@@ -106,95 +95,19 @@ body {
 }
 
 .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-.tab {
-    padding: 8px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #777;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    flex: 1;
-    text-align: center;
-}
+.tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
 .tab.active { color: var(--active-border); border-color: var(--active-border); }
 
-.input-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
-}
+.input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
 .input-row > * { flex: 1; min-width: 80px; }
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
+input, select { padding: 8px; background: #fff; border: 1px solid #ccc; color: #333; border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
-input, select {
-    padding: 8px;
-    background: #fff;
-    border: 1px solid #ccc;
-    color: #333;
-    border-radius: 6px;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-button.action-btn { 
-    padding: 10px;
-    background: var(--accent); 
-    color: white; 
-    font-weight: bold; 
-    cursor: pointer; 
-    border: none; 
-    border-radius: 6px;
-    font-size: 16px;
-    width: 100%;
-}
-button.map-btn {
-    padding: 8px;
-    background: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    width: 100%;
-}
-
-#mapContainer {
-    height: 250px;
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-    display: none;
-}
-
-.tst-section {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px dashed #ccc;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* 2. 真太陽時並排樣式 */
-.tst-bottom-row {
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-start; 
-    gap: 10px; 
-    padding-top: 5px; 
-    border-top: 1px dashed #ddd; 
-    width: 100%;
-    flex-wrap: nowrap; 
-}
-
+button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; }
+button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%; }
+#mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px; display: none; }
+.tst-section { background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px dashed #ccc; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
+.tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed #ddd; width: 100%; flex-wrap: nowrap; }
 .note { font-size: 12px; color: #888; margin-top: 5px; }
 
 /* --- 命主資訊 --- */
@@ -212,24 +125,9 @@ button.map-btn {
 }
 .info-col { display: flex; flex-direction: column; gap: 5px; }
 .info-col.left { border-right: 1px dashed #ddd; padding-right: 5px; }
-
-.info-item { 
-    display: flex; 
-    flex-direction: row;
-    align-items: baseline;
-    gap: 4px;
-}
-.info-label { 
-    font-weight: bold; 
-    color: #666; 
-    font-size: 13px;
-    white-space: nowrap;
-}
-.info-val { 
-    font-weight: 600; 
-    color: #000; 
-    word-break: break-word; 
-}
+.info-item { display: flex; flex-direction: row; align-items: baseline; gap: 4px; }
+.info-label { font-weight: bold; color: #666; font-size: 13px; white-space: nowrap; }
+.info-val { font-weight: 600; color: #000; word-break: break-word; }
 
 /* --- 核心顯示區 --- */
 .main-display {
@@ -241,7 +139,7 @@ button.map-btn {
     overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
-    align-items: flex-end;
+    align-items: stretch; /* 讓所有 group 等高 */
     justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
@@ -254,60 +152,22 @@ button.map-btn {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
-    height: fit-content;
+    height: auto;
     flex: 1; 
     justify-content: center; 
 }
+.group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
 
-.group-container.dynamic-group {
-    border: 1px solid var(--border);
-    background: var(--panel-bg);     
-}
-/* =========================================================
-   1. 吉時遮罩樣式 (模擬干支結構)
-   ========================================================= */
-.mask-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 5px; /* 對齊 pillarContent 的 padding */
-}
-
-.mask-gan {
-    font-size: 30px; /* 跟 .gan 一樣大 */
-    font-weight: bold;
-    color: #d32f2f;  /* 吉慶紅 */
-    line-height: 1.1;
-    margin-bottom: 2px; /* 跟 .gan 一樣的 margin */
-}
-
-.mask-zhi {
-    font-size: 30px; /* 跟 .zhi 一樣大 */
-    font-weight: bold;
-    color: #d32f2f;
-    line-height: 1.1;
-    margin-bottom: 6px; /* 跟 .zhi 一樣的 margin */
-}
-
-/* =========================================================
-   2. 左側「原局」標籤與按鈕定位
-   ========================================================= */
+/* --- 原局與隱藏鍵定位修正 --- */
 .group-label {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     
-    /* 【關鍵】68px 是為了讓「原局」文字頂部對齊「天干」頂部 
-       計算：TopInfo(35) + Title(33) = 68px */
-    padding-top: 68px; 
+    /* 【定位重點】：88px 讓文字對齊天干地支 */
+    /* 計算：TopInfo(35) + Title(33) + ShiShen(20) = 88px */
+    padding-top: 88px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -323,11 +183,10 @@ button.map-btn {
 
 .shensha-toggle-btn {
     cursor: pointer;
-    font-size: 10px; /* icon 稍微小一點比較精緻 */
+    font-size: 10px;
     color: var(--active-border);
     border: 1px solid var(--active-border);
     background: #fff;
-    
     width: 18px;
     height: 18px;
     min-width: 18px;
@@ -340,19 +199,17 @@ button.map-btn {
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【關鍵】132px 是為了對齊「十二長生」
-       計算：Gan(33) + Zhi(39) + Canggan(60) ≈ 132px 
-       這會把按鈕推到跟長生同一行 */
-    margin-top: 132px; 
+    /* 【定位重點】：108px 讓按鈕對齊十二長生 */
+    /* 計算：Gan(33) + Zhi(33) + Canggan(60) - 調整值 */
+    margin-top: 108px; 
     margin-right: -1px;
 }
-/* =========================================================
-   3. 底部區域填滿與優化
-   ========================================================= */
+
+/* --- 柱子結構優化 --- */
 .pillar.main {
     display: flex;
-    flex-direction: column; /* 確保內容垂直排列 */
-    /* ...其他原有設定保持不變 (width, border 等)... */
+    flex-direction: column;
+    align-items: center;
     width: 90px; 
     min-width: 90px;
     background: #fff;
@@ -360,120 +217,64 @@ button.map-btn {
     border-radius: 6px;
     position: relative;
     overflow: hidden;
-    height: auto; /* 自動高度 */
+    height: auto; 
+    flex-shrink: 0;
 }
 
-.pillar-bottom-section {
-    width: 100%;
+/* 頂部資訊區 (對齊眼仔) */
+.top-info {
+    min-height: 35px;
     display: flex;
     flex-direction: column;
-    
-    /* 【關鍵】flex-grow: 1 讓這個灰色區塊填滿剩餘空間 */
-    flex-grow: 1; 
-    
-    background-color: #fafafa; /* 淺灰背景 */
-    border-top: 1px dashed #eee;
-    border-radius: 0 0 6px 6px;
-}
-
-.shensha-list {
-    display: flex;
-    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
-    background-color: transparent;
-    
-    /* 【關鍵】減少上下留白 */
+    font-size: 11px;
+    color: #666;
     padding-top: 2px;
-    padding-bottom: 5px; 
-    gap: 1px;
 }
 
-/* 手機版調整 */
-@media (max-width: 600px) {
-    body { padding: 5px; }
-    .main-display { gap: 5px; justify-content: flex-start; }
-    .group-container { flex: 0 0 auto; justify-content: flex-start; }
-    .pillar.main { width: 50px; min-width: 50px; min-height: 210px; padding: 4px 0 30px 0; }
-    .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
-    .title-text { font-size: 12px !important; margin-bottom: 1px; }
-    .shishen-top { font-size: 11px !important; height: 14px; margin-bottom: 1px; }
-    .gan { font-size: 24px !important; margin-bottom: 1px; }
-    .zhi { font-size: 24px !important; margin-bottom: 2px; }
-    .canggan-box { gap: 1px; padding-top: 2px; }
-    .canggan-row { gap: 2px; font-size: 11px !important; }
-    .canggan-shishen { font-size: 10px !important; transform: scale(0.95); }
-    .lucky-mask { font-size: 16px; letter-spacing: 3px; top: 30px; }
-    .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
-    .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
-    
-    /* 帳戶欄調整 */
-    .auth-box { padding: 10px; }
-    .auth-hint { font-size: 12px; }
-}
-
-.top-info {
-    font-size: 12px;
-    color: #555;
-    text-align: center;
-    white-space: pre-line;
-    line-height: 1.3;
-    margin-bottom: 4px;
-    height: 32px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: 100%;
-    border-bottom: 1px dashed #eee;
-    padding-bottom: 2px;
-    font-weight: 500;
-}
-
-/* 通用標題基礎 (不帶背景) */
+/* 標題區域 */
 .title-text {
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 2px;
     color: #333;
     width: 100%;
-    text-align: center; /* 確保文字水平置中 */
+    text-align: center;
 }
-
-/* 只在「主顯示區」的柱子標題加灰色背景 */
+/* 只在主柱顯示灰色背景 */
 .pillar.main .title-text {
     background-color: #f0f0f0;
     padding: 6px 0;
     border-bottom: 1px solid #ddd;
     border-radius: 4px 4px 0 0;
 }
+.pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: #999; }
 
-/* 確保下方的 Rail (大運/流年) 沒有背景 */
-.pillar.rail .title-text {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin-bottom: 5px;
-    color: #999; /* 稍微淡一點 */
+/* 內容區：Flex Grow 確保撐滿 */
+.pillar-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1; /* 重要：讓內容撐滿柱子高度 */
 }
-.shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 
+.shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
+.shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
+/* 藏干區：固定高度以對齊十二長生 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     width: 100%;
-    
-    /* 【關鍵修改】設定最小高度！
-       一行藏干約 18px，3行約 54px，加上 margin 抓 60px。
-       這樣無論藏干有幾個，這個盒子的高度都一樣，
-       保證下面的十二長生起點一致。 */
-    min-height: 60px; 
-    justify-content: flex-start; /* 內容從上開始排 */
-    
+    min-height: 60px; /* 固定高度 */
+    justify-content: flex-start;
     margin-bottom: 5px;
     padding-top: 5px;
     border-top: 1px dashed #eee;
@@ -482,11 +283,10 @@ button.map-btn {
 .canggan-char { font-weight: bold; }
 .canggan-shishen { color: #777; font-size: 12px; }
 
+/* 眼仔按鈕 */
 .eye-btn {
     position: absolute;
-    /* 【關鍵修改】原本是 top: 5px，改大數字讓它往下移，貼近「時柱」 */
     top: 22px; 
-    
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
@@ -502,361 +302,17 @@ button.map-btn {
     z-index: 20;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
-/* 配合眼仔調整頂部資訊區的高度 */
-.top-info {
-    min-height: 35px; /* 稍微加高，容納下移的眼仔 */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* 文字靠上 */
-    align-items: center;
-    width: 100%;
-    font-size: 11px;
-    color: #666;
-    padding-top: 2px;
-}
-.lucky-mask {
-    position: absolute;
-    top: 32px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0 0 8px 8px;
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    font-size: 20px;
-    font-weight: bold;
-    color: #d32f2f;
-    letter-spacing: 6px;
-}
 
-/* --- 軌道區 --- */
-.rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
-.rail-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--panel-bg);
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    overflow-x: auto; 
-    white-space: nowrap;
-}
-.rail-title {
-    min-width: 30px;
-    font-weight: bold;
-    color: #555;
-    text-align: center;
-    font-size: 13px;
-    background: #eee;
-    padding: 5px 2px;
-    border-radius: 6px;
-    writing-mode: vertical-rl;
-}
-.rail-items { display: flex; gap: 6px; padding-right: 10px; }
-
-.pillar.rail {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 125px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    padding-top: 4px;
-    flex-shrink: 0;
-}
-.pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
-.pillar.active {
-    background: var(--highlight);
-    border-color: var(--active-border);
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-}
-
-.rail-info {
-    font-size: 11px;
-    color: #666;
-    text-align: center;
-    white-space: pre-line;
-    line-height: 1.1;
-    height: 26px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: 100%;
-    border-bottom: 1px dashed #eee;
-    margin-bottom: 3px;
-    padding-bottom: 1px;
-}
-.rail-row-inner { display: flex; align-items: baseline; gap: 2px; }
-.rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
-.rail-char { font-size: 22px; font-weight: bold; }
-
-/* --- Modal --- */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.modal-content {
-    background: #fff;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    background: #f9f9f9;
-    display: flex;
-    flex-direction: column; 
-    gap: 10px;
-}
-.modal-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-.modal-title-row h3 { margin: 0; font-size: 18px; color: #333; }
-.close-modal { font-size: 24px; cursor: pointer; color: #999; }
-
-.search-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-/* 分類濾鏡 */
-.category-filters {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 2px 0;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    width: 100%; 
-}
-.category-filters::-webkit-scrollbar { display: none; }
-
-.filter-chip {
-    padding: 8px 16px; 
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    background: #fff;
-    color: #666;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0; 
-    white-space: nowrap;
-}
-.filter-chip:hover { background: #f0f0f0; }
-.filter-chip.active {
-    background: var(--active-border);
-    color: white;
-    border-color: var(--active-border);
-    font-weight: bold;
-}
-
-.chart-list { padding: 10px; overflow-y: auto; flex: 1; }
-.chart-item {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s;
-    border-radius: 6px;
-}
-.chart-item:hover { background: #f0f7ff; }
-.chart-info { flex: 1; }
-.chart-name { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 4px; }
-.chart-tags span {
-    display: inline-block;
-    background: #e3f2fd;
-    color: #1976d2;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-right: 4px;
-}
-.chart-detail { font-size: 12px; color: #666; margin-top: 2px; }
-.delete-btn { padding: 6px 10px; background: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
-
-/* --- Footer --- */
-.app-footer {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-    text-align: center;
-    color: #888;
-    font-size: 13px;
-    width: 100%;
-}
-.app-footer a {
-    color: #333;
-    text-decoration: none;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: color 0.2s;
-}
-.app-footer a:hover { color: #E1306C; }
-.ig-icon { width: 16px; height: 16px; fill: currentColor; }
-
-::-webkit-scrollbar { height: 4px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-
-/* --- 修改後：十二長生樣式 (文字版 + 虛線) --- */
-.zhangsheng-text {
-    /* 修改：取消 absolute，改為 relative */
-    position: relative;     
-    width: 100%;
-    
-    font-size: 12px;
-    color: #888;
-    text-align: center;
-    
-    padding-top: 6px;       
-    padding-bottom: 6px;    
-    
-    border-top: 1px dashed #eee; 
-    background-color: transparent; /* 背景改透明 */
-    border-radius: 0;
-    font-weight: normal;
-}
-/* --- 新增：神煞系統樣式 --- */
-
-/* 神煞列表容器 */
-.shensha-list {
-    display: flex; /* 預設顯示 (Flex布局) */
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2px;
-    width: 100%;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px dotted #eee;
-    transition: all 0.3s ease;
-}
-
-/* 隱藏狀態 */
-.shensha-list.hidden {
-    display: none;
-}
-
-/* 單個神煞標籤 */
-.shensha-tag {
-    font-size: 11px;
-    color: #555; /* 統一顏色 */
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 1px 3px;
-    background-color: #fcfcfc;
-    white-space: nowrap;
-    transform: scale(0.95); /* 稍微縮小一點以適應手機 */
-}
-
-/* 隱藏/展開按鈕 */
-.shensha-toggle-btn {
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--active-border);
-    border: 1px solid var(--active-border);
-    
-    /* 【關鍵】解決變形問題：強制設定寬高，並不允許壓縮 */
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    min-height: 18px;
-    border-radius: 50%;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    writing-mode: horizontal-tb;
-    
-    /* 位置調整：放在文字的「正下方」(因為是直排，所以是左側或下方)
-       由於上面的 padding-top 已經定位了文字，這裡給一點 margin 讓它跟文字分開 */
-    margin-top: 8px; 
-    margin-right: -1px; /* 微調水平置中 */
-}
-
-.shensha-toggle-btn:hover {
-    background-color: var(--active-border);
-    color: white;
-}
-.pillar.main {
-    /* 移除 min-height，讓它隨內容縮放 */
-    height: auto; 
-    min-height: auto; 
-    
-    /* 移除 padding-bottom，因為不再需要預留絕對定位的空間 */
-    padding-bottom: 10px; 
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    /* 保持原有樣式 */
-    width: 90px; 
-    min-width: 90px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    position: relative;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-/* =========================================
-   新增：神煞系統與底部固定區塊樣式
-   ========================================= */
-
-/* 底部絕對定位容器 (包裹長生+神煞) */
+/* --- 底部區域 (填滿灰色) --- */
 .pillar-bottom-section {
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-top: 5px;
-    
-    /* 【關鍵】整個底部區塊加上淺灰色背景 */
-    background-color: #fafafa; 
-    
-    /* 確保背景色填滿底部圓角 */
-    border-radius: 0 0 6px 6px; 
-    
-    /* 上方加一條分隔線，區隔藏干與底部區域 */
-    border-top: 1px dashed #eee; 
-    
-    /* 確保它會撐開高度 */
-    flex-grow: 1;
+    flex-grow: 1; /* 【重要】填滿剩餘高度 */
+    background-color: #fafafa;
+    border-top: 1px dashed #eee;
+    border-radius: 0 0 6px 6px;
+    justify-content: flex-start; /* 內容靠上 */
 }
 
 /* 十二長生 */
@@ -866,12 +322,11 @@ button.map-btn {
     text-align: center;
     font-size: 12px;
     color: #888;
-    padding: 6px 0; /* 稍微增加舒適度 */
-    
-    /* 【關鍵】移除這裡的 border-top，因為已經移到 container 去了 */
+    padding: 6px 0;
     border-top: none; 
-    background-color: transparent; /* 透明，顯示父容器的灰色 */
+    background-color: transparent;
 }
+
 /* 神煞列表 */
 .shensha-list {
     display: flex;
@@ -879,26 +334,52 @@ button.map-btn {
     align-items: center;
     width: 100%;
     padding-bottom: 8px;
-    
-    /* 【關鍵】背景設為透明 (或是同樣的灰色) */
     background-color: transparent;
-    
-    /* 【關鍵】移除虛線！解決「驛馬」上面的線條問題 */
-    border-top: none; 
-    
-    transition: all 0.3s ease;
+    gap: 2px;
+}
+.shensha-list.hidden { display: none; }
+.shensha-tag {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+    padding: 1px 0;
 }
 
-/* 隱藏神煞時的樣式 */
-.shensha-list.hidden {
-    display: none;
+/* --- 軌道區 --- */
+.rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+.rail-row { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; white-space: nowrap; }
+.rail-title { min-width: 30px; font-weight: bold; color: #555; text-align: center; font-size: 13px; background: #eee; padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
+.rail-items { display: flex; gap: 6px; padding-right: 10px; }
+.pillar.rail {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 60px; height: 125px; background: #fff; border: 1px solid #eee; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; position: relative; padding-top: 4px; flex-shrink: 0;
 }
+.pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
+.pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
+.rail-info { font-size: 11px; color: #666; text-align: center; white-space: pre-line; line-height: 1.1; height: 26px; display: flex; align-items: flex-end; justify-content: center; width: 100%; border-bottom: 1px dashed #eee; margin-bottom: 3px; padding-bottom: 1px; }
+.rail-row-inner { display: flex; align-items: baseline; gap: 2px; }
+.rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
+.rail-char { font-size: 22px; font-weight: bold; }
 
-
-
-
-
-
-
-
-
+/* Modal 與其他 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: #fff; width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
+.modal-header { padding: 15px; border-bottom: 1px solid #eee; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
+.modal-title-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.modal-title-row h3 { margin: 0; font-size: 18px; color: #333; }
+.close-modal { font-size: 24px; cursor: pointer; color: #999; }
+.search-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.category-filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; white-space: nowrap; -webkit-overflow-scrolling: touch; width: 100%; }
+.category-filters::-webkit-scrollbar { display: none; }
+.filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; white-space: nowrap; }
+.filter-chip:hover { background: #f0f0f0; }
+.filter-chip.active { background: var(--active-border); color: white; border-color: var(--active-border); font-weight: bold; }
+.chart-list { padding: 10px; overflow-y: auto; flex: 1; }
+.chart-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; border-radius: 6px; }
+.chart-item:hover { background: #f0f7ff; }
+.chart-info { flex: 1; }
+.chart-name { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 4px; }
+.chart-tags span { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
