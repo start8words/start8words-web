@@ -542,15 +542,14 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     // 十二長生 (永遠顯示)
     const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
     
-    // 神煞列表 (根據變數決定是否隱藏)
-    const visibilityClass = window.isShenShaVisible ? '' : 'hidden';
-    const shenshaContainerHtml = `<div class="shensha-list ${visibilityClass}">${shenshaHtml}</div>`;
+// 神煞列表 (預設狀態)
+    const visibilityStyle = window.isShenShaVisible ? 'display:flex;' : 'display:none;';
+    const shenshaContainerHtml = `<div class="shensha-list" style="${visibilityStyle}">${shenshaHtml}</div>`;
 
-    // 底部區塊結構：長生在先，神煞在後 (自然堆疊)
+    // 底部結構：十二長生在上，神煞在下
     const footerHtml = `
         <div class="pillar-bottom-section">
-            ${zsHtml}
-            ${shenshaContainerHtml}
+            ${zsHtml}  ${shenshaContainerHtml}
         </div>
     `;
 
@@ -793,6 +792,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
 
     return list;
 }
+
 
 
 
