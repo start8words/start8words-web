@@ -6,7 +6,7 @@ window.marker = null;
 window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
-window.isShenShaVisible = true; // 預設顯示神煞
+window.isShenShaVisible = true; 
 window.originSolar = null;
 window.currentBaziData = null;
 window.currentDocId = null;
@@ -453,7 +453,6 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
     return list;
 }
 
-// 【重要修正】ToggleTime 不再使用遮罩，而是直接替換文字
 window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
     const eyeIcon = document.getElementById('eyeIcon');
@@ -708,7 +707,7 @@ function updateActiveDisplay() {
     const dy = state.daYuns[state.selDaYunIdx];
     
     // 【修正空大運塌陷】：
-    // 當沒有大運時，強制傳入假的文字 ('甲', '子') 但在 renderMainPillar 裡設為 transparent
+    // 移除傳入假文字的邏輯，直接傳入 '&nbsp;' 或空值
     if (dy) {
         const dyGZ = dy.getGanZhi();
         let dyStartAge = dy.getStartAge();
@@ -717,8 +716,7 @@ function updateActiveDisplay() {
         const dyInfo = `${dyStartAge}歲起\n${dyStartYear}年`;
         renderMainPillar('activeDaYun', dyGZ.charAt(0), dyGZ.charAt(1), '大運', false, dyInfo);
     } else {
-        // 使用特殊標記讓 renderMainPillar 知道要隱藏文字但保留結構
-        renderMainPillar('activeDaYun', '甲', '子', '大運', false, '未起運');
+        renderMainPillar('activeDaYun', '&nbsp;', '&nbsp;', '大運', false, '未起運');
     }
     
     const activeSolar = Solar.fromYmdHms(state.selYear, state.selMonth, state.selDay, state.selHour, 0, 0);
