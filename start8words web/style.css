@@ -87,7 +87,7 @@ body {
     border-radius: 0 0 12px 12px;
     color: #555;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     border: 1px solid var(--border);
     border-top: none;
     user-select: none;
@@ -119,7 +119,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border: 1px solid var(--border); 
     border-radius: 10px;
     padding: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     font-size: 13px;
 }
@@ -166,8 +166,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: flex-start;
     
-    /* 【修正】92px 讓「原局」頂部與「天干」頂部對齊 */
-    padding-top: 92px; 
+    /* 【修正】96px 讓「原局」頂部與「天干」頂部對齊 */
+    padding-top: 96px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -446,4 +446,5 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
 
