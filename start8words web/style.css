@@ -325,7 +325,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     background-color: transparent;
 }
 
-/* 神煞列表 */
+/* 神煞列表 (加回虛線) */
 .shensha-list {
     display: flex;
     flex-direction: column;
@@ -456,8 +456,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     
     /* [修正 2] 對應加大字體 (20px -> 24px) */
-    .gan { font-size: 24px; }
-    .zhi { font-size: 24px; }
+    .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; }
+    .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
     
     /* [修正 3] 十神空間增加 */
     .shishen-top { 
@@ -466,8 +466,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         margin-bottom: 4px; /* 增加距離 */
     }
     
-    .canggan-row { font-size: 10px; gap: 2px; }
-    .canggan-shishen { font-size: 9px; transform: scale(0.9); }
+    /* [修正 1] 藏干區字體加大與固定高度 */
+    .canggan-row { font-size: 12px; gap: 1px; }
+    .canggan-shishen { font-size: 10px; transform: none; }
     
     /* 縮小間距 */
     .main-display { gap: 2px; }
@@ -512,6 +513,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         /* 改為固定高度 height，並增加到 60px，解決對齊與缺失問題 */
         height: 60px; 
         min-height: 60px;
+        margin-bottom: 2px; /* 減少留白 */
+        padding-top: 2px;   /* 減少留白 */
     }
     
     .shensha-tag {
@@ -524,5 +527,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    
+    /* [修正] 減少底部區域留白 */
+    .pillar-bottom-section {
+        padding-bottom: 2px;
     }
 }
