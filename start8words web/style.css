@@ -134,7 +134,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     display: flex;
     flex-direction: row; 
     flex-wrap: nowrap;   
-    gap: 6px;
+    gap: 4px;
     margin-bottom: 20px;
     overflow-x: auto;    
     padding-bottom: 10px;
@@ -166,8 +166,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: flex-start;
     
-    /* 【修正】88px 讓「原局」頂部與「天干」頂部對齊 */
-    padding-top: 88px; 
+    /* 【修正】92px 讓「原局」頂部與「天干」頂部對齊 */
+    padding-top: 92px; 
     
     writing-mode: vertical-rl;
     text-align: center;
@@ -199,9 +199,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     transition: all 0.2s;
     writing-mode: horizontal-tb;
     
-    /* 【修正】115px 是為了將按鈕從天干位置推到底部十二長生的位置 */
+    /* 【修正】118px 是為了將按鈕從天干位置推到底部十二長生的位置 */
     /* 計算：(天干到十二長生的距離) - (原局文字高度) */
-    margin-top: 115px; 
+    margin-top: 118px; 
     
     margin-right: -1px;
 }
@@ -224,7 +224,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 
 /* [修正] 頂部資訊區：支援換行 */
 .top-info {
-    min-height: 38px;
+    min-height: 35px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -446,3 +446,4 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
