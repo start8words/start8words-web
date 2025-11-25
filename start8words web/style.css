@@ -120,7 +120,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border-radius: 10px;
     padding: 12px;
     
-    /* [修正 3] 收窄間距：原本是 15px (或10px)，改為 5px */
+    /* [修正] 收窄間距 */
     margin-bottom: 5px;
     
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -142,7 +142,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
-    align-items: stretch;
+    align-items: stretch; /* 讓柱子等高 */
     justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
@@ -438,7 +438,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         gap: 5px;
     }
     .auth-hint {
-        font-size: 12px; /* 縮小提示字體 */
+        font-size: 11px; /* 縮小提示字體 */
         white-space: normal;
         line-height: 1.2;
         flex: 1;
@@ -459,9 +459,15 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .gan { font-size: 24px; }
     .zhi { font-size: 24px; }
     
-    .shishen-top { font-size: 12px; height: 16px; }
-    .canggan-row { font-size: 12px; gap: 2px; }
-    .canggan-shishen { font-size: 11px; transform: scale(0.9); }
+    /* [修正 3] 十神空間增加 */
+    .shishen-top { 
+        font-size: 10px; 
+        height: 14px; 
+        margin-bottom: 4px; /* 增加距離 */
+    }
+    
+    .canggan-row { font-size: 10px; gap: 2px; }
+    .canggan-shishen { font-size: 9px; transform: scale(0.9); }
     
     /* 縮小間距 */
     .main-display { gap: 2px; }
@@ -471,7 +477,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .group-label {
         width: 18px;
         /* 手機版：對齊天干 */
-        padding-top: 80px; 
+        padding-top: 82px; 
         font-size: 11px;
     }
     .shensha-toggle-btn {
@@ -479,7 +485,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         height: 16px;
         font-size: 10px;
         /* 手機版：對齊十二長生 */
-        margin-top: 105px; 
+        margin-top: 117px; 
     }
     
     /* 調整頂部資訊區高度 */
@@ -503,9 +509,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     
     /* [修正 1] 固定藏干高度，確保對齊 */
     .canggan-box {
-        /* 改為固定高度 height，而非 min-height，確保下方線條對齊 */
-        height: 50px; 
-        min-height: 50px;
+        /* 改為固定高度 height，並增加到 60px，解決對齊與缺失問題 */
+        height: 60px; 
+        min-height: 60px;
     }
     
     .shensha-tag {
@@ -514,11 +520,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     /* [修正 1] 固定十二長生高度，確保對齊 */
     .zhangsheng-text {
         font-size: 10px;
-        height: 15px; /* 強制固定高度 */
+        height: 20px; /* 強制固定高度 */
         display: flex;
         align-items: center;
         justify-content: center;
     }
 }
-
-
