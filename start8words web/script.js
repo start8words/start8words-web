@@ -568,9 +568,10 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     // 顏色：隱藏模式(吉時)為紅，否則按五行
     let ganColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[gan] || '#333');
     let zhiColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[zhi] || '#333');
-    // 如果是空大運的透明字
-    if (gan === '&nbsp;' || gan === '甲') ganColor = 'transparent'; 
-    if (zhi === '&nbsp;' || zhi === '子') zhiColor = 'transparent';
+    
+    // 【修正】移除對「甲」與「子」的透明度判斷，修復正常八字被隱藏的問題
+    if (gan === '&nbsp;') ganColor = 'transparent'; 
+    if (zhi === '&nbsp;') zhiColor = 'transparent';
 
     const footerHtml = `
         <div class="pillar-bottom-section">
