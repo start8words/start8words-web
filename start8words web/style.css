@@ -218,15 +218,16 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 
 /* 頂部資訊區 */
 .top-info {
-    min-height: 38px;
+    min-height: 35px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: center;
+    text-align: center;
     width: 100%;
     font-size: 11px;
     color: #666;
-    padding-top: 2px;
+    padding-bottom: 2px;
     white-space: pre-line;
     line-height: 1.2;
 }
@@ -456,7 +457,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     
     /* [修正 2] 對應加大字體 (20px -> 24px) */
-    .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; }
+    .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; margin-bottom: 2px;}
     .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
     
     /* [修正 3] 十神空間增加 */
@@ -491,7 +492,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     
     /* 調整頂部資訊區高度 */
     .top-info {
-        min-height: 30px;
+        min-height: 28px;
         font-size: 10px;
     }
     
@@ -534,3 +535,4 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         padding-bottom: 2px;
     }
 }
+
