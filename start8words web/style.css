@@ -48,15 +48,13 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- 1. 帳戶管理欄 (白色底框) --- */
+/* --- 帳戶管理欄 --- */
 .auth-box {
-    background-color: #ffffff !important; /* 強制白色 */
-    background: var(--panel-bg);
+    background-color: #ffffff;
     padding: 15px 20px;
     border-radius: 12px;
     border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-top: 0; /* 緊貼標題 */
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -65,15 +63,7 @@ body {
     width: 100%;
     box-sizing: border-box;
 }
-
-/* 登入提示 */
-.auth-hint {
-    font-size: 14px;
-    color: #555;
-    font-weight: 500;
-    text-align: left;
-    flex: 1;
-}
+.auth-hint { font-size: 14px; color: #555; font-weight: 500; text-align: left; flex: 1; }
 
 /* --- 輸入控制區 --- */
 .control-wrapper {
@@ -87,7 +77,6 @@ body {
     border-bottom-right-radius: 0;
     transition: all 0.3s ease;
 }
-
 .control-wrapper.collapsed { display: none; }
 
 .toggle-bar {
@@ -106,95 +95,19 @@ body {
 }
 
 .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-.tab {
-    padding: 8px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #777;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    flex: 1;
-    text-align: center;
-}
+.tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
 .tab.active { color: var(--active-border); border-color: var(--active-border); }
 
-.input-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
-}
+.input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
 .input-row > * { flex: 1; min-width: 80px; }
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
+input, select { padding: 8px; background: #fff; border: 1px solid #ccc; color: #333; border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
-input, select {
-    padding: 8px;
-    background: #fff;
-    border: 1px solid #ccc;
-    color: #333;
-    border-radius: 6px;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-button.action-btn { 
-    padding: 10px;
-    background: var(--accent); 
-    color: white; 
-    font-weight: bold; 
-    cursor: pointer; 
-    border: none; 
-    border-radius: 6px;
-    font-size: 16px;
-    width: 100%;
-}
-button.map-btn {
-    padding: 8px;
-    background: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    width: 100%;
-}
-
-#mapContainer {
-    height: 250px;
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-    display: none;
-}
-
-.tst-section {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px dashed #ccc;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* 2. 真太陽時並排樣式 */
-.tst-bottom-row {
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-start; 
-    gap: 10px; 
-    padding-top: 5px; 
-    border-top: 1px dashed #ddd; 
-    width: 100%;
-    flex-wrap: nowrap; 
-}
-
+button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; }
+button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%; }
+#mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px; display: none; }
+.tst-section { background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px dashed #ccc; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
+.tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed #ddd; width: 100%; flex-wrap: nowrap; }
 .note { font-size: 12px; color: #888; margin-top: 5px; }
 
 /* --- 命主資訊 --- */
@@ -206,30 +119,18 @@ button.map-btn {
     border: 1px solid var(--border); 
     border-radius: 10px;
     padding: 12px;
-    margin-bottom: 15px;
+    
+    /* [修正] 收窄間距 */
+    margin-bottom: 5px;
+    
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     font-size: 13px;
 }
 .info-col { display: flex; flex-direction: column; gap: 5px; }
 .info-col.left { border-right: 1px dashed #ddd; padding-right: 5px; }
-
-.info-item { 
-    display: flex; 
-    flex-direction: row;
-    align-items: baseline;
-    gap: 4px;
-}
-.info-label { 
-    font-weight: bold; 
-    color: #666; 
-    font-size: 13px;
-    white-space: nowrap;
-}
-.info-val { 
-    font-weight: 600; 
-    color: #000; 
-    word-break: break-word; 
-}
+.info-item { display: flex; flex-direction: row; align-items: baseline; gap: 4px; }
+.info-label { font-weight: bold; color: #666; font-size: 13px; white-space: nowrap; }
+.info-val { font-weight: 600; color: #000; word-break: break-word; }
 
 /* --- 核心顯示區 --- */
 .main-display {
@@ -241,7 +142,7 @@ button.map-btn {
     overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
-    align-items: flex-end;
+    align-items: stretch; /* 讓柱子等高 */
     justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
@@ -254,108 +155,125 @@ button.map-btn {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
-    height: fit-content;
+    height: auto;
     flex: 1; 
     justify-content: center; 
 }
+.group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
 
-.group-container.dynamic-group {
-    border: 1px solid var(--border);
-    background: var(--panel-bg);     
-}
-
+/* --- 原局與隱藏鍵定位 --- */
 .group-label {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 88px; /* Desktop Default */
     writing-mode: vertical-rl;
     text-align: center;
     font-size: 12px;
     color: #999;
     font-weight: bold;
     letter-spacing: 2px;
-    padding: 0 2px;
     border-right: 1px solid #eee;
     margin-right: 2px;
+    width: 24px;
+    flex-shrink: 0;
+}
+
+.shensha-toggle-btn {
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--active-border);
+    border: 1px solid var(--active-border);
+    background: #fff;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
+    writing-mode: horizontal-tb;
+    margin-top: 115px; /* Desktop Default */
+    margin-right: -1px;
 }
 
+/* --- 柱子結構 --- */
 .pillar.main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 90px; 
+    width: 90px; /* Desktop width */
     min-width: 90px;
-    min-height: 220px;
     background: #fff;
     border: 1px solid #eee;
     border-radius: 6px;
-    padding: 5px 0;
     position: relative;
+    overflow: hidden;
+    height: auto; 
     flex-shrink: 0;
-    position: relative;
-    padding-bottom: 30px;
 }
 
-/* 手機版調整 */
-@media (max-width: 600px) {
-    body { padding: 5px; }
-    .main-display { gap: 5px; justify-content: flex-start; }
-    .group-container { flex: 0 0 auto; justify-content: flex-start; }
-    .pillar.main { width: 50px; min-width: 50px; min-height: 210px; padding: 4px 0 30px 0; }
-    .top-info { font-size: 11px !important; height: 30px !important; line-height: 1.2 !important; }
-    .title-text { font-size: 12px !important; margin-bottom: 1px; }
-    .shishen-top { font-size: 11px !important; height: 14px; margin-bottom: 1px; }
-    .gan { font-size: 24px !important; margin-bottom: 1px; }
-    .zhi { font-size: 24px !important; margin-bottom: 2px; }
-    .canggan-box { gap: 1px; padding-top: 2px; }
-    .canggan-row { gap: 2px; font-size: 11px !important; }
-    .canggan-shishen { font-size: 10px !important; transform: scale(0.95); }
-    .lucky-mask { font-size: 16px; letter-spacing: 3px; top: 30px; }
-    .eye-btn { width: 20px; height: 20px; font-size: 11px; top: -10px; }
-    .group-label { font-size: 11px; letter-spacing: 1px; width: 16px; }
-    
-    /* 帳戶欄調整 */
-    .auth-box { padding: 10px; }
-    .auth-hint { font-size: 12px; }
-}
-
+/* 頂部資訊區 */
 .top-info {
-    font-size: 12px;
-    color: #555;
-    text-align: center;
-    white-space: pre-line;
-    line-height: 1.3;
-    margin-bottom: 4px;
-    height: 32px;
+    min-height: 35px;
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
     width: 100%;
-    border-bottom: 1px dashed #eee;
+    font-size: 11px;
+    color: #666;
     padding-bottom: 2px;
-    font-weight: 500;
+    white-space: pre-line;
+    line-height: 1.2;
 }
 
-.title-text { font-size: 13px; color: #999; margin-bottom: 2px; font-weight: bold; }
-.shishen-top {
+/* 標題區域 */
+.title-text {
     font-size: 13px;
-    color: var(--color-shishen);
-    height: 18px;
-    margin-bottom: 2px;
     font-weight: bold;
-    white-space: nowrap;
+    margin-bottom: 2px;
+    color: #333;
+    width: 100%;
+    text-align: center;
 }
-.shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
+.pillar.main .title-text {
+    background-color: #f0f0f0;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+}
+.pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: #999; }
 
+/* 內容區 */
+.pillar-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1; 
+}
+
+/* 十神、天干、地支 */
+.shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
+.shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
+/* 藏干區 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     width: 100%;
+    min-height: 60px; /* Desktop Default */
+    justify-content: flex-start;
+    margin-bottom: 5px;
     padding-top: 5px;
     border-top: 1px dashed #eee;
 }
@@ -363,215 +281,123 @@ button.map-btn {
 .canggan-char { font-weight: bold; }
 .canggan-shishen { color: #777; font-size: 12px; }
 
+/* 眼仔按鈕 */
 .eye-btn {
     position: absolute;
-    top: -12px;
+    top: 6px; 
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
     border-radius: 50%;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     border: 1px solid #ccc;
     z-index: 20;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.lucky-mask {
-    position: absolute;
-    top: 32px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    z-index: 10;
+/* --- 底部區域 --- */
+.pillar-bottom-section {
+    width: 100%;
     display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+    background-color: #fafafa; 
+    border-top: 1px dashed #eee;
+    border-radius: 0 0 6px 6px;
+    justify-content: flex-start;
+    padding-bottom: 5px; 
+}
+
+/* 十二長生 */
+.zhangsheng-text {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    padding: 6px 0;
+    border-top: none; 
+    background-color: transparent;
+}
+
+/* 神煞列表 (加回虛線) */
+.shensha-list {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    border-radius: 0 0 8px 8px;
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    font-size: 20px;
-    font-weight: bold;
-    color: #d32f2f;
-    letter-spacing: 6px;
+    width: 100%;
+    padding-bottom: 2px;
+    background-color: transparent;
+    gap: 1px;
+    border-top: 1px dashed #ccc; 
+    margin-top: 2px;
+    padding-top: 2px;
+}
+.shensha-list.hidden { display: none; border-top: none; } 
+.shensha-tag {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+    padding: 1px 0;
 }
 
 /* --- 軌道區 --- */
 .rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
-.rail-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--panel-bg);
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    overflow-x: auto; 
-    white-space: nowrap;
-}
-.rail-title {
-    min-width: 30px;
-    font-weight: bold;
-    color: #555;
-    text-align: center;
-    font-size: 13px;
-    background: #eee;
-    padding: 5px 2px;
-    border-radius: 6px;
-    writing-mode: vertical-rl;
-}
+.rail-row { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; white-space: nowrap; }
+.rail-title { min-width: 30px; font-weight: bold; color: #555; text-align: center; font-size: 13px; background: #eee; padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
 .rail-items { display: flex; gap: 6px; padding-right: 10px; }
-
 .pillar.rail {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 125px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    padding-top: 4px;
-    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 60px; height: 125px; background: #fff; border: 1px solid #eee; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; position: relative; padding-top: 4px; flex-shrink: 0;
 }
 .pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
-.pillar.active {
-    background: var(--highlight);
-    border-color: var(--active-border);
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-}
+.pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
 
-.rail-info {
-    font-size: 11px;
-    color: #666;
-    text-align: center;
-    white-space: pre-line;
-    line-height: 1.1;
-    height: 26px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: 100%;
-    border-bottom: 1px dashed #eee;
-    margin-bottom: 3px;
-    padding-bottom: 1px;
+.rail-info { 
+    font-size: 11px; 
+    color: #666; 
+    text-align: center; 
+    display: block; 
+    white-space: pre; 
+    line-height: 1.3; 
+    height: 36px; 
+    width: 100%; 
+    border-bottom: 1px dashed #eee; 
+    margin-bottom: 3px; 
+    padding-top: 4px;
 }
 .rail-row-inner { display: flex; align-items: baseline; gap: 2px; }
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* --- Modal --- */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.modal-content {
-    background: #fff;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    background: #f9f9f9;
-    display: flex;
-    flex-direction: column; 
-    gap: 10px;
-}
-.modal-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
+/* Modal 與其他 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: #fff; width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
+.modal-header { padding: 15px; border-bottom: 1px solid #eee; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
+.modal-title-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .modal-title-row h3 { margin: 0; font-size: 18px; color: #333; }
 .close-modal { font-size: 24px; cursor: pointer; color: #999; }
-
-.search-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-/* 分類濾鏡 */
-.category-filters {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 2px 0;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    width: 100%; 
-}
+.search-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.category-filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; white-space: nowrap; -webkit-overflow-scrolling: touch; width: 100%; }
 .category-filters::-webkit-scrollbar { display: none; }
-
-.filter-chip {
-    padding: 8px 16px; 
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    background: #fff;
-    color: #666;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0; 
-    white-space: nowrap;
-}
+.filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; white-space: nowrap; }
 .filter-chip:hover { background: #f0f0f0; }
-.filter-chip.active {
-    background: var(--active-border);
-    color: white;
-    border-color: var(--active-border);
-    font-weight: bold;
-}
-
+.filter-chip.active { background: var(--active-border); color: white; border-color: var(--active-border); font-weight: bold; }
 .chart-list { padding: 10px; overflow-y: auto; flex: 1; }
-.chart-item {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s;
-    border-radius: 6px;
-}
+.chart-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; border-radius: 6px; }
 .chart-item:hover { background: #f0f7ff; }
 .chart-info { flex: 1; }
 .chart-name { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 4px; }
-.chart-tags span {
-    display: inline-block;
-    background: #e3f2fd;
-    color: #1976d2;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-right: 4px;
-}
+.chart-tags span { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
 .chart-detail { font-size: 12px; color: #666; margin-top: 2px; }
 .delete-btn { padding: 6px 10px; background: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
 
@@ -595,33 +421,119 @@ button.map-btn {
     transition: color 0.2s;
 }
 .app-footer a:hover { color: #E1306C; }
-.ig-icon { width: 16px; height: 16px; fill: currentColor; }
+
+.ig-icon { width: 16px !important; height: 16px !important; fill: currentColor; }
 
 ::-webkit-scrollbar { height: 4px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
-/* --- 修改後：十二長生樣式 (文字版 + 虛線) --- */
-.zhangsheng-text {
-    position: absolute;     /* 【關鍵】絕對定位 */
-    bottom: 0;              /* 強制貼在底部 */
-    left: 0;                /* 左邊對齊 */
-    width: 100%;            /* 寬度撐滿整個格子 */
+/* =========================================
+   【新增】手機版專用樣式 (max-width: 600px)
+   ========================================= */
+@media (max-width: 600px) {
     
-    font-size: 12px;
-    color: #888;
-    text-align: center;
+    /* 1. Auth Box (手機版): 保持左右排列，但縮小字體以防重疊 */
+    .auth-box {
+        padding: 10px;
+        gap: 5px;
+    }
+    .auth-hint {
+        font-size: 11px; /* 縮小提示字體 */
+        white-space: normal;
+        line-height: 1.2;
+        flex: 1;
+    }
+    #btnLogin {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+        width: auto !important;
+    }
+
+    /* 2. 柱子收窄 (52px) 以在 iPhone 顯示更多內容 */
+    .pillar.main {
+        width: 52px;
+        min-width: 52px;
+    }
     
-    padding-top: 6px;       /* 調整虛線與文字的距離 */
-    padding-bottom: 6px;    /* 調整文字與底部的距離 */
+    /* [修正 2] 對應加大字體 (20px -> 24px) */
+    .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; margin-bottom: 2px;}
+    .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
     
-    border-top: 1px dashed #eee; /* 虛線分隔 */
-    background-color: #fff;      /* 背景白色，避免與上方內容重疊時變透明 */
-    border-radius: 0 0 6px 6px;  /* 如果格子有圓角，這裡也要修圓角 */
-    font-weight: normal;
+    /* [修正 3] 十神空間增加 */
+    .shishen-top { 
+        font-size: 10px; 
+        height: 14px; 
+        margin-bottom: 4px; /* 增加距離 */
+    }
+    
+    /* [修正 1] 藏干區字體加大與固定高度 */
+    .canggan-row { font-size: 12px; gap: 1px; }
+    .canggan-shishen { font-size: 10px; transform: none; }
+    
+    /* 縮小間距 */
+    .main-display { gap: 2px; }
+    .group-container { padding: 4px 2px; gap: 1px; }
+    
+    /* [手機版] 調整定位參數 (因字體變大，高度可能微調) */
+    .group-label {
+        width: 18px;
+        /* 手機版：對齊天干 */
+        padding-top: 82px; 
+        font-size: 11px;
+    }
+    .shensha-toggle-btn {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        /* 手機版：對齊十二長生 */
+        margin-top: 117px; 
+    }
+    
+    /* 調整頂部資訊區高度 */
+    .top-info {
+        min-height: 28px;
+        font-size: 10px;
+    }
+    
+    .title-text {
+        font-size: 11px;
+        padding: 4px 0;
+    }
+    
+    /* 調整眼仔位置 */
+    .eye-btn {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        top: 4px;
+    }
+    
+    /* [修正 1] 固定藏干高度，確保對齊 */
+    .canggan-box {
+        /* 改為固定高度 height，並增加到 60px，解決對齊與缺失問題 */
+        height: 60px; 
+        min-height: 60px;
+        margin-bottom: 2px; /* 減少留白 */
+        padding-top: 2px;   /* 減少留白 */
+    }
+    
+    .shensha-tag {
+        font-size: 11px;
+    }
+    /* [修正 1] 固定十二長生高度，確保對齊 */
+    .zhangsheng-text {
+        font-size: 10px;
+        height: 20px; /* 強制固定高度 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* [修正] 減少底部區域留白 */
+    .pillar-bottom-section {
+        padding-bottom: 2px;
+    }
 }
-
-
-
 
 

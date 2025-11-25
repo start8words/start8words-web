@@ -6,6 +6,7 @@ window.marker = null;
 window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
+window.isShenShaVisible = true; 
 window.originSolar = null;
 window.currentBaziData = null;
 window.currentDocId = null;
@@ -172,7 +173,6 @@ let state = { birthSolar: null, baseDayGan: null, daYuns: [], selDaYunIdx: 0, se
 // --- 開始新排盤 (入口函數) ---
 window.startNewChart = function() {
     window.currentDocId = null; 
-
     window.initChart(); 
     
     const saveCheck = document.getElementById('saveChartCheck');
@@ -338,7 +338,6 @@ window.initChart = function() {
             inputMode: window.currentInputMode,
             location: document.getElementById('locationName').value,
             useTST: document.getElementById('useTST').checked,
-            // 【修正】預設值改為 '自己'，與 HTML 選單一致
             tags: document.getElementById('tagsInput') ? document.getElementById('tagsInput').value : '自己', 
             zishiMode: zishiMode,
             bazi: {
@@ -359,7 +358,7 @@ window.initChart = function() {
 // 5. 輔助函數
 // ==========================================
 function getShiShen(targetGan, isDayPillarStem) {
-    if (!state.baseDayGan || !targetGan) return '';
+    if (!state.baseDayGan || !targetGan || targetGan === '&nbsp;' || targetGan === '吉') return '';
     if (isDayPillarStem) return '日主';
     const dayIdx = GAN_LIST.indexOf(state.baseDayGan);
     const targetIdx = GAN_LIST.indexOf(targetGan);
@@ -376,75 +375,119 @@ function getShiShen(targetGan, isDayPillarStem) {
     if ((targetEl + 2) % 5 === dayEl) return samePol ? '七殺' : '正官';
     return '';
 }
-// --- 十二長生計算輔助函數 ---
+
 function getZhangSheng(gan, zhi) {
-    if (!gan || !zhi) return '';
-    
-    // 定義十二長生順序
+    if (!gan || !zhi || gan === '&nbsp;' || zhi === '&nbsp;' || gan === '吉') return '';
     const ZS_ORDER = ['長生', '沐浴', '冠帶', '臨官', '帝旺', '衰', '病', '死', '墓', '絕', '胎', '養'];
-    // 定義地支順序
     const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-    
-    // 定義十天干的長生起點與順逆 (true=順行, false=逆行)
-    // 甲亥順，乙午逆，丙戊寅順，丁己酉逆，庚巳順，辛子逆，壬申順，癸卯逆
     const GAN_RULES = {
-        '甲': { start: '亥', forward: true },
-        '乙': { start: '午', forward: false },
-        '丙': { start: '寅', forward: true },
-        '戊': { start: '寅', forward: true }, // 土水同宮或土隨火，此处採用火土同宮
-        '丁': { start: '酉', forward: false },
-        '己': { start: '酉', forward: false },
-        '庚': { start: '巳', forward: true },
-        '辛': { start: '子', forward: false },
-        '壬': { start: '申', forward: true },
-        '癸': { start: '卯', forward: false }
+        '甲': { start: '亥', forward: true }, '乙': { start: '午', forward: false },
+        '丙': { start: '寅', forward: true }, '戊': { start: '寅', forward: true }, 
+        '丁': { start: '酉', forward: false }, '己': { start: '酉', forward: false },
+        '庚': { start: '巳', forward: true }, '辛': { start: '子', forward: false },
+        '壬': { start: '申', forward: true }, '癸': { start: '卯', forward: false }
     };
-
-    const rule = GAN_RULES[gan];
-    if (!rule) return '';
-
+    const rule = GAN_RULES[gan]; if (!rule) return '';
     const startIdx = ZHI_ORDER.indexOf(rule.start);
     const targetIdx = ZHI_ORDER.indexOf(zhi);
-    
     if (startIdx === -1 || targetIdx === -1) return '';
-
     let offset;
-    if (rule.forward) {
-        // 順行：(目標 - 起點)
-        offset = targetIdx - startIdx;
-    } else {
-        // 逆行：(起點 - 目標)
-        offset = startIdx - targetIdx;
-    }
-
-    // 處理負數，確保在 0-11 之間
+    if (rule.forward) offset = targetIdx - startIdx;
+    else offset = startIdx - targetIdx;
     if (offset < 0) offset += 12;
     offset = offset % 12;
-
     return ZS_ORDER[offset];
 }
+
 function getShortShiShen(fullShiShen) { return SHISHEN_SHORT[fullShiShen] || ''; }
 
+function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
+    if (!pillarZhi || !dayGan || pillarZhi === '&nbsp;' || pillarZhi === '時') return [];
+    const list = [];
+    const nobleMap = {
+        '甲': ['丑','未'], '戊': ['丑','未'], '庚': ['丑','未'],
+        '乙': ['子','申'], '己': ['子','申'],
+        '丙': ['亥','酉'], '丁': ['亥','酉'],
+        '壬': ['巳','卯'], '癸': ['巳','卯'],
+        '辛': ['午','寅']
+    };
+    if (nobleMap[dayGan] && nobleMap[dayGan].includes(pillarZhi)) list.push('天乙');
+
+    const checkYiMa = (baseZhi) => {
+        if (['申','子','辰'].includes(baseZhi) && pillarZhi === '寅') return true;
+        if (['寅','午','戌'].includes(baseZhi) && pillarZhi === '申') return true;
+        if (['亥','卯','未'].includes(baseZhi) && pillarZhi === '巳') return true;
+        if (['巳','酉','丑'].includes(baseZhi) && pillarZhi === '亥') return true;
+        return false;
+    };
+    if (checkYiMa(dayZhi) || checkYiMa(yearZhi)) list.push('驛馬');
+
+    const checkTaoHua = (baseZhi) => {
+        if (['申','子','辰'].includes(baseZhi) && pillarZhi === '酉') return true;
+        if (['寅','午','戌'].includes(baseZhi) && pillarZhi === '卯') return true;
+        if (['亥','卯','未'].includes(baseZhi) && pillarZhi === '子') return true;
+        if (['巳','酉','丑'].includes(baseZhi) && pillarZhi === '午') return true;
+        return false;
+    };
+    if (checkTaoHua(dayZhi) || checkTaoHua(yearZhi)) list.push('桃花');
+
+    const wenChangMap = {'甲':'巳', '乙':'午', '丙':'申', '戊':'申', '丁':'酉', '己':'酉', '庚':'亥', '辛':'子', '壬':'寅', '癸':'卯'};
+    if (wenChangMap[dayGan] === pillarZhi) list.push('文昌');
+
+    const yangRenMap = {'甲':'卯', '乙':'寅', '丙':'午', '戊':'午', '丁':'巳', '己':'巳', '庚':'酉', '辛':'申', '壬':'子', '癸':'亥'};
+    if (yangRenMap[dayGan] === pillarZhi) list.push('羊刃');
+
+    const luMap = {'甲':'寅', '乙':'卯', '丙':'巳', '戊':'巳', '丁':'午', '己':'午', '庚':'申', '辛':'酉', '壬':'亥', '癸':'子'};
+    if (luMap[dayGan] === pillarZhi) list.push('祿神');
+
+    const GAN_IDX = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ZHI_IDX = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    if (dayGan && dayZhi) {
+        const gIdx = GAN_IDX.indexOf(dayGan);
+        const zIdx = ZHI_IDX.indexOf(dayZhi);
+        const k1 = (zIdx - gIdx + 10 + 12) % 12;
+        const k2 = (zIdx - gIdx + 11 + 12) % 12;
+        const pZhiIdx = ZHI_IDX.indexOf(pillarZhi);
+        if (pZhiIdx === k1 || pZhiIdx === k2) list.push('空亡');
+    }
+    return list;
+}
+
+// 【重要修正】ToggleTime 不再使用遮罩，而是直接替換文字
 window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
-    const contentDiv = document.getElementById('pillarContent_baseHour');
     const eyeIcon = document.getElementById('eyeIcon');
-    if (window.isTimeHidden) {
-        contentDiv.style.display = 'none';
-        eyeIcon.innerText = '🔒';
-        const parent = contentDiv.parentElement;
-        if (!parent.querySelector('#maskText')) {
-            const mask = document.createElement('div');
-            mask.id = 'maskText';
-            mask.className = 'lucky-mask';
-            mask.innerText = '吉時';
-            parent.appendChild(mask);
-        } else { parent.querySelector('#maskText').style.display = 'flex'; }
-    } else {
-        contentDiv.style.display = 'flex';
-        eyeIcon.innerText = '👁';
-        const mask = document.getElementById('maskText');
-        if(mask) mask.style.display = 'none';
+    
+    // 重新渲染時柱
+    if (state.birthSolar && state.baseDayGan) {
+        const bazi = state.birthSolar.getLunar().getEightChar();
+        const tGan = bazi.getTimeGan();
+        const tZhi = bazi.getTimeZhi();
+        const timeTitle = document.querySelector('#baseHour .title-text').innerText;
+        
+        renderMainPillar('baseHour', tGan, tZhi, timeTitle, false, '', true);
+    }
+    
+    if(eyeIcon) eyeIcon.innerText = window.isTimeHidden ? '🔒' : '👁';
+}
+
+window.toggleShenShaAll = function() {
+    window.isShenShaVisible = !window.isShenShaVisible;
+    
+    const lists = document.querySelectorAll('.shensha-list');
+    lists.forEach(el => {
+        if (window.isShenShaVisible) {
+            el.classList.remove('hidden');
+            el.style.display = 'flex';
+        } else {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+    });
+
+    const btn = document.getElementById('btnToggleShenSha');
+    if(btn) {
+        btn.innerText = window.isShenShaVisible ? '▲' : '▼'; 
     }
 }
 
@@ -459,44 +502,97 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const el = document.getElementById(id);
     if (!el) return;
 
-    // 1. 計算十神
-    const shishen = getShiShen(gan, isDayPillar);
-    const shishenClass = (shishen === '日主') ? 'shishen-top dm' : 'shishen-top';
-    
-    // 2. 處理藏干
-    const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
-    let cangganHtml = '';
-    hiddenGans.forEach(hGan => {
-        const hShishen = getShiShen(hGan, false);
-        const color = WUXING_COLOR[hGan] || '#333';
-        cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
-    });
+    // 【邏輯修正】：隱藏模式強制內容
+    let displayGan = gan;
+    let displayZhi = zhi;
+    let displayShiShen = '';
+    let showCangGan = true;
+    let showZhangSheng = true;
+    let isHiddenMode = false;
 
-    // 3. 【最終修正版】計算十二長生
-    let zhangshengText = '';
-    // 確保有日主 (state.baseDayGan) 和該柱地支 (zhi)
-    if (state.baseDayGan && zhi) {
-        zhangshengText = getZhangSheng(state.baseDayGan, zhi);
+    // 吉時模式：強制紅色、吉時字樣
+    if (hasEye && window.isTimeHidden) {
+        isHiddenMode = true;
+        displayGan = '吉';
+        displayZhi = '時';
+        showCangGan = false;
+        showZhangSheng = false;
+        displayShiShen = '&nbsp;'; 
+    } else {
+        displayShiShen = getShiShen(gan, isDayPillar);
     }
 
-    // 4. 組裝 HTML
-    const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
-    const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">👁</div>` : '';
+    // 1. 十神
+    const shishenClass = (displayShiShen === '日主') ? 'shishen-top dm' : 'shishen-top';
+    const shishenHtml = `<div class="${shishenClass}">${displayShiShen || '&nbsp;'}</div>`;
     
-    // 顯示標籤
-    const zsHtml = zhangshengText ? `<div class="zhangsheng-text">${zhangshengText}</div>` : '';
+    // 2. 藏干 (隱藏模式下渲染空div保持高度)
+    let cangganHtml = '';
+    if (isHiddenMode) {
+         // 渲染3個空行撐高度
+         cangganHtml = `<div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div>`;
+    } else if (zhi !== '&nbsp;') {
+        const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
+        hiddenGans.forEach(hGan => {
+            const hShishen = getShiShen(hGan, false);
+            const color = WUXING_COLOR[hGan] || '#333';
+            cangganHtml += `<div class="canggan-row"><span class="canggan-char" style="color:${color}">${hGan}</span><span class="canggan-shishen">${hShishen}</span></div>`;
+        });
+    }
+
+    // 3. 十二長生
+    let zhangshengText = '&nbsp;';
+    if (!isHiddenMode && state.baseDayGan && zhi && zhi !== '&nbsp;') {
+        zhangshengText = getZhangSheng(state.baseDayGan, zhi) || '&nbsp;';
+    } 
+    const zsHtml = `<div class="zhangsheng-text">${zhangshengText}</div>`;
+
+    // 4. 神煞
+    let shenshaHtml = '';
+    if (!isHiddenMode && state.baseDayGan && state.birthSolar && zhi !== '&nbsp;') {
+        const baziObj = state.birthSolar.getLunar().getEightChar();
+        const dGan = baziObj.getDayGan();
+        const dZhi = baziObj.getDayZhi();
+        const yZhi = baziObj.getYearZhi();
+        const shenshaList = getShenSha(zhi, dGan, dZhi, yZhi);
+        shenshaHtml = shenshaList.map(s => `<span class="shensha-tag">${s}</span>`).join('');
+    }
+
+    // 5. 組裝
+    const eyeHtml = hasEye ? `<div id="eyeIcon" class="eye-btn" onclick="toggleTimeVisibility()">${window.isTimeHidden ? '🔒' : '👁'}</div>` : '';
+    const infoHtml = infoText ? `<div class="top-info">${infoText}</div>` : `<div class="top-info" style="border:none;"></div>`;
+    
+    const visibilityStyle = window.isShenShaVisible ? 'display:flex;' : 'display:none;';
+    const shenshaContainerHtml = `<div class="shensha-list" style="${visibilityStyle}">${shenshaHtml}</div>`;
+
+    // 顏色：隱藏模式(吉時)為紅，否則按五行
+    let ganColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[gan] || '#333');
+    let zhiColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[zhi] || '#333');
+    
+    // 【修正】移除對「甲」與「子」的透明度判斷，修復正常八字被隱藏的問題
+    if (gan === '&nbsp;') ganColor = 'transparent'; 
+    if (zhi === '&nbsp;') zhiColor = 'transparent';
+
+    const footerHtml = `
+        <div class="pillar-bottom-section">
+            ${zsHtml}
+            ${shenshaContainerHtml}
+        </div>
+    `;
 
     const contentHtml = `
-        <div id="pillarContent_${id}" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-            <div class="${shishenClass}">${shishen}</div>
-            <div class="gan" style="color:${WUXING_COLOR[gan]}">${gan}</div>
-            <div class="zhi" style="color:${WUXING_COLOR[zhi]}">${zhi}</div>
+        <div id="pillarContent_${id}" class="pillar-content-wrapper">
+            ${shishenHtml}
+            <div class="gan" style="color:${ganColor}">${displayGan}</div>
+            <div class="zhi" style="color:${zhiColor}">${displayZhi}</div>
             <div class="canggan-box">${cangganHtml}</div>
-            ${zsHtml} </div>
+            ${footerHtml}
+        </div>
     `;
     
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
 }
+
 function renderRailPillar(gan, zhi, title, infoText) {
     const ganSS = getShortShiShen(getShiShen(gan, false));
     const zhiMainGan = (LOOKUP_HIDDEN[zhi] || [])[0];
@@ -611,14 +707,19 @@ function renderRailsCascadeFromHour() { renderHourRail(); updateActiveDisplay();
 function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
     const dy = state.daYuns[state.selDaYunIdx];
-    if (!dy) return;
     
-    const dyGZ = dy.getGanZhi();
-    let dyStartAge = dy.getStartAge();
-    let dyStartYear = dy.getStartYear();
-    if(dyStartYear < 1000) dyStartYear += birthYear;
-    const dyInfo = `${dyStartAge}歲起\n${dyStartYear}年`;
-    renderMainPillar('activeDaYun', dyGZ.charAt(0), dyGZ.charAt(1), '大運', false, dyInfo);
+    // 【修正空大運塌陷】：
+    // 移除傳入假文字的邏輯，直接傳入 '&nbsp;' 或空值
+    if (dy) {
+        const dyGZ = dy.getGanZhi();
+        let dyStartAge = dy.getStartAge();
+        let dyStartYear = dy.getStartYear();
+        if(dyStartYear < 1000) dyStartYear += birthYear;
+        const dyInfo = `${dyStartAge}歲起\n${dyStartYear}年`;
+        renderMainPillar('activeDaYun', dyGZ.charAt(0), dyGZ.charAt(1), '大運', false, dyInfo);
+    } else {
+        renderMainPillar('activeDaYun', '&nbsp;', '&nbsp;', '大運', false, '未起運');
+    }
     
     const activeSolar = Solar.fromYmdHms(state.selYear, state.selMonth, state.selDay, state.selHour, 0, 0);
     const activeLunar = activeSolar.getLunar();
@@ -648,7 +749,3 @@ function highlightSelection(id, idx) {
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
 }
-
-
-
-
