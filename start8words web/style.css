@@ -190,14 +190,12 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     height: 18px;
     min-width: 18px;
     min-height: 18px;
-    border-radius: 50%;
+    border-radius: 0%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
     writing-mode: horizontal-tb;
-    margin-top: 115px; /* Desktop Default */
-    margin-right: -1px;
+    margin-top: 120px; /* Desktop Default */
 }
 
 /* --- 柱子結構 --- */
@@ -487,7 +485,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         height: 16px;
         font-size: 10px;
         /* 手機版：對齊十二長生 */
-        margin-top: 117px; 
+        margin-top: 112px; 
     }
     
     /* 調整頂部資訊區高度 */
@@ -535,5 +533,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         padding-bottom: 2px;
     }
 }
+
 
 
