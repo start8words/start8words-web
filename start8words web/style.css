@@ -284,7 +284,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 /* 眼仔按鈕 */
 .eye-btn {
     position: absolute;
-    top: 4px; 
+    top: 6px; 
     left: 50%;
     transform: translateX(-50%);
     background: #fff;
@@ -295,7 +295,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     border: 1px solid #ccc;
     z-index: 20;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -506,7 +506,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         width: 16px;
         height: 16px;
         font-size: 10px;
-        top: 2px;
+        top: 4px;
     }
     
     /* [修正 1] 固定藏干高度，確保對齊 */
@@ -535,4 +535,5 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         padding-bottom: 2px;
     }
 }
+
 
