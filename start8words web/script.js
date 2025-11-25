@@ -453,6 +453,7 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
     return list;
 }
 
+// 【重要修正】ToggleTime 不再使用遮罩，而是直接替換文字
 window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
     const eyeIcon = document.getElementById('eyeIcon');
