@@ -438,7 +438,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         gap: 5px;
     }
     .auth-hint {
-        font-size: 11px; /* 縮小提示字體 */
+        font-size: 12px; /* 縮小提示字體 */
         white-space: normal;
         line-height: 1.2;
         flex: 1;
@@ -459,9 +459,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .gan { font-size: 24px; }
     .zhi { font-size: 24px; }
     
-    .shishen-top { font-size: 10px; height: 14px; }
-    .canggan-row { font-size: 10px; gap: 2px; }
-    .canggan-shishen { font-size: 9px; transform: scale(0.9); }
+    .shishen-top { font-size: 12px; height: 14px; }
+    .canggan-row { font-size: 12px; gap: 2px; }
+    .canggan-shishen { font-size: 11px; transform: scale(0.9); }
     
     /* 縮小間距 */
     .main-display { gap: 2px; }
@@ -520,3 +520,4 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         justify-content: center;
     }
 }
+
