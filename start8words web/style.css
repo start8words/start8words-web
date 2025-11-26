@@ -209,8 +209,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
     align-items: stretch;
-    /* 【關鍵修改】改為 center，讓電腦版也置中對齊，不撐開左右 */
-    justify-content: center; 
+    
+    /* 【修改】電腦版恢復為 space-between，讓區塊對齊左右 */
+    justify-content: space-between; 
+    
     -webkit-overflow-scrolling: touch;
 }
 
@@ -223,8 +225,11 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     height: auto;
-    /* 【關鍵修改】改為 auto，不強制佔滿剩餘空間，保持緊湊 */
-    flex: 0 0 auto; 
+    
+    /* 【修改】移除 flex: 0 0 auto，改為 flex: 1 或預設，以便 space-between 生效 */
+    flex: 1; 
+    max-width: 49%; /* 確保兩個區塊大約佔一半，避免太寬 */
+    
     justify-content: center; 
 }
 .group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
@@ -514,7 +519,14 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .canggan-shishen { font-size: 10px; transform: none; }
     
     .main-display { gap: 2px; }
-    .group-container { padding: 4px 2px; gap: 1px; }
+    
+    .group-container { 
+        padding: 4px 2px; 
+        gap: 1px; 
+        /* 手機版保持原有設定，覆蓋電腦版的寬度 */
+        flex: 1; 
+        max-width: none;
+    }
     
     .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
     .shensha-toggle-btn { width: 16px; height: 16px; font-size: 10px; margin-top: 110px; }
