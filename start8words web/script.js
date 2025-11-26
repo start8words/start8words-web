@@ -724,8 +724,9 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const visibilityStyle = window.isShenShaVisible ? 'display:flex;' : 'display:none;';
     const shenshaContainerHtml = `<div class="shensha-list" style="${visibilityStyle}">${shenshaHtml}</div>`;
 
-    let ganColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[gan] || '#333');
-    let zhiColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[zhi] || '#333');
+    // 【修改顏色】隱藏模式(吉時)改為淺灰 #cccccc
+    let ganColor = isHiddenMode ? '#cccccc' : (WUXING_COLOR[gan] || '#333');
+    let zhiColor = isHiddenMode ? '#cccccc' : (WUXING_COLOR[zhi] || '#333');
     
     if (gan === '&nbsp;') ganColor = 'transparent'; 
     if (zhi === '&nbsp;') zhiColor = 'transparent';
