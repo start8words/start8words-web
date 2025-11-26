@@ -223,14 +223,14 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     height: auto;
-    flex: 5; 
+    flex: 4.7; 
     justify-content: space-around; 
 }
 
 .group-container.dynamic-group { 
     border: 1px solid var(--border); 
     background: var(--panel-bg);
-    flex: 4; 
+    flex: 4.3; 
 }
 
 /* 原局與隱藏鍵定位 */
@@ -598,4 +598,5 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     #shareImgContainer { padding: 10px; }
 }
+
 
