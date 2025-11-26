@@ -18,7 +18,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=8.1">
+    <link rel="stylesheet" href="style.css?v=8.2">
 </head>
 <body>
 
@@ -92,6 +92,7 @@
             </div>
         </div>
 
+        <!-- 干支反推面板 -->
         <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
             <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
@@ -156,8 +157,25 @@
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
 
-    <div class="toggle-bar" id="toggleBar" onclick="toggleInputs()">
-        ▼ 收起輸入區
+    <!-- 【新增】50:50 控制列 -->
+    <div class="toggle-row">
+        <div class="toggle-col left" id="toggleInputBtn" onclick="toggleInputs()">
+            ▼ 收起輸入區
+        </div>
+        <div class="toggle-col right" id="toggleToolsBtn" onclick="toggleTools()">
+            ▼ 展開工具列
+        </div>
+    </div>
+
+    <!-- 【移動】截圖工具列 (移到這裡，預設隱藏) -->
+    <div id="toolsBar" class="tools-bar" style="display: none;">
+        <div class="tool-label">分享截圖：</div>
+        <button class="tool-btn" onclick="shareChart('origin')">
+            📷 原局 (四柱)
+        </button>
+        <button class="tool-btn" onclick="shareChart('main')">
+            📸 原局 + 運歲 (六柱)
+        </button>
     </div>
 
     <div id="infoDashboard" class="info-dashboard">
@@ -171,16 +189,6 @@
             <div class="info-item"><span class="info-label">農曆:</span><span class="info-val" id="dispLunar">-</span></div>
             <div class="info-item"><span class="info-label">真太陽時:</span><span class="info-val" id="dispTST">-</span></div>
         </div>
-    </div>
-
-    <div class="tools-bar">
-        <div class="tool-label">分享截圖：</div>
-        <button class="tool-btn" onclick="shareChart('origin')">
-            📷 原局 (四柱)
-        </button>
-        <button class="tool-btn" onclick="shareChart('main')">
-            📸 原局 + 運歲 (六柱)
-        </button>
     </div>
 
     <div class="main-display" id="topDisplay" style="display:none;">
@@ -211,6 +219,7 @@
         <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
+    <!-- 我的命盤 Modal -->
     <div id="chartModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -237,6 +246,7 @@
         </div>
     </div>
 
+    <!-- 反推結果 Modal -->
     <div id="reverseResultModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -247,10 +257,12 @@
                 <div style="font-size:13px; color:#666;">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
             </div>
             <div id="reverseList" class="chart-list">
-                </div>
+                <!-- 結果將插入這裡 -->
+            </div>
         </div>
     </div>
 
+    <!-- 截圖分享 Modal -->
     <div id="shareModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 90%; width: 500px; background: #f4f6f8;">
             <div class="modal-header">
@@ -263,7 +275,8 @@
                 </div>
             </div>
             <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: #e0e0e0; min-height: 200px;">
-                </div>
+                <!-- 圖片生成後會出現在這裡 -->
+            </div>
         </div>
     </div>
 
@@ -277,7 +290,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=8.4"></script>
+    <script src="script.js?v=8.5"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
