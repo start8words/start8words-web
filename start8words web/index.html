@@ -16,8 +16,9 @@
     <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <link rel="stylesheet" href="style.css?v=8.2">
 </head>
 <body>
 
@@ -156,8 +157,25 @@
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
 
-    <div class="toggle-bar" id="toggleBar" onclick="toggleInputs()">
-        ▼ 收起輸入區
+    <!-- 【新增】50:50 控制列 -->
+    <div class="toggle-row">
+        <div class="toggle-col left" id="toggleInputBtn" onclick="toggleInputs()">
+            ▼ 收起輸入區
+        </div>
+        <div class="toggle-col right" id="toggleToolsBtn" onclick="toggleTools()">
+            ▼ 展開工具列
+        </div>
+    </div>
+
+    <!-- 【移動】截圖工具列 (移到這裡，預設隱藏) -->
+    <div id="toolsBar" class="tools-bar" style="display: none;">
+        <div class="tool-label">分享截圖：</div>
+        <button class="tool-btn" onclick="shareChart('origin')">
+            📷 原局 (四柱)
+        </button>
+        <button class="tool-btn" onclick="shareChart('main')">
+            📸 原局 + 運歲 (六柱)
+        </button>
     </div>
 
     <div id="infoDashboard" class="info-dashboard">
@@ -228,7 +246,7 @@
         </div>
     </div>
 
-    <!-- 反推結果 Modal (新增) -->
+    <!-- 反推結果 Modal -->
     <div id="reverseResultModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -244,6 +262,24 @@
         </div>
     </div>
 
+    <!-- 截圖分享 Modal -->
+    <div id="shareModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 90%; width: 500px; background: #f4f6f8;">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h3>📤 命盤截圖</h3>
+                    <span class="close-modal" onclick="closeShareModal()">×</span>
+                </div>
+                <div style="font-size:13px; color:#666; margin-top:5px;">
+                    長按下方圖片即可儲存或是分享給朋友。
+                </div>
+            </div>
+            <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: #e0e0e0; min-height: 200px;">
+                <!-- 圖片生成後會出現在這裡 -->
+            </div>
+        </div>
+    </div>
+
     <div class="app-footer">
         <p>© 2025 逸晴命理 All Rights Reserved.</p>
         <a href="https://instagram.com/start_8words" target="_blank">
@@ -254,7 +290,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=8.3"></script>
+    <script src="script.js?v=8.5"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -441,7 +477,6 @@
             document.getElementById('useTST').checked = data.useTST || false;
             
             const tagsSelect = document.getElementById('tagsInput');
-            // 這裡也將 fallback 設為 '自己'，確保一致
             if (tagsSelect) tagsSelect.value = data.tags || '自己';
 
             if (saveChartCheck) saveChartCheck.checked = false;

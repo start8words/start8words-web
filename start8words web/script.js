@@ -6,6 +6,7 @@ window.marker = null;
 window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
+window.isToolsCollapsed = true; 
 window.isShenShaVisible = true; 
 window.originSolar = null;
 window.currentBaziData = null;
@@ -84,15 +85,31 @@ window.switchTab = function(mode) {
 
 window.toggleInputs = function() {
     const wrapper = document.getElementById('inputWrapper');
-    const bar = document.getElementById('toggleBar');
+    const btn = document.getElementById('toggleInputBtn'); 
+    
     if (window.isInputsCollapsed) {
         wrapper.classList.remove('collapsed');
-        bar.innerText = '▼ 收起輸入區';
+        btn.innerText = '▼ 收起輸入區';
     } else {
         wrapper.classList.add('collapsed');
-        bar.innerText = '▲ 展開輸入區';
+        btn.innerText = '▲ 展開輸入區';
     }
     window.isInputsCollapsed = !window.isInputsCollapsed;
+}
+
+window.toggleTools = function() {
+    const bar = document.getElementById('toolsBar');
+    const btn = document.getElementById('toggleToolsBtn');
+    
+    if (window.isToolsCollapsed) {
+        bar.style.display = 'flex';
+        btn.innerText = '▲ 收起工具列';
+        window.isToolsCollapsed = false;
+    } else {
+        bar.style.display = 'none';
+        btn.innerText = '▼ 展開工具列';
+        window.isToolsCollapsed = true;
+    }
 }
 
 window.toggleMap = function(forceClose) {
@@ -212,26 +229,17 @@ function validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz) {
     const mgIdx = GAN_LIST.indexOf(mg);
     const mzIdx = ZHI_LIST.indexOf(mz);
     
-    // 月干檢查 (五虎遁)
-    // 寅月(2) offset=2. 公式: ((年干+1)*2 + (月支-2)) % 10
-    // 修正：月支從寅(2)開始算。
-    // 簡單表：甲己之年丙(2)作首。
-    // 年干idx: 0(甲), 1(乙)...
-    // 0->2, 1->4, 2->6, 3->8, 4->0...  => (idx % 5 * 2 + 2) % 10 是寅月天干
     const startMonthGan = (ygIdx % 5 * 2 + 2) % 10; 
-    // 目標月支距離寅月的差值
     let monthDiff = mzIdx - 2;
     if (monthDiff < 0) monthDiff += 12;
     
     const expectedMgIdx = (startMonthGan + monthDiff) % 10;
     if (expectedMgIdx !== mgIdx) return "年柱與月柱不符 (五虎遁)";
 
-    // 時干檢查 (五鼠遁)
     const dgIdx = GAN_LIST.indexOf(dg);
     const hgIdx = GAN_LIST.indexOf(hg);
-    const hzIdx = ZHI_LIST.indexOf(hz); // 子0...
+    const hzIdx = ZHI_LIST.indexOf(hz); 
     
-    // 甲己還加甲(0)。
     const startHourGan = (dgIdx % 5 * 2) % 10;
     const expectedHgIdx = (startHourGan + hzIdx) % 10;
     
@@ -240,7 +248,6 @@ function validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz) {
     return null;
 }
 
-// 【重要修正】改進版反推邏輯
 function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
     const err = validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz);
     if (err) {
@@ -252,11 +259,8 @@ function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
     const START_YEAR = 1800;
     const END_YEAR = 2100;
 
-    // 1. 找第一個符合的年柱 (立春後)
-    // 為了保險，我們掃描前 65 年，找到第一個符合的年份
     let startY = -1;
     for(let y = START_YEAR; y <= START_YEAR + 65; y++) {
-        // 檢查該年立夏(5月)的年柱，通常比較穩
         const bazi = Solar.fromYmd(y, 5, 15).getLunar().getEightChar();
         if (bazi.getYearGan() === yg && bazi.getYearZhi() === yz) {
             startY = y;
@@ -269,63 +273,30 @@ function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
         return;
     }
 
-    // 2. 跳躍搜尋
     for (let y = startY; y <= END_YEAR; y += 60) {
-        // 在這一年(前後)找符合月柱的區間
-        // 我們不依賴 jieQiMap 硬性對應，而是直接遍歷該年的 24 節氣
-        // 辛未年的庚寅月，可能在 1991年2月，也可能在 1992年初? 不，寅月一定是立春後。
-        
         const l = Lunar.fromYmd(y, 6, 1);
         const jieQiTable = l.getJieQiTable();
-        const jieQiNames = l.getJieQiList(); // 獲取節氣名稱列表
+        const jieQiNames = l.getJieQiList(); 
         
-        // 我們要找的是：哪一個節氣開始後，月柱是 mg+mz ?
-        // 遍歷所有節氣點
         for (let jqKey in jieQiTable) {
             const solar = jieQiTable[jqKey];
-            // 檢查這個節氣當天的月柱 (或者節氣後一天，以防邊界)
-            // 注意：Lunar 庫的月柱切換是在節氣當天
-            
-            const bazi = solar.getLunar().getEightChar();
-            
-            // 如果這個節氣點的月柱符合
-            // 或者，這個節氣點剛好是我們要找的月份的開始
-            // 簡單點：我們檢查這個節氣點的月干支是否符合
-            // 為了保險，取節氣後 10 分鐘
-            
-            // 直接建立一個檢查用的時間點 (節氣當天中午)
             const checkDate = Solar.fromYmdHms(solar.getYear(), solar.getMonth(), solar.getDay(), 12, 0, 0);
             const checkBazi = checkDate.getLunar().getEightChar();
             
             if (checkBazi.getMonthGan() === mg && checkBazi.getMonthZhi() === mz) {
-                // 找到了月份！
-                // 這個月從這個節氣開始，到下一個節氣結束
-                // 下一個節氣是什麼？
-                // 我們可以簡單地往後搜 32 天
-                
-                let current = solar; // 節氣當天
+                let current = solar; 
                 let daysChecked = 0;
                 
                 while (daysChecked < 35) {
-                    // 再次確認月柱 (防止跨到下個月)
                     const curBazi = current.getLunar().getEightChar();
                     if (curBazi.getMonthGan() !== mg || curBazi.getMonthZhi() !== mz) {
-                        // 月份跑掉了，結束這個迴圈
                         if (daysChecked > 0) break; 
                     }
                     
-                    // 檢查日柱
                     if (curBazi.getDayGan() === dg && curBazi.getDayZhi() === dz) {
-                        // 找到日期！
                         const hIdx = ZHI_LIST.indexOf(hz);
                         let hour = hIdx * 2;
                         if (hz === '子') hour = 0; 
-                        
-                        // 排除夜子時導致日柱變動的情況 (這裡只顯示早子時日期，由用戶自行判斷)
-                        // 或者我們可以更精細：如果時辰是 23:00，日柱會不會變？
-                        // Lunar庫通常 23:00 換日柱。
-                        // 如果反推的是 23:00 (晚子時)，那它其實是前一天的 23:00
-                        // 但這裡我們簡單化：只回傳 00:00 - 22:59 的對應
                         
                         results.push({
                             date: current.toYmd(),
@@ -337,7 +308,6 @@ function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
                     current = current.next(1);
                     daysChecked++;
                 }
-                // 找到一個月就夠了，不用再搜這年的其他節氣 (除非閏月? 八字不論閏月)
                 break; 
             }
         }
@@ -374,7 +344,6 @@ window.closeReverseModal = function() {
 }
 
 window.selectReverseDate = function(dateStr, timeStr) {
-    // 填入西曆輸入框並排盤
     window.switchTab('solar');
     document.getElementById('birthDate').value = dateStr + 'T' + timeStr;
     window.closeReverseModal();
@@ -418,7 +387,6 @@ window.initChart = function() {
             const lunar = Lunar.fromYmdHms(y, m, d, h, 0, 0);
             window.originSolar = lunar.getSolar();
         }
-        // ganzhi mode is handled in startNewChart
 
         // 2. 真太陽時計算
         let calculatingSolar = window.originSolar; 
@@ -647,7 +615,6 @@ function getShenSha(pillarZhi, dayGan, dayZhi, yearZhi) {
     return list;
 }
 
-// 【重要修正】ToggleTime 不再使用遮罩，而是直接替換文字
 window.toggleTimeVisibility = function() {
     window.isTimeHidden = !window.isTimeHidden;
     const eyeIcon = document.getElementById('eyeIcon');
@@ -696,7 +663,6 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const el = document.getElementById(id);
     if (!el) return;
 
-    // 【邏輯修正】：隱藏模式強制內容
     let displayGan = gan;
     let displayZhi = zhi;
     let displayShiShen = '';
@@ -720,10 +686,9 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const shishenClass = (displayShiShen === '日主') ? 'shishen-top dm' : 'shishen-top';
     const shishenHtml = `<div class="${shishenClass}">${displayShiShen || '&nbsp;'}</div>`;
     
-    // 2. 藏干 (隱藏模式下渲染空div保持高度)
+    // 2. 藏干
     let cangganHtml = '';
     if (isHiddenMode) {
-         // 渲染3個空行撐高度
          cangganHtml = `<div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div>`;
     } else if (zhi !== '&nbsp;') {
         const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
@@ -759,11 +724,9 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const visibilityStyle = window.isShenShaVisible ? 'display:flex;' : 'display:none;';
     const shenshaContainerHtml = `<div class="shensha-list" style="${visibilityStyle}">${shenshaHtml}</div>`;
 
-    // 顏色：隱藏模式(吉時)為紅，否則按五行
     let ganColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[gan] || '#333');
     let zhiColor = isHiddenMode ? '#d32f2f' : (WUXING_COLOR[zhi] || '#333');
     
-    // 【修正】移除對「甲」與「子」的透明度判斷，修復正常八字被隱藏的問題
     if (gan === '&nbsp;') ganColor = 'transparent'; 
     if (zhi === '&nbsp;') zhiColor = 'transparent';
 
@@ -902,8 +865,6 @@ function updateActiveDisplay() {
     let birthYear = state.birthSolar.getYear();
     const dy = state.daYuns[state.selDaYunIdx];
     
-    // 【修正空大運塌陷】：
-    // 移除傳入假文字的邏輯，直接傳入 '&nbsp;' 或空值
     if (dy) {
         const dyGZ = dy.getGanZhi();
         let dyStartAge = dy.getStartAge();
@@ -942,4 +903,110 @@ function highlightSelection(id, idx) {
     const c = document.getElementById(id).children;
     for(let el of c) el.classList.remove('active');
     if(c[idx]) c[idx].classList.add('active');
+}
+
+// ==========================================
+// 6. 截圖分享功能 (強制使用 Modal)
+// ==========================================
+
+window.shareChart = async function(mode) {
+    if (typeof html2canvas === 'undefined') {
+        alert("系統載入中，請稍後再試...");
+        return;
+    }
+
+    const topDisplay = document.getElementById('topDisplay');
+    // 檢查是否有內容 (簡單判斷：如果是 'none' 代表還沒排盤)
+    if (!topDisplay || topDisplay.style.display === 'none') {
+        alert("請先進行排盤");
+        return;
+    }
+
+    const btn = event.currentTarget; // 獲取點擊的按鈕
+    const originalBtnText = btn.innerText;
+    btn.innerText = "生成中...";
+    btn.disabled = true;
+
+    try {
+        let targetElement;
+        let hiddenElements = [];
+
+        // 1. 根據模式選擇目標與處理 DOM
+        if (mode === 'origin') {
+            // 模式一：只取原局 (四柱)。原局位於第一個 .group-container
+            targetElement = topDisplay.querySelector('.group-container');
+        } 
+        else if (mode === 'main') {
+            // 模式二：原局 + 運歲 (六柱) -> 截取整個 topDisplay
+            targetElement = topDisplay;
+            
+            // 暫時隱藏不需要的流月、流日、流時
+            // 這裡對應 updateActiveDisplay 裡的 ID
+            const idsToHide = ['activeMonth', 'activeDay', 'activeHour'];
+            
+            idsToHide.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    // 記錄原本的 display 屬性
+                    el.dataset.originalDisplay = el.style.display; 
+                    el.style.display = 'none';
+                    hiddenElements.push(el);
+                }
+            });
+        }
+
+        // 2. 執行截圖
+        // scale: 2 確保 Retina 螢幕清晰度
+        // useCORS: true 避免若有跨域圖片(如地圖tile)導致tainted canvas
+        const canvas = await html2canvas(targetElement, {
+            scale: 2,
+            backgroundColor: '#f4f6f8', // 使用 App 背景色
+            logging: false,
+            useCORS: true 
+        });
+
+        // 3. 恢復剛剛隱藏的元素
+        hiddenElements.forEach(el => {
+            el.style.display = el.dataset.originalDisplay || '';
+        });
+
+        // 4. 輸出結果 (只使用 Modal，不呼叫原生分享)
+        canvas.toBlob(async (blob) => {
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+
+            if (!blob) return;
+
+            // 直接生成 URL 並顯示在 Modal
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.src = url;
+            img.style.maxWidth = "100%";
+            img.style.maxHeight = "60vh";
+            img.style.borderRadius = "8px";
+            img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            
+            const container = document.getElementById('shareImgContainer');
+            container.innerHTML = ''; // 清空舊圖
+            container.appendChild(img);
+            
+            document.getElementById('shareModal').style.display = 'flex';
+
+        }, 'image/png');
+
+    } catch (e) {
+        console.error("截圖失敗:", e);
+        alert("截圖生成失敗，請稍後再試。");
+        btn.innerText = originalBtnText;
+        btn.disabled = false;
+        
+        // 確保發生錯誤時也要恢復元素
+        hiddenElements.forEach(el => {
+            el.style.display = el.dataset.originalDisplay || '';
+        });
+    }
+}
+
+window.closeShareModal = function() {
+    document.getElementById('shareModal').style.display = 'none';
 }
