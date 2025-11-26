@@ -175,7 +175,7 @@ let state = { birthSolar: null, baseDayGan: null, daYuns: [], selDaYunIdx: 0, se
 window.startNewChart = function() {
     window.currentDocId = null; 
     
-    // [新增] 檢查是否為干支反推模式
+    // [干支反推模式]
     if (window.currentInputMode === 'ganzhi') {
         const yg = document.getElementById('gzYearGan').value;
         const yz = document.getElementById('gzYearZhi').value;
@@ -207,35 +207,41 @@ window.startNewChart = function() {
     }
 }
 
-// --- [新增] 干支反推邏輯 ---
 function validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz) {
-    // 1. 檢查年上起月 (五虎遁)
     const ygIdx = GAN_LIST.indexOf(yg);
     const mgIdx = GAN_LIST.indexOf(mg);
-    // 年干 x 2 + 2 = 立春月干 (寅月)
-    // 注意：mz (月支) 寅=2, 卯=3 ... 子=11, 丑=12 (lunar-js 標準)
-    // 或者我們直接推算：甲己之年丙作首 (甲0,己5 -> 丙2) => (0%5 + 1)*2 = 2(丙)
-    // 寅月offset = 2. 
-    // 月干公式： (YearGanIndex % 5 + 1) * 2 + (MonthZhiIndex - 2)
-    const mzIdx = ZHI_LIST.indexOf(mz); // 子=0, 丑=1, 寅=2 ...
-    // 調整月支索引，以寅為起點 (0)
-    let monthOffset = (mzIdx - 2 + 12) % 12;
-    let expectedMgIdx = ((ygIdx % 5) * 2 + 2 + monthOffset) % 10;
+    const mzIdx = ZHI_LIST.indexOf(mz);
+    
+    // 月干檢查 (五虎遁)
+    // 寅月(2) offset=2. 公式: ((年干+1)*2 + (月支-2)) % 10
+    // 修正：月支從寅(2)開始算。
+    // 簡單表：甲己之年丙(2)作首。
+    // 年干idx: 0(甲), 1(乙)...
+    // 0->2, 1->4, 2->6, 3->8, 4->0...  => (idx % 5 * 2 + 2) % 10 是寅月天干
+    const startMonthGan = (ygIdx % 5 * 2 + 2) % 10; 
+    // 目標月支距離寅月的差值
+    let monthDiff = mzIdx - 2;
+    if (monthDiff < 0) monthDiff += 12;
+    
+    const expectedMgIdx = (startMonthGan + monthDiff) % 10;
     if (expectedMgIdx !== mgIdx) return "年柱與月柱不符 (五虎遁)";
 
-    // 2. 檢查日上起時 (五鼠遁)
+    // 時干檢查 (五鼠遁)
     const dgIdx = GAN_LIST.indexOf(dg);
     const hgIdx = GAN_LIST.indexOf(hg);
-    const hzIdx = ZHI_LIST.indexOf(hz);
-    // 甲己還加甲 (甲0 -> 甲0) => (0%5)*2 = 0
-    let expectedHgIdx = ((dgIdx % 5) * 2 + hzIdx) % 10;
+    const hzIdx = ZHI_LIST.indexOf(hz); // 子0...
+    
+    // 甲己還加甲(0)。
+    const startHourGan = (dgIdx % 5 * 2) % 10;
+    const expectedHgIdx = (startHourGan + hzIdx) % 10;
+    
     if (expectedHgIdx !== hgIdx) return "日柱與時柱不符 (五鼠遁)";
 
-    return null; // 合法
+    return null;
 }
 
+// 【重要修正】改進版反推邏輯
 function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
-    // 1. 驗證合法性
     const err = validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz);
     if (err) {
         alert("干支組合錯誤：" + err);
@@ -246,19 +252,13 @@ function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
     const START_YEAR = 1800;
     const END_YEAR = 2100;
 
-    // 2. 搜尋年份
-    // 為了效能，我們只檢查大致符合的年份
-    // 年柱以立春為界。
-    // 我們先遍歷 1800-2100，檢查每年的立春後的干支
-    // 優化：60年一循環
-    
-    // 先找到第一個符合年柱的年份
-    // Lunar.fromYmd(year, 6, 1) 取年中比較保險
+    // 1. 找第一個符合的年柱 (立春後)
+    // 為了保險，我們掃描前 65 年，找到第一個符合的年份
     let startY = -1;
-    for(let y = START_YEAR; y <= START_YEAR + 60; y++) {
-        // 檢查該年立春後的干支
-        const sample = Solar.fromYmd(y, 6, 1).getLunar().getEightChar();
-        if (sample.getYearGan() === yg && sample.getYearZhi() === yz) {
+    for(let y = START_YEAR; y <= START_YEAR + 65; y++) {
+        // 檢查該年立夏(5月)的年柱，通常比較穩
+        const bazi = Solar.fromYmd(y, 5, 15).getLunar().getEightChar();
+        if (bazi.getYearGan() === yg && bazi.getYearZhi() === yz) {
             startY = y;
             break;
         }
@@ -269,137 +269,77 @@ function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
         return;
     }
 
-    // 3. 迴圈搜尋
+    // 2. 跳躍搜尋
     for (let y = startY; y <= END_YEAR; y += 60) {
-        // 在這一年中，找符合月支的節氣區間
-        // mz: 月支。例如 '寅'
-        // Lunar.getJieQiTable() 傳回 map: { '立春': Solar, ... }
-        // 我們需要知道 mz 對應哪個節氣
-        // 寅:立春, 卯:驚蟄, ... 子:大雪, 丑:小寒
-        const jieQiMap = {
-            '寅':'立春', '卯':'驚蟄', '辰':'清明', '巳':'立夏', '午':'芒種', '未':'小暑',
-            '申':'立秋', '酉':'白露', '戌':'寒露', '亥':'立冬', '子':'大雪', '丑':'小寒'
-        };
-        const nextJieQiMap = {
-            '寅':'驚蟄', '卯':'清明', '辰':'立夏', '巳':'芒種', '午':'小暑', '未':'立秋',
-            '申':'白露', '酉':'寒露', '戌':'立冬', '亥':'大雪', '子':'小寒', '丑':'立春'
-        };
-
-        const jqName = jieQiMap[mz];
-        const nextJqName = nextJieQiMap[mz];
+        // 在這一年(前後)找符合月柱的區間
+        // 我們不依賴 jieQiMap 硬性對應，而是直接遍歷該年的 24 節氣
+        // 辛未年的庚寅月，可能在 1991年2月，也可能在 1992年初? 不，寅月一定是立春後。
         
-        // 注意：如果是 '丑'月 (小寒)，它的結束節氣 '立春' 可能是下一年的立春
-        // 這裡要小心跨年問題。通常 Solar.fromYmd(y, ...) 取得的節氣表是該年的
+        const l = Lunar.fromYmd(y, 6, 1);
+        const jieQiTable = l.getJieQiTable();
+        const jieQiNames = l.getJieQiList(); // 獲取節氣名稱列表
         
-        // 獲取該年所有節氣
-        const lunar = Lunar.fromYmd(y, 6, 1); // 隨便取個年中
-        const jieQiTable = lunar.getJieQiTable();
-        
-        // 找到節氣日期
-        // 注意：jieQiTable 的 key 是節氣名稱，value 是 Solar 物件
-        // 但是 lunar-javascript 的 getJieQiTable 可能只包含當年的
-        
-        // 為了準確，我們用 Solar.fromYmd 逐日掃描可能太慢
-        // 我們利用 jieQiTable
-        // 如果 mz 是 寅(Feb), y年的立春存在
-        // 如果 mz 是 丑(Jan), 它是 y 年的小寒 到 y 年的立春? 不，八字年柱立春換
-        // 如果 y 年是 乙巳年。 它的丑月是 丁丑月 (上一年的尾巴) 還是 己丑月 (這一年的尾巴)?
-        // 我們搜尋的 y 是符合「年柱」的 y。所以我們找的是 y 年立春後，到 y+1 年立春前。
-        // 所以 丑月 是 y 年底的 小寒 到 y+1 年 立春。
-        
-        // 重新策略：
-        // 1. 獲取 y 年立春 (Start of Year Pillar)
-        // 2. 獲取 y+1 年立春 (End of Year Pillar)
-        // 3. 在此區間內，根據 mz 鎖定月份區間
-        
-        // 獲取 y 年立春
-        const lichunCurrent = lunar.getJieQiTable()['立春']; // 這可能是 y 年的立春
-        // 如果 lunar 實例的年份不對，可能拿不到。
-        // 正確做法：遍歷該年所有節氣，找到符合 mz 的那個節氣
-        
-        const solarY = Solar.fromYmd(y, 1, 1); // 1月1日
-        // 掃描該年及次年的節氣
-        // 為了簡化，我們直接從 y年1月 到 y+2年1月 遍歷每一天？太慢。
-        
-        // 使用 Lunar 庫功能：
-        // 建立一個該年立春後的 Lunar 日期，然後檢查月柱
-        // 我們知道 mz 對應的節氣。
-        // 我們直接找 y 年的該節氣。
-        // 比如 mz='寅' -> 找 y 年的 立春。
-        // mz='卯' -> 找 y 年的 驚蟄。
-        // ...
-        // mz='丑' -> 找 y+1 年的 小寒。 (因為丑月是該八字年的最後一個月)
-        // mz='子' -> 找 y 年的 大雪。
-        
-        let targetYear = y;
-        const zhiIndex = ZHI_LIST.indexOf(mz); // 子0 丑1 寅2 ...
-        // 八字年中，寅是第1個月，丑是第12個月。
-        // 寅(2)..亥(11) 在 y 年。
-        // 子(0), 丑(1) 在 y 年年底 / y+1 年年初。
-        
-        // 簡單對應：
-        // 寅(2) -> y年 立春
-        // ...
-        // 亥(11) -> y年 立冬
-        // 子(0) -> y年 大雪
-        // 丑(1) -> y+1年 小寒 (注意：這是西曆 y+1 年)
-        
-        if (['丑'].includes(mz)) targetYear = y + 1;
-        // 特別注意：子月通常在 12月，還是在 y 年。丑月在 1月，在 y+1 年。
-        
-        // 獲取 targetYear 的該節氣日期
-        // 我們可以 loop 該年所有節氣
-        const l = Lunar.fromYmd(targetYear, 6, 1);
-        const table = l.getJieQiTable();
-        let startSolar = table[jqName];
-        
-        if (!startSolar) {
-            // 有可能節氣在 y+1 年 (例如查找丑月，但用了 y)
-            // 容錯：如果找不到，試試前後年，或者直接掃描
-            continue;
-        }
-        
-        // 結束點是下一個節氣
-        let endSolar = table[nextJqName];
-        // 如果 nextJqName 是 '立春' (即丑月結束)，它可能不在 table 裡 (如果是跨年)
-        if (!endSolar && nextJqName === '立春') {
-             // 找下一年的立春
-             const l2 = Lunar.fromYmd(targetYear + 1, 6, 1);
-             endSolar = l2.getJieQiTable()['立春'];
-        }
-        
-        if (!startSolar || !endSolar) continue;
-        
-        // 找到了月份區間 [startSolar, endSolar)
-        // 遍歷每一天
-        let current = startSolar;
-        // 限制迴圈防止死循環，一個月最多 32 天
-        let daysCount = 0;
-        while (daysCount < 35) {
-            if (current.isAfter(endSolar) || current.toYmd() === endSolar.toYmd()) break;
+        // 我們要找的是：哪一個節氣開始後，月柱是 mg+mz ?
+        // 遍歷所有節氣點
+        for (let jqKey in jieQiTable) {
+            const solar = jieQiTable[jqKey];
+            // 檢查這個節氣當天的月柱 (或者節氣後一天，以防邊界)
+            // 注意：Lunar 庫的月柱切換是在節氣當天
             
-            // 檢查日柱
-            const dGZ = current.getLunar().getEightChar().getDayGanZhi();
-            if (dGZ === dg + dz) {
-                // 找到符合的日期！
-                // 時間設為該時柱的中間值或起始值
-                // hz: 子 -> 00:00, 丑 -> 02:00 ...
-                const hIdx = ZHI_LIST.indexOf(hz);
-                let hour = hIdx * 2;
-                if (hz === '子') hour = 0; // 早子時
-                // 夜子時處理? 用戶選了 "子"，通常指早子。如果是夜子，日柱會變。
-                // 這裡簡化，設為該時辰的起始 + 10分
-                if (hour === 0) hour = 0; 
+            const bazi = solar.getLunar().getEightChar();
+            
+            // 如果這個節氣點的月柱符合
+            // 或者，這個節氣點剛好是我們要找的月份的開始
+            // 簡單點：我們檢查這個節氣點的月干支是否符合
+            // 為了保險，取節氣後 10 分鐘
+            
+            // 直接建立一個檢查用的時間點 (節氣當天中午)
+            const checkDate = Solar.fromYmdHms(solar.getYear(), solar.getMonth(), solar.getDay(), 12, 0, 0);
+            const checkBazi = checkDate.getLunar().getEightChar();
+            
+            if (checkBazi.getMonthGan() === mg && checkBazi.getMonthZhi() === mz) {
+                // 找到了月份！
+                // 這個月從這個節氣開始，到下一個節氣結束
+                // 下一個節氣是什麼？
+                // 我們可以簡單地往後搜 32 天
                 
-                results.push({
-                    date: current.toYmd(),
-                    time: (hour < 10 ? '0'+hour : hour) + ":00",
-                    ganzhi: `${yg}${yz}年 ${mg}${mz}月 ${dg}${dz}日 ${hg}${hz}時`
-                });
+                let current = solar; // 節氣當天
+                let daysChecked = 0;
+                
+                while (daysChecked < 35) {
+                    // 再次確認月柱 (防止跨到下個月)
+                    const curBazi = current.getLunar().getEightChar();
+                    if (curBazi.getMonthGan() !== mg || curBazi.getMonthZhi() !== mz) {
+                        // 月份跑掉了，結束這個迴圈
+                        if (daysChecked > 0) break; 
+                    }
+                    
+                    // 檢查日柱
+                    if (curBazi.getDayGan() === dg && curBazi.getDayZhi() === dz) {
+                        // 找到日期！
+                        const hIdx = ZHI_LIST.indexOf(hz);
+                        let hour = hIdx * 2;
+                        if (hz === '子') hour = 0; 
+                        
+                        // 排除夜子時導致日柱變動的情況 (這裡只顯示早子時日期，由用戶自行判斷)
+                        // 或者我們可以更精細：如果時辰是 23:00，日柱會不會變？
+                        // Lunar庫通常 23:00 換日柱。
+                        // 如果反推的是 23:00 (晚子時)，那它其實是前一天的 23:00
+                        // 但這裡我們簡單化：只回傳 00:00 - 22:59 的對應
+                        
+                        results.push({
+                            date: current.toYmd(),
+                            time: (hour < 10 ? '0'+hour : hour) + ":00",
+                            ganzhi: `${yg}${yz}年 ${mg}${mz}月 ${dg}${dz}日 ${hg}${hz}時`
+                        });
+                    }
+                    
+                    current = current.next(1);
+                    daysChecked++;
+                }
+                // 找到一個月就夠了，不用再搜這年的其他節氣 (除非閏月? 八字不論閏月)
+                break; 
             }
-            
-            current = current.next(1);
-            daysCount++;
         }
     }
 
