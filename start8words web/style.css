@@ -79,20 +79,90 @@ body {
 }
 .control-wrapper.collapsed { display: none; }
 
-.toggle-bar {
+/* 【新增】50:50 控制按鈕列 */
+.toggle-row {
+    display: flex;
+    width: 100%;
     background: #e0e0e0;
+    border-radius: 0 0 12px 12px;
+    border: 1px solid var(--border);
+    border-top: none;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.toggle-col {
+    flex: 1; /* 50% 寬度 */
     text-align: center;
     padding: 8px;
     cursor: pointer;
-    border-radius: 0 0 12px 12px;
+    font-size: 13px;
     color: #555;
     font-weight: bold;
-    margin-bottom: 15px;
-    border: 1px solid var(--border);
-    border-top: none;
     user-select: none;
-    font-size: 13px;
+    transition: background-color 0.2s;
+    background-color: #e0e0e0;
 }
+
+.toggle-col:hover {
+    background-color: #d0d0d0;
+}
+
+.toggle-col.left {
+    border-right: 1px solid #ccc;
+}
+
+/* --- 工具列 (移至按鈕下方) --- */
+.tools-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 靠右對齊，讓分享按鈕清楚 */
+    gap: 10px;
+    padding: 10px;
+    background: #f1f1f1; /* 稍微深一點的背景區分 */
+    border-radius: 8px;
+    margin-bottom: 15px; /* 與下方 dashboard 的距離 */
+    border: 1px solid #ddd;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tool-label {
+    font-size: 13px;
+    color: #666;
+    font-weight: bold;
+}
+
+.tool-btn {
+    background-color: #fff;
+    border: 1px solid var(--border);
+    color: #555;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    white-space: nowrap;
+}
+
+.tool-btn:hover {
+    background-color: #f0f7ff;
+    border-color: var(--active-border);
+    color: var(--active-border);
+}
+
+.tool-btn:active {
+    transform: translateY(1px);
+}
+
 
 .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
 .tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
@@ -424,51 +494,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* =========================================
-   【新增】分享截圖工具列樣式
-   ========================================= */
-.tools-bar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding: 0 5px;
-    margin-top: 10px; /* 與上方儀表板保持距離 */
-}
-
-.tool-label {
-    font-size: 13px;
-    color: #666;
-    font-weight: bold;
-}
-
-.tool-btn {
-    background-color: #fff;
-    border: 1px solid var(--border);
-    color: #555;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    white-space: nowrap;
-}
-
-.tool-btn:hover {
-    background-color: #f0f7ff;
-    border-color: var(--active-border);
-    color: var(--active-border);
-}
-
-.tool-btn:active {
-    transform: translateY(1px);
-}
-
-/* =========================================
    【手機版專用樣式】(max-width: 600px)
    ========================================= */
 @media (max-width: 600px) {
@@ -505,7 +530,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     
     .pillar-bottom-section { padding-bottom: 2px; }
 
-    /* 【新增】工具列手機適配 */
+    /* 【工具列手機適配】 */
     .tools-bar {
         justify-content: space-between; 
         gap: 8px;
