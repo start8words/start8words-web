@@ -120,8 +120,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border-radius: 10px;
     padding: 12px;
     
-    /* [修正] 收窄間距 */
-    margin-bottom: 5px;
+    /* 桌面版間距 */
+    margin-bottom: 15px;
     
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     font-size: 13px;
@@ -449,6 +449,11 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         width: auto !important;
     }
 
+    /* [修正 3] 縮小命主資訊區下方間距 */
+    .info-dashboard {
+        margin-bottom: 5px;
+    }
+
     /* 2. 柱子收窄 (52px) 以在 iPhone 顯示更多內容 */
     .pillar.main {
         width: 52px;
@@ -485,7 +490,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         width: 16px;
         height: 16px;
         font-size: 10px;
-        /* 手機版：對齊十二長生 */
+        /* 手機版：對齊十二長生 (重新計算距離) */
         margin-top: 117px; 
     }
     
@@ -510,7 +515,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     
     /* [修正 1] 固定藏干高度，確保對齊 */
     .canggan-box {
-        /* 改為固定高度 height，並增加到 60px，解決對齊與缺失問題 */
+        /* 強制固定高度 60px */
         height: 60px; 
         min-height: 60px;
         margin-bottom: 2px; /* 減少留白 */
