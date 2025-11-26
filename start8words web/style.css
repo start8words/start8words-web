@@ -119,10 +119,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border: 1px solid var(--border); 
     border-radius: 10px;
     padding: 12px;
-    
-    /* [修正] 收窄間距 */
     margin-bottom: 5px;
-    
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     font-size: 13px;
 }
@@ -142,7 +139,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
-    align-items: stretch; /* 讓柱子等高 */
+    align-items: stretch;
     justify-content: space-between; 
     -webkit-overflow-scrolling: touch;
 }
@@ -324,7 +321,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     background-color: transparent;
 }
 
-/* 神煞列表 (加回虛線) */
+/* 神煞列表 */
 .shensha-list {
     display: flex;
     flex-direction: column;
@@ -427,109 +424,97 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* =========================================
-   【新增】手機版專用樣式 (max-width: 600px)
+   【新增】分享截圖工具列樣式
+   ========================================= */
+.tools-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0 5px;
+    margin-top: 10px; /* 與上方儀表板保持距離 */
+}
+
+.tool-label {
+    font-size: 13px;
+    color: #666;
+    font-weight: bold;
+}
+
+.tool-btn {
+    background-color: #fff;
+    border: 1px solid var(--border);
+    color: #555;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    white-space: nowrap;
+}
+
+.tool-btn:hover {
+    background-color: #f0f7ff;
+    border-color: var(--active-border);
+    color: var(--active-border);
+}
+
+.tool-btn:active {
+    transform: translateY(1px);
+}
+
+/* =========================================
+   【手機版專用樣式】(max-width: 600px)
    ========================================= */
 @media (max-width: 600px) {
     
-    /* 1. Auth Box (手機版): 保持左右排列，但縮小字體以防重疊 */
-    .auth-box {
-        padding: 10px;
-        gap: 5px;
-    }
-    .auth-hint {
-        font-size: 11px; /* 縮小提示字體 */
-        white-space: normal;
-        line-height: 1.2;
-        flex: 1;
-    }
-    #btnLogin {
-        font-size: 12px !important;
-        padding: 6px 12px !important;
-        width: auto !important;
-    }
+    .auth-box { padding: 10px; gap: 5px; }
+    .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
+    #btnLogin { font-size: 12px !important; padding: 6px 12px !important; width: auto !important; }
 
-    /* 2. 柱子收窄 (52px) 以在 iPhone 顯示更多內容 */
-    .pillar.main {
-        width: 52px;
-        min-width: 52px;
-    }
+    .pillar.main { width: 52px; min-width: 52px; }
     
-    /* [修正 2] 對應加大字體 (20px -> 24px) */
     .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; margin-bottom: 2px;}
     .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
     
-    /* [修正 3] 十神空間增加 */
-    .shishen-top { 
-        font-size: 10px; 
-        height: 14px; 
-        margin-bottom: 4px; /* 增加距離 */
-    }
+    .shishen-top { font-size: 10px; height: 14px; margin-bottom: 4px; }
     
-    /* [修正 1] 藏干區字體加大與固定高度 */
     .canggan-row { font-size: 12px; gap: 1px; }
     .canggan-shishen { font-size: 10px; transform: none; }
     
-    /* 縮小間距 */
     .main-display { gap: 2px; }
     .group-container { padding: 4px 2px; gap: 1px; }
     
-    /* [手機版] 調整定位參數 (因字體變大，高度可能微調) */
-    .group-label {
-        width: 18px;
-        /* 手機版：對齊天干 */
-        padding-top: 82px; 
-        font-size: 11px;
-    }
-    .shensha-toggle-btn {
-        width: 16px;
-        height: 16px;
-        font-size: 10px;
-        /* 手機版：對齊十二長生 */
-        margin-top: 110px; 
-    }
+    .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
+    .shensha-toggle-btn { width: 16px; height: 16px; font-size: 10px; margin-top: 110px; }
     
-    /* 調整頂部資訊區高度 */
-    .top-info {
-        min-height: 28px;
-        font-size: 10px;
-    }
+    .top-info { min-height: 28px; font-size: 10px; }
+    .title-text { font-size: 11px; padding: 4px 0; }
     
-    .title-text {
-        font-size: 11px;
-        padding: 4px 0;
-    }
+    .eye-btn { width: 16px; height: 16px; font-size: 10px; top: 4px; }
     
-    /* 調整眼仔位置 */
-    .eye-btn {
-        width: 16px;
-        height: 16px;
-        font-size: 10px;
-        top: 4px;
-    }
+    .canggan-box { height: 60px; min-height: 60px; margin-bottom: 2px; padding-top: 2px; }
     
-    /* [修正 1] 固定藏干高度，確保對齊 */
-    .canggan-box {
-        /* 改為固定高度 height，並增加到 60px，解決對齊與缺失問題 */
-        height: 60px; 
-        min-height: 60px;
-        margin-bottom: 2px; /* 減少留白 */
-        padding-top: 2px;   /* 減少留白 */
-    }
+    .shensha-tag { font-size: 11px; }
+    .zhangsheng-text { font-size: 10px; height: 20px; display: flex; align-items: center; justify-content: center; }
     
-    .shensha-tag {
-        font-size: 11px;
+    .pillar-bottom-section { padding-bottom: 2px; }
+
+    /* 【新增】工具列手機適配 */
+    .tools-bar {
+        justify-content: space-between; 
+        gap: 8px;
     }
-    /* [修正 1] 固定十二長生高度，確保對齊 */
-    .zhangsheng-text {
-        font-size: 10px;
-        height: 20px; /* 強制固定高度 */
-        display: flex;
-        align-items: center;
+    .tool-btn {
+        flex: 1; 
         justify-content: center;
+        padding: 8px 0;
+        font-size: 12px;
     }
-    
-    /* [修正] 減少底部區域留白 */
-    .pillar-bottom-section {
-        padding-bottom: 2px;
-    }
+    #shareImgContainer { padding: 10px; }
 }
