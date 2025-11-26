@@ -16,8 +16,9 @@
     <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <link rel="stylesheet" href="style.css?v=8.1">
 </head>
 <body>
 
@@ -91,7 +92,6 @@
             </div>
         </div>
 
-        <!-- 干支反推面板 -->
         <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
             <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
@@ -173,6 +173,16 @@
         </div>
     </div>
 
+    <div class="tools-bar">
+        <div class="tool-label">分享截圖：</div>
+        <button class="tool-btn" onclick="shareChart('origin')">
+            📷 原局 (四柱)
+        </button>
+        <button class="tool-btn" onclick="shareChart('main')">
+            📸 原局 + 運歲 (六柱)
+        </button>
+    </div>
+
     <div class="main-display" id="topDisplay" style="display:none;">
         <div class="group-container">
             <div class="group-label">
@@ -201,7 +211,6 @@
         <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
-    <!-- 我的命盤 Modal -->
     <div id="chartModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -228,7 +237,6 @@
         </div>
     </div>
 
-    <!-- 反推結果 Modal (新增) -->
     <div id="reverseResultModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -239,8 +247,23 @@
                 <div style="font-size:13px; color:#666;">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
             </div>
             <div id="reverseList" class="chart-list">
-                <!-- 結果將插入這裡 -->
+                </div>
+        </div>
+    </div>
+
+    <div id="shareModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 90%; width: 500px; background: #f4f6f8;">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h3>📤 命盤截圖</h3>
+                    <span class="close-modal" onclick="closeShareModal()">×</span>
+                </div>
+                <div style="font-size:13px; color:#666; margin-top:5px;">
+                    長按下方圖片即可儲存或是分享給朋友。
+                </div>
             </div>
+            <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: #e0e0e0; min-height: 200px;">
+                </div>
         </div>
     </div>
 
@@ -254,7 +277,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=8.3"></script>
+    <script src="script.js?v=8.4"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -441,7 +464,6 @@
             document.getElementById('useTST').checked = data.useTST || false;
             
             const tagsSelect = document.getElementById('tagsInput');
-            // 這裡也將 fallback 設為 '自己'，確保一致
             if (tagsSelect) tagsSelect.value = data.tags || '自己';
 
             if (saveChartCheck) saveChartCheck.checked = false;
