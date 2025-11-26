@@ -91,8 +91,9 @@
             </div>
         </div>
 
+        <!-- 干支反推面板 -->
         <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
-            <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1924-2044年間符合的日期</div>
+            <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
                 <span style="width:30px; font-weight:bold; color:#555;">年柱</span>
                 <select id="gzYearGan" style="flex:1"></select>
@@ -150,7 +151,7 @@
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
         <div style="margin-top:15px; text-align:center;">
-            <button class="action-btn" onclick="startNewChart()">即時排盤</button>
+            <button class="action-btn" onclick="startNewChart()">即時排盤 / 搜尋</button>
         </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
@@ -200,6 +201,7 @@
         <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
+    <!-- 我的命盤 Modal -->
     <div id="chartModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -226,6 +228,22 @@
         </div>
     </div>
 
+    <!-- 反推結果 Modal (新增) -->
+    <div id="reverseResultModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h3>📅 干支反推結果</h3>
+                    <span class="close-modal" onclick="closeReverseModal()">×</span>
+                </div>
+                <div style="font-size:13px; color:#666;">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
+            </div>
+            <div id="reverseList" class="chart-list">
+                <!-- 結果將插入這裡 -->
+            </div>
+        </div>
+    </div>
+
     <div class="app-footer">
         <p>© 2025 逸晴命理 All Rights Reserved.</p>
         <a href="https://instagram.com/start_8words" target="_blank">
@@ -236,7 +254,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=9.0"></script>
+    <script src="script.js?v=8.3"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
@@ -498,9 +516,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
