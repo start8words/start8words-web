@@ -164,6 +164,7 @@ function getEquationOfTime(date) {
 
 const WUXING_COLOR = {'甲':'var(--color-wood)','乙':'var(--color-wood)','寅':'var(--color-wood)','卯':'var(--color-wood)','丙':'var(--color-fire)','丁':'var(--color-fire)','巳':'var(--color-fire)','午':'var(--color-fire)','戊':'var(--color-earth)','己':'var(--color-earth)','辰':'var(--color-earth)','戌':'var(--color-earth)','丑':'var(--color-earth)','未':'var(--color-earth)','庚':'var(--color-metal)','辛':'var(--color-metal)','申':'var(--color-metal)','酉':'var(--color-metal)','壬':'var(--color-water)','癸':'var(--color-water)','亥':'var(--color-water)','子':'var(--color-water)'};
 const GAN_LIST = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const ZHI_LIST = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const SHISHEN_SHORT = {'比肩':'比','劫財':'劫','食神':'食','傷官':'傷','偏財':'才','正財':'財','七殺':'殺','正官':'官','偏印':'梟','正印':'印','日主':'主'};
 const ZHI_TIME = {'子':'23-01','丑':'01-03','寅':'03-05','卯':'05-07','辰':'07-09','巳':'09-11','午':'11-13','未':'13-15','申':'15-17','酉':'17-19','戌':'19-21','亥':'21-23'};
 const LOOKUP_HIDDEN = {'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],'辰':['戊','乙','癸'],'巳':['丙','庚','戊'],'午':['丁','己'],'未':['己','丁','乙'],'申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']};
@@ -173,6 +174,27 @@ let state = { birthSolar: null, baseDayGan: null, daYuns: [], selDaYunIdx: 0, se
 // --- 開始新排盤 (入口函數) ---
 window.startNewChart = function() {
     window.currentDocId = null; 
+    
+    // [新增] 檢查是否為干支反推模式
+    if (window.currentInputMode === 'ganzhi') {
+        const yg = document.getElementById('gzYearGan').value;
+        const yz = document.getElementById('gzYearZhi').value;
+        const mg = document.getElementById('gzMonthGan').value;
+        const mz = document.getElementById('gzMonthZhi').value;
+        const dg = document.getElementById('gzDayGan').value;
+        const dz = document.getElementById('gzDayZhi').value;
+        const hg = document.getElementById('gzHourGan').value;
+        const hz = document.getElementById('gzHourZhi').value;
+
+        if(!yg || !yz || !mg || !mz || !dg || !dz || !hg || !hz) {
+            alert("請完整選擇四柱干支");
+            return;
+        }
+
+        searchDates(yg, yz, mg, mz, dg, dz, hg, hz);
+        return;
+    }
+
     window.initChart(); 
     
     const saveCheck = document.getElementById('saveChartCheck');
@@ -183,6 +205,240 @@ window.startNewChart = function() {
             }
         }, 200);
     }
+}
+
+// --- [新增] 干支反推邏輯 ---
+function validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz) {
+    // 1. 檢查年上起月 (五虎遁)
+    const ygIdx = GAN_LIST.indexOf(yg);
+    const mgIdx = GAN_LIST.indexOf(mg);
+    // 年干 x 2 + 2 = 立春月干 (寅月)
+    // 注意：mz (月支) 寅=2, 卯=3 ... 子=11, 丑=12 (lunar-js 標準)
+    // 或者我們直接推算：甲己之年丙作首 (甲0,己5 -> 丙2) => (0%5 + 1)*2 = 2(丙)
+    // 寅月offset = 2. 
+    // 月干公式： (YearGanIndex % 5 + 1) * 2 + (MonthZhiIndex - 2)
+    const mzIdx = ZHI_LIST.indexOf(mz); // 子=0, 丑=1, 寅=2 ...
+    // 調整月支索引，以寅為起點 (0)
+    let monthOffset = (mzIdx - 2 + 12) % 12;
+    let expectedMgIdx = ((ygIdx % 5) * 2 + 2 + monthOffset) % 10;
+    if (expectedMgIdx !== mgIdx) return "年柱與月柱不符 (五虎遁)";
+
+    // 2. 檢查日上起時 (五鼠遁)
+    const dgIdx = GAN_LIST.indexOf(dg);
+    const hgIdx = GAN_LIST.indexOf(hg);
+    const hzIdx = ZHI_LIST.indexOf(hz);
+    // 甲己還加甲 (甲0 -> 甲0) => (0%5)*2 = 0
+    let expectedHgIdx = ((dgIdx % 5) * 2 + hzIdx) % 10;
+    if (expectedHgIdx !== hgIdx) return "日柱與時柱不符 (五鼠遁)";
+
+    return null; // 合法
+}
+
+function searchDates(yg, yz, mg, mz, dg, dz, hg, hz) {
+    // 1. 驗證合法性
+    const err = validateGanZhi(yg, yz, mg, mz, dg, dz, hg, hz);
+    if (err) {
+        alert("干支組合錯誤：" + err);
+        return;
+    }
+
+    const results = [];
+    const START_YEAR = 1800;
+    const END_YEAR = 2100;
+
+    // 2. 搜尋年份
+    // 為了效能，我們只檢查大致符合的年份
+    // 年柱以立春為界。
+    // 我們先遍歷 1800-2100，檢查每年的立春後的干支
+    // 優化：60年一循環
+    
+    // 先找到第一個符合年柱的年份
+    // Lunar.fromYmd(year, 6, 1) 取年中比較保險
+    let startY = -1;
+    for(let y = START_YEAR; y <= START_YEAR + 60; y++) {
+        // 檢查該年立春後的干支
+        const sample = Solar.fromYmd(y, 6, 1).getLunar().getEightChar();
+        if (sample.getYearGan() === yg && sample.getYearZhi() === yz) {
+            startY = y;
+            break;
+        }
+    }
+
+    if (startY === -1) {
+        alert("在搜尋範圍內找不到符合的年柱");
+        return;
+    }
+
+    // 3. 迴圈搜尋
+    for (let y = startY; y <= END_YEAR; y += 60) {
+        // 在這一年中，找符合月支的節氣區間
+        // mz: 月支。例如 '寅'
+        // Lunar.getJieQiTable() 傳回 map: { '立春': Solar, ... }
+        // 我們需要知道 mz 對應哪個節氣
+        // 寅:立春, 卯:驚蟄, ... 子:大雪, 丑:小寒
+        const jieQiMap = {
+            '寅':'立春', '卯':'驚蟄', '辰':'清明', '巳':'立夏', '午':'芒種', '未':'小暑',
+            '申':'立秋', '酉':'白露', '戌':'寒露', '亥':'立冬', '子':'大雪', '丑':'小寒'
+        };
+        const nextJieQiMap = {
+            '寅':'驚蟄', '卯':'清明', '辰':'立夏', '巳':'芒種', '午':'小暑', '未':'立秋',
+            '申':'白露', '酉':'寒露', '戌':'立冬', '亥':'大雪', '子':'小寒', '丑':'立春'
+        };
+
+        const jqName = jieQiMap[mz];
+        const nextJqName = nextJieQiMap[mz];
+        
+        // 注意：如果是 '丑'月 (小寒)，它的結束節氣 '立春' 可能是下一年的立春
+        // 這裡要小心跨年問題。通常 Solar.fromYmd(y, ...) 取得的節氣表是該年的
+        
+        // 獲取該年所有節氣
+        const lunar = Lunar.fromYmd(y, 6, 1); // 隨便取個年中
+        const jieQiTable = lunar.getJieQiTable();
+        
+        // 找到節氣日期
+        // 注意：jieQiTable 的 key 是節氣名稱，value 是 Solar 物件
+        // 但是 lunar-javascript 的 getJieQiTable 可能只包含當年的
+        
+        // 為了準確，我們用 Solar.fromYmd 逐日掃描可能太慢
+        // 我們利用 jieQiTable
+        // 如果 mz 是 寅(Feb), y年的立春存在
+        // 如果 mz 是 丑(Jan), 它是 y 年的小寒 到 y 年的立春? 不，八字年柱立春換
+        // 如果 y 年是 乙巳年。 它的丑月是 丁丑月 (上一年的尾巴) 還是 己丑月 (這一年的尾巴)?
+        // 我們搜尋的 y 是符合「年柱」的 y。所以我們找的是 y 年立春後，到 y+1 年立春前。
+        // 所以 丑月 是 y 年底的 小寒 到 y+1 年 立春。
+        
+        // 重新策略：
+        // 1. 獲取 y 年立春 (Start of Year Pillar)
+        // 2. 獲取 y+1 年立春 (End of Year Pillar)
+        // 3. 在此區間內，根據 mz 鎖定月份區間
+        
+        // 獲取 y 年立春
+        const lichunCurrent = lunar.getJieQiTable()['立春']; // 這可能是 y 年的立春
+        // 如果 lunar 實例的年份不對，可能拿不到。
+        // 正確做法：遍歷該年所有節氣，找到符合 mz 的那個節氣
+        
+        const solarY = Solar.fromYmd(y, 1, 1); // 1月1日
+        // 掃描該年及次年的節氣
+        // 為了簡化，我們直接從 y年1月 到 y+2年1月 遍歷每一天？太慢。
+        
+        // 使用 Lunar 庫功能：
+        // 建立一個該年立春後的 Lunar 日期，然後檢查月柱
+        // 我們知道 mz 對應的節氣。
+        // 我們直接找 y 年的該節氣。
+        // 比如 mz='寅' -> 找 y 年的 立春。
+        // mz='卯' -> 找 y 年的 驚蟄。
+        // ...
+        // mz='丑' -> 找 y+1 年的 小寒。 (因為丑月是該八字年的最後一個月)
+        // mz='子' -> 找 y 年的 大雪。
+        
+        let targetYear = y;
+        const zhiIndex = ZHI_LIST.indexOf(mz); // 子0 丑1 寅2 ...
+        // 八字年中，寅是第1個月，丑是第12個月。
+        // 寅(2)..亥(11) 在 y 年。
+        // 子(0), 丑(1) 在 y 年年底 / y+1 年年初。
+        
+        // 簡單對應：
+        // 寅(2) -> y年 立春
+        // ...
+        // 亥(11) -> y年 立冬
+        // 子(0) -> y年 大雪
+        // 丑(1) -> y+1年 小寒 (注意：這是西曆 y+1 年)
+        
+        if (['丑'].includes(mz)) targetYear = y + 1;
+        // 特別注意：子月通常在 12月，還是在 y 年。丑月在 1月，在 y+1 年。
+        
+        // 獲取 targetYear 的該節氣日期
+        // 我們可以 loop 該年所有節氣
+        const l = Lunar.fromYmd(targetYear, 6, 1);
+        const table = l.getJieQiTable();
+        let startSolar = table[jqName];
+        
+        if (!startSolar) {
+            // 有可能節氣在 y+1 年 (例如查找丑月，但用了 y)
+            // 容錯：如果找不到，試試前後年，或者直接掃描
+            continue;
+        }
+        
+        // 結束點是下一個節氣
+        let endSolar = table[nextJqName];
+        // 如果 nextJqName 是 '立春' (即丑月結束)，它可能不在 table 裡 (如果是跨年)
+        if (!endSolar && nextJqName === '立春') {
+             // 找下一年的立春
+             const l2 = Lunar.fromYmd(targetYear + 1, 6, 1);
+             endSolar = l2.getJieQiTable()['立春'];
+        }
+        
+        if (!startSolar || !endSolar) continue;
+        
+        // 找到了月份區間 [startSolar, endSolar)
+        // 遍歷每一天
+        let current = startSolar;
+        // 限制迴圈防止死循環，一個月最多 32 天
+        let daysCount = 0;
+        while (daysCount < 35) {
+            if (current.isAfter(endSolar) || current.toYmd() === endSolar.toYmd()) break;
+            
+            // 檢查日柱
+            const dGZ = current.getLunar().getEightChar().getDayGanZhi();
+            if (dGZ === dg + dz) {
+                // 找到符合的日期！
+                // 時間設為該時柱的中間值或起始值
+                // hz: 子 -> 00:00, 丑 -> 02:00 ...
+                const hIdx = ZHI_LIST.indexOf(hz);
+                let hour = hIdx * 2;
+                if (hz === '子') hour = 0; // 早子時
+                // 夜子時處理? 用戶選了 "子"，通常指早子。如果是夜子，日柱會變。
+                // 這裡簡化，設為該時辰的起始 + 10分
+                if (hour === 0) hour = 0; 
+                
+                results.push({
+                    date: current.toYmd(),
+                    time: (hour < 10 ? '0'+hour : hour) + ":00",
+                    ganzhi: `${yg}${yz}年 ${mg}${mz}月 ${dg}${dz}日 ${hg}${hz}時`
+                });
+            }
+            
+            current = current.next(1);
+            daysCount++;
+        }
+    }
+
+    showReverseResults(results);
+}
+
+function showReverseResults(results) {
+    const modal = document.getElementById('reverseResultModal');
+    const list = document.getElementById('reverseList');
+    list.innerHTML = '';
+
+    if (results.length === 0) {
+        list.innerHTML = '<p style="text-align:center; padding:20px;">找不到符合的日期</p>';
+    } else {
+        results.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'chart-item';
+            div.innerHTML = `
+                <div class="chart-info" onclick="selectReverseDate('${r.date}', '${r.time}')">
+                    <div class="chart-name">${r.date} ${r.time}</div>
+                    <div class="chart-detail">${r.ganzhi}</div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+    modal.style.display = 'flex';
+}
+
+window.closeReverseModal = function() {
+    document.getElementById('reverseResultModal').style.display = 'none';
+}
+
+window.selectReverseDate = function(dateStr, timeStr) {
+    // 填入西曆輸入框並排盤
+    window.switchTab('solar');
+    document.getElementById('birthDate').value = dateStr + 'T' + timeStr;
+    window.closeReverseModal();
+    window.startNewChart();
 }
 
 // --- 排盤主程式 ---
@@ -222,9 +478,7 @@ window.initChart = function() {
             const lunar = Lunar.fromYmdHms(y, m, d, h, 0, 0);
             window.originSolar = lunar.getSolar();
         }
-        else if (window.currentInputMode === 'ganzhi') {
-            alert("干支功能暫未連接"); return;
-        }
+        // ganzhi mode is handled in startNewChart
 
         // 2. 真太陽時計算
         let calculatingSolar = window.originSolar; 
