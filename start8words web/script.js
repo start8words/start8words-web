@@ -6,6 +6,7 @@ window.marker = null;
 window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
+window.isToolsCollapsed = true; // 新增：預設收起工具列
 window.isShenShaVisible = true; 
 window.originSolar = null;
 window.currentBaziData = null;
@@ -82,17 +83,35 @@ window.switchTab = function(mode) {
     if(pGZ) pGZ.style.display = mode === 'ganzhi' ? 'flex' : 'none';
 }
 
+// 【左鍵功能】展開/收起輸入區
 window.toggleInputs = function() {
     const wrapper = document.getElementById('inputWrapper');
-    const bar = document.getElementById('toggleBar');
+    const btn = document.getElementById('toggleInputBtn'); // 改用新ID
+    
     if (window.isInputsCollapsed) {
         wrapper.classList.remove('collapsed');
-        bar.innerText = '▼ 收起輸入區';
+        btn.innerText = '▼ 收起輸入區';
     } else {
         wrapper.classList.add('collapsed');
-        bar.innerText = '▲ 展開輸入區';
+        btn.innerText = '▲ 展開輸入區';
     }
     window.isInputsCollapsed = !window.isInputsCollapsed;
+}
+
+// 【右鍵功能】展開/收起工具列 (新增)
+window.toggleTools = function() {
+    const bar = document.getElementById('toolsBar');
+    const btn = document.getElementById('toggleToolsBtn');
+    
+    if (window.isToolsCollapsed) {
+        bar.style.display = 'flex';
+        btn.innerText = '▲ 收起工具列';
+        window.isToolsCollapsed = false;
+    } else {
+        bar.style.display = 'none';
+        btn.innerText = '▼ 展開工具列';
+        window.isToolsCollapsed = true;
+    }
 }
 
 window.toggleMap = function(forceClose) {
