@@ -13,12 +13,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>逸晴命理 - 免費八字排盤工具</title>
     
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
     <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=8.2">
+    <link rel="stylesheet" href="style.css?v=8.6">
 </head>
 <body>
 
@@ -157,7 +159,7 @@
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
 
-    <!-- 【新增】50:50 控制列 -->
+    <!-- 50:50 控制列 -->
     <div class="toggle-row">
         <div class="toggle-col left" id="toggleInputBtn" onclick="toggleInputs()">
             ▼ 收起輸入區
@@ -167,7 +169,7 @@
         </div>
     </div>
 
-    <!-- 【移動】截圖工具列 (移到這裡，預設隱藏) -->
+    <!-- 截圖工具列 -->
     <div id="toolsBar" class="tools-bar" style="display: none;">
         <div class="tool-label">分享截圖：</div>
         <button class="tool-btn" onclick="shareChart('origin')">
@@ -290,7 +292,7 @@
         </a>
     </div>
 
-    <script src="script.js?v=8.5"></script>
+    <script src="script.js?v=8.6"></script>
 
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
