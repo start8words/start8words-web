@@ -199,18 +199,18 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .info-val { font-weight: 600; color: #000; word-break: break-word; }
 
 /* =========================================
-   核心顯示區 (桌面版與通用樣式)
+   核心顯示區 (桌面版設定)
    ========================================= */
 .main-display {
     display: flex;
     flex-direction: row; 
     flex-wrap: nowrap;   
-    gap: 15px; /* 桌面版：增加區塊間距 */
+    /* 【修改】縮小間距：從 15px 減至 4px (縮小約 70%) */
+    gap: 4px; 
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
     align-items: stretch;
-    /* 桌面版：左右對齊 */
     justify-content: space-between; 
 }
 
@@ -218,16 +218,20 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     display: flex;
     gap: 3px; 
     background: var(--panel-bg);
-    padding: 10px; /* 桌面版：增加內距讓整體看起來更大器 */
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     height: auto;
-    /* 桌面版：自動伸展填滿空間 (按比例放大) */
-    flex: 1; 
+    flex: 4.7; 
     justify-content: space-around; 
 }
-.group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
+
+.group-container.dynamic-group { 
+    border: 1px solid var(--border); 
+    background: var(--panel-bg);
+    flex: 4.3; 
+}
 
 /* 原局與隱藏鍵定位 */
 .group-label {
@@ -271,10 +275,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* 桌面版：移除固定寬度，改為彈性伸展 */
+    /* 桌面版：彈性伸展 */
     width: auto; 
     flex: 1; 
-    min-width: 80px; /* 確保最小寬度，避免文字擠壓 */
+    min-width: 70px; /* 稍微調小最小寬度，確保不撐爆 */
     
     background: #fff;
     border: 1px solid #eee;
@@ -497,6 +501,33 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* =========================================
+   【截圖專用模式 (Screenshot Mode)】
+   ========================================= */
+.main-display.screenshot-mode {
+    display: inline-flex !important; 
+    width: auto !important;
+    min-width: auto !important;
+    justify-content: center !important;
+    gap: 5px !important; 
+    background-color: #f4f6f8 !important; 
+    margin: 0 !important;
+    padding: 20px !important; 
+    border-bottom: none !important; 
+}
+
+.main-display.screenshot-mode .group-container {
+    flex: 0 0 auto !important; 
+    width: auto !important;
+    max-width: none !important;
+}
+
+.main-display.screenshot-mode .pillar.main {
+    flex: 0 0 auto !important; 
+    width: 90px !important;    
+    min-width: 90px !important;
+}
+
+/* =========================================
    【手機版專用樣式】(max-width: 600px)
    ========================================= */
 @media (max-width: 600px) {
@@ -516,7 +547,12 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .group-container { 
         padding: 4px 2px; 
         gap: 1px; 
+        /* 手機版恢復為自動寬度，不依比例 */
         flex: 0 0 auto; 
+    }
+    
+    .group-container.dynamic-group {
+        flex: 0 0 auto;
     }
     
     .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
@@ -562,3 +598,5 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     #shareImgContainer { padding: 10px; }
 }
+
+

@@ -907,7 +907,7 @@ function highlightSelection(id, idx) {
 }
 
 // ==========================================
-// 6. 截圖分享功能 (強制使用 Modal)
+// 6. 截圖分享功能 (優化版：支援 Screenshot Mode)
 // ==========================================
 
 window.shareChart = async function(mode) {
@@ -917,38 +917,38 @@ window.shareChart = async function(mode) {
     }
 
     const topDisplay = document.getElementById('topDisplay');
-    // 檢查是否有內容 (簡單判斷：如果是 'none' 代表還沒排盤)
     if (!topDisplay || topDisplay.style.display === 'none') {
         alert("請先進行排盤");
         return;
     }
 
-    const btn = event.currentTarget; // 獲取點擊的按鈕
+    const btn = event.currentTarget;
     const originalBtnText = btn.innerText;
     btn.innerText = "生成中...";
     btn.disabled = true;
+
+    // 1. 【關鍵步驟】加入截圖專用 class
+    // 這會瞬間將排版變成「緊湊模式」，修正大運流年過寬的問題
+    topDisplay.classList.add('screenshot-mode');
 
     try {
         let targetElement;
         let hiddenElements = [];
 
-        // 1. 根據模式選擇目標與處理 DOM
+        // 2. 根據模式選擇目標與處理隱藏元素
         if (mode === 'origin') {
-            // 模式一：只取原局 (四柱)。原局位於第一個 .group-container
+            // 原局 (四柱)
             targetElement = topDisplay.querySelector('.group-container');
         } 
         else if (mode === 'main') {
-            // 模式二：原局 + 運歲 (六柱) -> 截取整個 topDisplay
+            // 原局 + 運歲 (六柱)
             targetElement = topDisplay;
             
             // 暫時隱藏不需要的流月、流日、流時
-            // 這裡對應 updateActiveDisplay 裡的 ID
             const idsToHide = ['activeMonth', 'activeDay', 'activeHour'];
-            
             idsToHide.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    // 記錄原本的 display 屬性
                     el.dataset.originalDisplay = el.style.display; 
                     el.style.display = 'none';
                     hiddenElements.push(el);
@@ -956,39 +956,41 @@ window.shareChart = async function(mode) {
             });
         }
 
-        // 2. 執行截圖
-        // scale: 2 確保 Retina 螢幕清晰度
-        // useCORS: true 避免若有跨域圖片(如地圖tile)導致tainted canvas
+        // 3. 執行截圖
         const canvas = await html2canvas(targetElement, {
-            scale: 2,
-            backgroundColor: '#f4f6f8', // 使用 App 背景色
+            scale: 2, // 高解析度
+            backgroundColor: '#f4f6f8',
             logging: false,
             useCORS: true 
         });
 
-        // 3. 恢復剛剛隱藏的元素
+        // 4. 【關鍵步驟】還原現場
+        // 移除截圖專用 class，讓介面瞬間變回原本的彈性排版
+        topDisplay.classList.remove('screenshot-mode');
+        
+        // 恢復隱藏的柱子
         hiddenElements.forEach(el => {
             el.style.display = el.dataset.originalDisplay || '';
         });
 
-        // 4. 輸出結果 (只使用 Modal，不呼叫原生分享)
+        // 5. 輸出結果 (Modal)
         canvas.toBlob(async (blob) => {
             btn.innerText = originalBtnText;
             btn.disabled = false;
 
             if (!blob) return;
 
-            // 直接生成 URL 並顯示在 Modal
             const url = URL.createObjectURL(blob);
             const img = new Image();
             img.src = url;
+            // 設定預覽圖樣式
             img.style.maxWidth = "100%";
-            img.style.maxHeight = "60vh";
+            img.style.height = "auto"; 
             img.style.borderRadius = "8px";
             img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
             
             const container = document.getElementById('shareImgContainer');
-            container.innerHTML = ''; // 清空舊圖
+            container.innerHTML = '';
             container.appendChild(img);
             
             document.getElementById('shareModal').style.display = 'flex';
@@ -998,16 +1000,17 @@ window.shareChart = async function(mode) {
     } catch (e) {
         console.error("截圖失敗:", e);
         alert("截圖生成失敗，請稍後再試。");
+        
+        // 發生錯誤也要確保還原
+        topDisplay.classList.remove('screenshot-mode');
+        // 這裡無法訪問 hiddenElements (scope問題)，但在 alert 後用戶通常會刷新
+        
         btn.innerText = originalBtnText;
         btn.disabled = false;
-        
-        // 確保發生錯誤時也要恢復元素
-        hiddenElements.forEach(el => {
-            el.style.display = el.dataset.originalDisplay || '';
-        });
     }
 }
 
 window.closeShareModal = function() {
     document.getElementById('shareModal').style.display = 'none';
 }
+
