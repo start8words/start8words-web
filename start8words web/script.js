@@ -6,7 +6,7 @@ window.marker = null;
 window.currentInputMode = 'solar';
 window.isTimeHidden = false; 
 window.isInputsCollapsed = false; 
-window.isToolsCollapsed = true; // 新增：預設收起工具列
+window.isToolsCollapsed = true; 
 window.isShenShaVisible = true; 
 window.originSolar = null;
 window.currentBaziData = null;
@@ -83,10 +83,9 @@ window.switchTab = function(mode) {
     if(pGZ) pGZ.style.display = mode === 'ganzhi' ? 'flex' : 'none';
 }
 
-// 【左鍵功能】展開/收起輸入區
 window.toggleInputs = function() {
     const wrapper = document.getElementById('inputWrapper');
-    const btn = document.getElementById('toggleInputBtn'); // 改用新ID
+    const btn = document.getElementById('toggleInputBtn'); 
     
     if (window.isInputsCollapsed) {
         wrapper.classList.remove('collapsed');
@@ -98,7 +97,6 @@ window.toggleInputs = function() {
     window.isInputsCollapsed = !window.isInputsCollapsed;
 }
 
-// 【右鍵功能】展開/收起工具列 (新增)
 window.toggleTools = function() {
     const bar = document.getElementById('toolsBar');
     const btn = document.getElementById('toggleToolsBtn');
@@ -908,7 +906,7 @@ function highlightSelection(id, idx) {
 }
 
 // ==========================================
-// 6. 截圖分享功能 (新增)
+// 6. 截圖分享功能 (強制使用 Modal)
 // ==========================================
 
 window.shareChart = async function(mode) {
@@ -972,32 +970,14 @@ window.shareChart = async function(mode) {
             el.style.display = el.dataset.originalDisplay || '';
         });
 
-        // 4. 輸出結果
+        // 4. 輸出結果 (只使用 Modal，不呼叫原生分享)
         canvas.toBlob(async (blob) => {
             btn.innerText = originalBtnText;
             btn.disabled = false;
 
             if (!blob) return;
 
-            // --- 嘗試使用手機原生分享 (Web Share API) ---
-            // 條件：HTTPS環境 + 瀏覽器支援 + File分享支援
-            const file = new File([blob], "bazi-chart.png", { type: "image/png" });
-            
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: '逸晴命理八字排盤',
-                        text: ''
-                    });
-                    return; // 成功分享則結束，不顯示 Modal
-                } catch (err) {
-                    // 用戶取消分享或發生錯誤，降級為顯示 Modal
-                    console.log("分享取消或不支援:", err);
-                }
-            }
-
-            // --- 降級方案：顯示圖片 Modal 供長按儲存 ---
+            // 直接生成 URL 並顯示在 Modal
             const url = URL.createObjectURL(blob);
             const img = new Image();
             img.src = url;
@@ -1021,7 +1001,9 @@ window.shareChart = async function(mode) {
         btn.disabled = false;
         
         // 確保發生錯誤時也要恢復元素
-        // 若要更嚴謹，可將 hiddenElements 宣告在 try 之外。
+        hiddenElements.forEach(el => {
+            el.style.display = el.dataset.originalDisplay || '';
+        });
     }
 }
 
