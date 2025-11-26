@@ -79,7 +79,7 @@ body {
 }
 .control-wrapper.collapsed { display: none; }
 
-/* 【新增】50:50 控制按鈕列 */
+/* 50:50 控制按鈕列 */
 .toggle-row {
     display: flex;
     width: 100%;
@@ -112,16 +112,16 @@ body {
     border-right: 1px solid #ccc;
 }
 
-/* --- 工具列 (移至按鈕下方) --- */
+/* --- 工具列 --- */
 .tools-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* 靠右對齊，讓分享按鈕清楚 */
+    justify-content: flex-end; /* 靠右對齊 */
     gap: 10px;
     padding: 10px;
-    background: #f1f1f1; /* 稍微深一點的背景區分 */
+    background: #f1f1f1; 
     border-radius: 8px;
-    margin-bottom: 15px; /* 與下方 dashboard 的距離 */
+    margin-bottom: 15px; 
     border: 1px solid #ddd;
     animation: fadeIn 0.3s ease;
 }
@@ -162,7 +162,6 @@ body {
 .tool-btn:active {
     transform: translateY(1px);
 }
-
 
 .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
 .tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
@@ -210,7 +209,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
     align-items: stretch;
-    justify-content: space-between; 
+    /* 【關鍵修改】改為 center，讓電腦版也置中對齊，不撐開左右 */
+    justify-content: center; 
     -webkit-overflow-scrolling: touch;
 }
 
@@ -223,7 +223,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     height: auto;
-    flex: 1; 
+    /* 【關鍵修改】改為 auto，不強制佔滿剩餘空間，保持緊湊 */
+    flex: 0 0 auto; 
     justify-content: center; 
 }
 .group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
