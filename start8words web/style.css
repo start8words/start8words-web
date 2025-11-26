@@ -92,7 +92,7 @@ body {
 }
 
 .toggle-col {
-    flex: 1; /* 50% 寬度 */
+    flex: 1; 
     text-align: center;
     padding: 8px;
     cursor: pointer;
@@ -116,7 +116,7 @@ body {
 .tools-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* 靠右對齊 */
+    justify-content: flex-end; 
     gap: 10px;
     padding: 10px;
     background: #f1f1f1; 
@@ -198,49 +198,44 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .info-label { font-weight: bold; color: #666; font-size: 13px; white-space: nowrap; }
 .info-val { font-weight: 600; color: #000; word-break: break-word; }
 
-/* --- 核心顯示區 --- */
+/* =========================================
+   核心顯示區 (桌面版與通用樣式)
+   ========================================= */
 .main-display {
     display: flex;
     flex-direction: row; 
     flex-wrap: nowrap;   
-    gap: 6px;
+    gap: 15px; /* 桌面版：增加區塊間距 */
     margin-bottom: 20px;
-    overflow-x: auto;    
     padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
     align-items: stretch;
-    
-    /* 【修改】電腦版恢復為 space-between，讓區塊對齊左右 */
+    /* 桌面版：左右對齊 */
     justify-content: space-between; 
-    
-    -webkit-overflow-scrolling: touch;
 }
 
 .group-container {
     display: flex;
     gap: 3px; 
     background: var(--panel-bg);
-    padding: 6px 4px;
+    padding: 10px; /* 桌面版：增加內距讓整體看起來更大器 */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     height: auto;
-    
-    /* 【修改】移除 flex: 0 0 auto，改為 flex: 1 或預設，以便 space-between 生效 */
+    /* 桌面版：自動伸展填滿空間 (按比例放大) */
     flex: 1; 
-    max-width: 49%; /* 確保兩個區塊大約佔一半，避免太寬 */
-    
-    justify-content: center; 
+    justify-content: space-around; 
 }
 .group-container.dynamic-group { border: 1px solid var(--border); background: var(--panel-bg); }
 
-/* --- 原局與隱藏鍵定位 --- */
+/* 原局與隱藏鍵定位 */
 .group-label {
     display: flex;
     flex-direction: row; 
     align-items: center;
     justify-content: flex-start;
-    padding-top: 88px; /* Desktop Default */
+    padding-top: 88px; 
     writing-mode: vertical-rl;
     text-align: center;
     font-size: 12px;
@@ -248,7 +243,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     font-weight: bold;
     letter-spacing: 2px;
     border-right: 1px solid #eee;
-    margin-right: 2px;
+    margin-right: 5px;
     width: 24px;
     flex-shrink: 0;
 }
@@ -268,23 +263,25 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     align-items: center;
     justify-content: center;
     writing-mode: horizontal-tb;
-    margin-top: 120px; /* Desktop Default */
+    margin-top: 120px; 
 }
 
-/* --- 柱子結構 --- */
+/* 柱子結構 */
 .pillar.main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 90px; /* Desktop width */
-    min-width: 90px;
+    /* 桌面版：移除固定寬度，改為彈性伸展 */
+    width: auto; 
+    flex: 1; 
+    min-width: 80px; /* 確保最小寬度，避免文字擠壓 */
+    
     background: #fff;
     border: 1px solid #eee;
     border-radius: 6px;
     position: relative;
     overflow: hidden;
     height: auto; 
-    flex-shrink: 0;
 }
 
 /* 頂部資訊區 */
@@ -508,7 +505,29 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
     #btnLogin { font-size: 12px !important; padding: 6px 12px !important; width: auto !important; }
 
-    .pillar.main { width: 52px; min-width: 52px; }
+    /* 重置核心顯示區：恢復水平捲動，不自動伸展 */
+    .main-display {
+        overflow-x: auto; 
+        gap: 2px;
+        justify-content: flex-start;
+    }
+    
+    /* 重置群組容器：不伸展，依內容大小 */
+    .group-container { 
+        padding: 4px 2px; 
+        gap: 1px; 
+        flex: 0 0 auto; 
+    }
+    
+    .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
+    .shensha-toggle-btn { width: 16px; height: 16px; font-size: 10px; margin-top: 110px; }
+    
+    /* 重置柱子：固定寬度 */
+    .pillar.main { 
+        width: 52px; 
+        min-width: 52px; 
+        flex: 0 0 52px;
+    }
     
     .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; margin-bottom: 2px;}
     .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
@@ -517,19 +536,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     
     .canggan-row { font-size: 12px; gap: 1px; }
     .canggan-shishen { font-size: 10px; transform: none; }
-    
-    .main-display { gap: 2px; }
-    
-    .group-container { 
-        padding: 4px 2px; 
-        gap: 1px; 
-        /* 手機版保持原有設定，覆蓋電腦版的寬度 */
-        flex: 1; 
-        max-width: none;
-    }
-    
-    .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
-    .shensha-toggle-btn { width: 16px; height: 16px; font-size: 10px; margin-top: 110px; }
     
     .top-info { min-height: 28px; font-size: 10px; }
     .title-text { font-size: 11px; padding: 4px 0; }
