@@ -1,0 +1,21 @@
+{
+  "name": "逸晴命理",
+  "short_name": "逸晴命理",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#f4f6f8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
