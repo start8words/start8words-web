@@ -1,33 +1,93 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-WW024NHKJF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google Tag Manager / Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WW024NHKJF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WW024NHKJF');
+    </script>
 
-  gtag('config', 'G-WW024NHKJF');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>逸晴命理 - 免費八字排盤工具</title>
+    
+    <!-- ==========================================
+         SEO 核心設定 (Meta Tags)
+         ========================================== -->
+    <title>逸晴命理 (Start8Words) - 專業免費八字排盤 | 真太陽時 | 流年大運分析</title>
+    
+    <!-- 網頁描述：這是 Google 搜尋結果顯示的摘要，務必包含核心關鍵字 -->
+    <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。支援真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞分析。適合命理師與八字愛好者使用的最佳工具。">
+    
+    <!-- 關鍵字：雖然 Google 已不太看重此標籤，但對 Bing 等其他引擎仍有幫助 -->
+    <meta name="keywords" content="八字, 排盤, 免費算命, 八字排盤, 逸晴命理, Start8Words, 四柱八字, 流年運勢, 真太陽時, 子平八字, 命理工具, 線上排盤">
+    
+    <meta name="author" content="逸晴命理 Start8Words">
+    
+    <!-- Canonical URL：避免重複內容，請將 href 替換為你的真實網域 (例如 https://start8words.com) -->
+    <link rel="canonical" href="https://start8words.com/" />
     
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
+    <!-- ==========================================
+         社群分享優化 (Open Graph & Twitter Card)
+         ========================================== -->
+    <!-- Facebook / Line / WhatsApp 預覽設定 -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="逸晴命理 - 專業免費八字排盤工具">
+    <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
+    <meta property="og:url" content="https://start8words.com/">
+    <meta property="og:site_name" content="逸晴命理 Start8Words">
+    <!-- 請上傳一張 1200x630 的預覽圖並替換此連結 -->
+    <meta property="og:image" content="https://start8words.com/share-preview.png">
+
+    <!-- Twitter 卡片設定 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="逸晴命理 - 專業免費八字排盤">
+    <meta name="twitter:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤。">
+    <meta name="twitter:image" content="https://start8words.com/share-preview.png">
+
+    <!-- ==========================================
+         結構化資料 (Schema.org JSON-LD)
+         幫助 Google 理解這是一個「軟體應用程式」
+         ========================================== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "逸晴命理 (Start8Words)",
+      "operatingSystem": "Web",
+      "applicationCategory": "LifestyleApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "HKD"
+      },
+      "description": "專業的線上八字排盤工具，支援真太陽時、流年流月流日排盤。",
+      "author": {
+        "@type": "Person",
+        "name": "逸晴命理"
+      }
+    }
+    </script>
+
+    <!-- 核心庫 -->
     <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
 <div class="app-container">
 
     <div class="app-header">
-        逸晴命理 - 免費八字排盤工具
+        <h1>逸晴命理</h1>
+        <div style="font-size: 14px; font-weight: normal; color: #555; margin-top: 5px;">專業免費八字排盤工具</div>
     </div>
 
     <div id="auth-container" class="auth-box">
@@ -282,18 +342,46 @@
         </div>
     </div>
 
-    <div class="app-footer">
-        <p>© 2025 逸晴命理 All Rights Reserved.</p>
-        <a href="https://instagram.com/start_8words" target="_blank">
-            <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-            @start_8words
-        </a>
-    </div>
+    <!-- ==========================================
+         SEO 頁尾內容區 (增加關鍵字權重)
+         ========================================== -->
+    <footer class="seo-footer">
+        <section class="seo-content">
+            <h2>關於逸晴命理 (Start8Words)</h2>
+            <p>
+                逸晴命理是一個專業的<strong>免費線上八字排盤系統</strong>，致力於提供最精準的命理分析工具。
+                不同於傳統算命網站，我們結合了現代科技與傳統命理，提供<strong>真太陽時校正</strong>、
+                <strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
+            </p>
+            <p>
+                無論您是專業的命理師，還是對八字感興趣的初學者，Start8Words 都能協助您快速排出準確的四柱八字命盤。
+                我們的功能包括：
+                <ul>
+                    <li><strong>八字排盤</strong>：支援西曆、農曆及干支反推排盤。</li>
+                    <li><strong>真太陽時</strong>：根據出生地經度，自動校正平太陽時誤差。</li>
+                    <li><strong>十神與藏干</strong>：完整顯示天干地支的十神關係與地支藏干。</li>
+                    <li><strong>神煞分析</strong>：自動計算天乙貴人、驛馬、桃花、文昌、羊刃、祿神及空亡。</li>
+                    <li><strong>截圖分享</strong>：一鍵生成精美命盤圖片，方便儲存與社群分享。</li>
+                </ul>
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                關鍵字：八字排盤, 免費算命, 四柱八字, 線上排盤, 紫微斗數, 真太陽時, 
+                流年運勢, 2025運勢, 逸晴命理, Start8Words.
+            </p>
+        </section>
 
-    <script src="script.js?v=9"></script>
+        <div class="app-footer">
+            <p>© 2025 逸晴命理 All Rights Reserved.</p>
+            <a href="https://instagram.com/start_8words" target="_blank">
+                <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                @start_8words
+            </a>
+        </div>
+    </footer>
 
+    <script src="script.js?v=10"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
@@ -551,10 +639,6 @@
             }
         });
     </script>
+</div>
 </body>
 </html>
-
-
-
-
-
