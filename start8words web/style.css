@@ -502,17 +502,22 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 
 /* =========================================
    【截圖專用模式 (Screenshot Mode)】
+   修正手機版裁切問題：
+   1. inline-flex 讓寬度隨內容撐開
+   2. flex-start 確保從最左邊開始算
+   3. overflow: visible 允許超出螢幕
    ========================================= */
 .main-display.screenshot-mode {
     display: inline-flex !important; 
     width: auto !important;
     min-width: auto !important;
-    justify-content: center !important;
+    justify-content: flex-start !important; /* 改為靠左，避免置中導致左右超出視窗被切 */
     gap: 5px !important; 
     background-color: #f4f6f8 !important; 
     margin: 0 !important;
     padding: 20px !important; 
     border-bottom: none !important; 
+    overflow: visible !important; /* 關鍵：允許內容溢出容器邊界 */
 }
 
 .main-display.screenshot-mode .group-container {
@@ -526,7 +531,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     width: 90px !important;    
     min-width: 90px !important;
 }
-
 /* =========================================
    【手機版專用樣式】(max-width: 600px)
    ========================================= */
@@ -598,5 +602,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     #shareImgContainer { padding: 10px; }
 }
+
 
 
