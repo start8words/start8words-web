@@ -14,45 +14,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <!-- ==========================================
-         SEO 核心設定 (Meta Tags)
+         1. 標題與描述 (解決文字混亂問題)
          ========================================== -->
-    <title>逸晴命理 (Start8Words) - 專業免費八字排盤 | 真太陽時 | 流年大運分析</title>
+    <title>逸晴命理 - 免費八字排盤 | 真太陽時 | 流年大運分析</title>
     
-    <!-- 網頁描述：這是 Google 搜尋結果顯示的摘要，務必包含核心關鍵字 -->
-    <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。支援真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞分析。適合命理師與八字愛好者使用的最佳工具。">
+    <!-- 這段文字會取代搜尋結果中亂抓的「按鈕文字」 -->
+    <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。特色功能：真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞自動分析。介面簡潔，手機電腦皆適用。">
     
-    <!-- 關鍵字：雖然 Google 已不太看重此標籤，但對 Bing 等其他引擎仍有幫助 -->
     <meta name="keywords" content="八字, 排盤, 免費算命, 八字排盤, 逸晴命理, Start8Words, 四柱八字, 流年運勢, 真太陽時, 子平八字, 命理工具, 線上排盤">
-    
     <meta name="author" content="逸晴命理 Start8Words">
-    
-    <!-- Canonical URL：避免重複內容，請將 href 替換為你的真實網域 (例如 https://start8words.com) -->
     <link rel="canonical" href="https://start8words.com/" />
-    
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
     <!-- ==========================================
-         社群分享優化 (Open Graph & Twitter Card)
+         2. 網站圖示設定 (解決 Icon 消失問題)
+         請準備一張至少 192x192 的正方形圖片，命名為 icon.png 並上傳
          ========================================== -->
-    <!-- Facebook / Line / WhatsApp 預覽設定 -->
+    <!-- 傳統 Icon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Google 搜尋與 Android 桌面需要的大圖示 -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
+    <!-- Apple 裝置圖示 -->
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- 社群分享預覽 -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="逸晴命理 - 專業免費八字排盤工具">
     <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
     <meta property="og:url" content="https://start8words.com/">
     <meta property="og:site_name" content="逸晴命理 Start8Words">
-    <!-- 請上傳一張 1200x630 的預覽圖並替換此連結 -->
-    <meta property="og:image" content="https://start8words.com/share-preview.png">
+    <meta property="og:image" content="https://start8words.com/icon.png">
 
-    <!-- Twitter 卡片設定 -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="逸晴命理 - 專業免費八字排盤">
-    <meta name="twitter:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤。">
-    <meta name="twitter:image" content="https://start8words.com/share-preview.png">
-
-    <!-- ==========================================
-         結構化資料 (Schema.org JSON-LD)
-         幫助 Google 理解這是一個「軟體應用程式」
-         ========================================== -->
+    <!-- JSON-LD 結構化資料 -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -69,7 +62,8 @@
       "author": {
         "@type": "Person",
         "name": "逸晴命理"
-      }
+      },
+      "image": "https://start8words.com/icon.png"
     }
     </script>
 
@@ -79,7 +73,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -342,31 +336,17 @@
         </div>
     </div>
 
-    <!-- ==========================================
-         SEO 頁尾內容區 (增加關鍵字權重)
-         ========================================== -->
+    <!-- SEO 頁尾內容區 -->
     <footer class="seo-footer">
         <section class="seo-content">
             <h2>關於逸晴命理 (Start8Words)</h2>
             <p>
-                逸晴命理是一個專業的<strong>免費線上八字排盤系統</strong>，致力於提供最精準的命理分析工具。
-                不同於傳統算命網站，我們結合了現代科技與傳統命理，提供<strong>真太陽時校正</strong>、
-                <strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
-            </p>
-            <p>
-                無論您是專業的命理師，還是對八字感興趣的初學者，Start8Words 都能協助您快速排出準確的四柱八字命盤。
-                我們的功能包括：
-                <ul>
-                    <li><strong>八字排盤</strong>：支援西曆、農曆及干支反推排盤。</li>
-                    <li><strong>真太陽時</strong>：根據出生地經度，自動校正平太陽時誤差。</li>
-                    <li><strong>十神與藏干</strong>：完整顯示天干地支的十神關係與地支藏干。</li>
-                    <li><strong>神煞分析</strong>：自動計算天乙貴人、驛馬、桃花、文昌、羊刃、祿神及空亡。</li>
-                    <li><strong>截圖分享</strong>：一鍵生成精美命盤圖片，方便儲存與社群分享。</li>
-                </ul>
+                逸晴命理免費提供一個專業的<strong>線上八字排盤系統</strong>，致力於提供最精準的命理分析工具。
+                我們提供<strong>真太陽時校正</strong>、<strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
             </p>
             <p style="font-size: 12px; color: #999; margin-top: 10px;">
                 關鍵字：八字排盤, 免費算命, 四柱八字, 線上排盤, 紫微斗數, 真太陽時, 
-                流年運勢, 2025運勢, 逸晴命理, Start8Words.
+                流年運勢, 2026運勢, 逸晴命理, Start8Words, 專業批命, 八字詳批.
             </p>
         </section>
 
@@ -381,22 +361,20 @@
         </div>
     </footer>
 
-    <script src="script.js?v=10"></script>
+    <script src="script.js?v=11"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
+        // ... (保留原本的 Firebase Logic，為了簡潔這裡省略，實際檔案生成時會包含) ...
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
-        
         const saveChartCheck = document.getElementById('saveChartCheck');
         const lblSaveChart = document.getElementById('lblSaveChart');
-        
         const userProfile = document.getElementById('userProfile');
         const userAvatar = document.getElementById('userAvatar');
         const userName = document.getElementById('userName');
         const loggedOutUI = document.getElementById('loggedOutUI');
-        
         const modal = document.getElementById('chartModal');
         const chartList = document.getElementById('chartList');
         const searchInput = document.getElementById('searchInput');
@@ -642,3 +620,4 @@
 </div>
 </body>
 </html>
+
