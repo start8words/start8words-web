@@ -907,7 +907,7 @@ function highlightSelection(id, idx) {
 }
 
 // ==========================================
-// 6. 截圖分享功能 (修復手機版左右裁切問題)
+// 6. 截圖分享功能 (終極修復：替身截圖法)
 // ==========================================
 
 window.shareChart = async function(mode) {
@@ -927,63 +927,72 @@ window.shareChart = async function(mode) {
     btn.innerText = "生成中...";
     btn.disabled = true;
 
-    // 1. 加入截圖專用 class (切換為緊湊模式)
-    topDisplay.classList.add('screenshot-mode');
+    // 1. 建立替身容器 (Ghost Container)
+    // 設定為固定定位、移出螢幕外、寬度設為 max-content 以容納所有內容
+    const ghostContainer = document.createElement('div');
+    ghostContainer.style.position = 'fixed';
+    ghostContainer.style.top = '0';
+    ghostContainer.style.left = '-9999px';
+    ghostContainer.style.width = 'max-content'; // 關鍵：讓容器隨內容撐開，不受螢幕限制
+    ghostContainer.style.zIndex = '-9999';
+    ghostContainer.style.backgroundColor = '#f4f6f8'; // 確保背景色
+    
+    // 2. 複製命盤內容
+    // 我們複製整個 topDisplay，這樣可以保持所有樣式結構
+    const clone = topDisplay.cloneNode(true);
+    
+    // 移除複製節點的 id 以免與原 DOM 衝突 (雖然截圖後就刪除，但這是好習慣)
+    clone.removeAttribute('id');
+    
+    // 3. 根據模式處理複製品
+    if (mode === 'origin') {
+        // 模式一：只保留原局 (第一個 group-container)
+        // 找出原局容器
+        const originGroup = clone.querySelector('.group-container');
+        // 清空 clone 內部，只放回原局
+        clone.innerHTML = '';
+        if (originGroup) {
+            clone.appendChild(originGroup);
+        }
+        // 為保持一致美觀，給予適當的 padding
+        clone.style.display = 'inline-flex';
+        clone.style.padding = '20px';
+        clone.style.gap = '10px';
+        clone.style.backgroundColor = '#f4f6f8';
+        
+    } else {
+        // 模式二：原局 + 運歲 (六柱)
+        // 套用我們在 style.css 定義好的截圖專用樣式
+        clone.classList.add('screenshot-mode');
+        
+        // 隱藏流月、流日、流時
+        // 注意：要在 clone 裡面找這些元素
+        const idsToHide = ['activeMonth', 'activeDay', 'activeHour'];
+        idsToHide.forEach(id => {
+            const el = clone.querySelector('#' + id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    // 4. 將替身加入 DOM (為了讓瀏覽器渲染它)
+    ghostContainer.appendChild(clone);
+    document.body.appendChild(ghostContainer);
 
     try {
-        let targetElement;
-        let hiddenElements = [];
-
-        // 2. 根據模式選擇目標與處理隱藏元素
-        if (mode === 'origin') {
-            // 原局 (四柱)
-            targetElement = topDisplay.querySelector('.group-container');
-        } 
-        else if (mode === 'main') {
-            // 原局 + 運歲 (六柱)
-            targetElement = topDisplay;
-            
-            // 暫時隱藏不需要的流月、流日、流時
-            const idsToHide = ['activeMonth', 'activeDay', 'activeHour'];
-            idsToHide.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.dataset.originalDisplay = el.style.display; 
-                    el.style.display = 'none';
-                    hiddenElements.push(el);
-                }
-            });
-        }
-
-        // 3. 【關鍵修正】計算實際內容寬度，防止手機版左右被切
-        // 在加入 screenshot-mode 後，container 會變成 inline-flex 自動撐開
-        // 我們讀取它的 scrollWidth (實際總寬度)
-        const contentWidth = targetElement.scrollWidth;
-        const contentHeight = targetElement.scrollHeight;
-
-        // 執行截圖，並強制指定視窗寬度
-        const canvas = await html2canvas(targetElement, {
+        // 5. 執行截圖
+        // 因為 ghostContainer 寬度足夠，html2canvas 不會裁切
+        const canvas = await html2canvas(clone, {
             scale: 2, // 高解析度
             backgroundColor: '#f4f6f8',
             logging: false,
-            useCORS: true,
-            // 強制設定寬度，覆蓋手機螢幕寬度的限制
-            width: contentWidth,
-            height: contentHeight,
-            windowWidth: contentWidth + 50, // 加一點緩衝，確保不會剛好切邊
-            x: 0,
-            scrollX: 0
+            useCORS: true
         });
 
-        // 4. 還原現場
-        topDisplay.classList.remove('screenshot-mode');
-        
-        hiddenElements.forEach(el => {
-            el.style.display = el.dataset.originalDisplay || '';
-        });
-
-        // 5. 輸出結果
+        // 6. 輸出結果
         canvas.toBlob(async (blob) => {
+            // 移除替身
+            document.body.removeChild(ghostContainer);
+            
             btn.innerText = originalBtnText;
             btn.disabled = false;
 
@@ -1009,7 +1018,11 @@ window.shareChart = async function(mode) {
         console.error("截圖失敗:", e);
         alert("截圖生成失敗，請稍後再試。");
         
-        topDisplay.classList.remove('screenshot-mode');
+        // 發生錯誤也要清理
+        if (document.body.contains(ghostContainer)) {
+            document.body.removeChild(ghostContainer);
+        }
+        
         btn.innerText = originalBtnText;
         btn.disabled = false;
     }
@@ -1018,4 +1031,3 @@ window.shareChart = async function(mode) {
 window.closeShareModal = function() {
     document.getElementById('shareModal').style.display = 'none';
 }
-
