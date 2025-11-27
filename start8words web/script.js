@@ -907,7 +907,7 @@ function highlightSelection(id, idx) {
 }
 
 // ==========================================
-// 6. 截圖分享功能 (優化版：支援 Screenshot Mode)
+// 6. 截圖分享功能 (修復手機版左右裁切問題)
 // ==========================================
 
 window.shareChart = async function(mode) {
@@ -927,8 +927,7 @@ window.shareChart = async function(mode) {
     btn.innerText = "生成中...";
     btn.disabled = true;
 
-    // 1. 【關鍵步驟】加入截圖專用 class
-    // 這會瞬間將排版變成「緊湊模式」，修正大運流年過寬的問題
+    // 1. 加入截圖專用 class (切換為緊湊模式)
     topDisplay.classList.add('screenshot-mode');
 
     try {
@@ -956,24 +955,34 @@ window.shareChart = async function(mode) {
             });
         }
 
-        // 3. 執行截圖
+        // 3. 【關鍵修正】計算實際內容寬度，防止手機版左右被切
+        // 在加入 screenshot-mode 後，container 會變成 inline-flex 自動撐開
+        // 我們讀取它的 scrollWidth (實際總寬度)
+        const contentWidth = targetElement.scrollWidth;
+        const contentHeight = targetElement.scrollHeight;
+
+        // 執行截圖，並強制指定視窗寬度
         const canvas = await html2canvas(targetElement, {
             scale: 2, // 高解析度
             backgroundColor: '#f4f6f8',
             logging: false,
-            useCORS: true 
+            useCORS: true,
+            // 強制設定寬度，覆蓋手機螢幕寬度的限制
+            width: contentWidth,
+            height: contentHeight,
+            windowWidth: contentWidth + 50, // 加一點緩衝，確保不會剛好切邊
+            x: 0,
+            scrollX: 0
         });
 
-        // 4. 【關鍵步驟】還原現場
-        // 移除截圖專用 class，讓介面瞬間變回原本的彈性排版
+        // 4. 還原現場
         topDisplay.classList.remove('screenshot-mode');
         
-        // 恢復隱藏的柱子
         hiddenElements.forEach(el => {
             el.style.display = el.dataset.originalDisplay || '';
         });
 
-        // 5. 輸出結果 (Modal)
+        // 5. 輸出結果
         canvas.toBlob(async (blob) => {
             btn.innerText = originalBtnText;
             btn.disabled = false;
@@ -983,7 +992,6 @@ window.shareChart = async function(mode) {
             const url = URL.createObjectURL(blob);
             const img = new Image();
             img.src = url;
-            // 設定預覽圖樣式
             img.style.maxWidth = "100%";
             img.style.height = "auto"; 
             img.style.borderRadius = "8px";
@@ -1001,10 +1009,7 @@ window.shareChart = async function(mode) {
         console.error("截圖失敗:", e);
         alert("截圖生成失敗，請稍後再試。");
         
-        // 發生錯誤也要確保還原
         topDisplay.classList.remove('screenshot-mode');
-        // 這裡無法訪問 hiddenElements (scope問題)，但在 alert 後用戶通常會刷新
-        
         btn.innerText = originalBtnText;
         btn.disabled = false;
     }
