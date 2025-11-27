@@ -13,33 +13,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- ==========================================
-         1. 標題與描述 (解決文字混亂問題)
-         ========================================== -->
+    <!-- PWA 設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <!-- iOS PWA 支援 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="逸晴命理">
+    
+    <!-- SEO 設定 -->
     <title>逸晴命理 - 免費八字排盤 | 真太陽時 | 流年大運分析</title>
-    
-    <!-- 這段文字會取代搜尋結果中亂抓的「按鈕文字」 -->
     <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。特色功能：真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞自動分析。介面簡潔，手機電腦皆適用。">
-    
     <meta name="keywords" content="八字, 排盤, 免費算命, 八字排盤, 逸晴命理, Start8Words, 四柱八字, 流年運勢, 真太陽時, 子平八字, 命理工具, 線上排盤">
     <meta name="author" content="逸晴命理 Start8Words">
     <link rel="canonical" href="https://start8words.com/" />
 
-    <!-- ==========================================
-         2. 網站圖示設定 (解決 Icon 消失問題)
-         請準備一張至少 192x192 的正方形圖片，命名為 icon.png 並上傳
-         ========================================== -->
-    <!-- 傳統 Icon -->
+    <!-- Icon 設定 -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <!-- Google 搜尋與 Android 桌面需要的大圖示 -->
     <link rel="icon" type="image/png" sizes="192x192" href="/icon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
-    <!-- Apple 裝置圖示 -->
     <link rel="apple-touch-icon" href="/icon.png">
 
     <!-- 社群分享預覽 -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="逸晴命理 - 專業免費八字排盤工具">
+    <meta property="og:title" content="逸晴命理 - 免費八字排盤工具">
     <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
     <meta property="og:url" content="https://start8words.com/">
     <meta property="og:site_name" content="逸晴命理 Start8Words">
@@ -73,7 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -81,7 +78,7 @@
 
     <div class="app-header">
         <h1>逸晴命理</h1>
-        <div style="font-size: 14px; font-weight: normal; color: #555; margin-top: 5px;">免費八字專業排盤工具</div>
+        <div style="font-size: 14px; font-weight: normal; color: #555; margin-top: 5px;">免費八字排盤工具</div>
     </div>
 
     <div id="auth-container" class="auth-box">
@@ -148,7 +145,6 @@
             </div>
         </div>
 
-        <!-- 干支反推面板 -->
         <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
             <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
@@ -223,14 +219,19 @@
         </div>
     </div>
 
-    <!-- 截圖工具列 -->
+    <!-- 截圖與 APP 安裝工具列 -->
     <div id="toolsBar" class="tools-bar" style="display: none;">
+        <!-- PWA 安裝按鈕 (預設隱藏，由 JS 控制顯示) -->
+        <button id="btnInstallApp" class="tool-btn" style="display:none; border-color: #4caf50; color: #2e7d32; background: #e8f5e9;">
+            📲 安裝 APP
+        </button>
+        
         <div class="tool-label">分享截圖：</div>
         <button class="tool-btn" onclick="shareChart('origin')">
-            📷 原局 (四柱)
+            📷 原局四柱
         </button>
         <button class="tool-btn" onclick="shareChart('main')">
-            📸 原局 + 運歲 (六柱)
+            📷 原局運歲六柱
         </button>
     </div>
 
@@ -336,17 +337,45 @@
         </div>
     </div>
 
+    <!-- iOS 安裝教學 Modal (新增) -->
+    <div id="iosInstallModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content ios-install-content">
+            <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
+                <div class="modal-title-row">
+                    <h3>安裝到 iPhone / iPad</h3>
+                    <span class="close-modal" onclick="document.getElementById('iosInstallModal').style.display='none'">×</span>
+                </div>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                <p style="font-size: 15px; color: #555; line-height: 1.6;">
+                    請點擊瀏覽器上方或下方的 <strong style="color:#2196f3">分享按鈕</strong>
+                    <br>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 10px 0;">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    <br>
+                    然後選擇 <strong>「加入主畫面」</strong> 即可。
+                </p>
+                <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                    (Add to Home Screen)
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SEO 頁尾內容區 -->
     <footer class="seo-footer">
         <section class="seo-content">
             <h2>關於逸晴命理 (Start8Words)</h2>
             <p>
-                逸晴命理免費提供一個專業的<strong>線上八字排盤系統</strong>，致力於提供最精準的命理分析工具。
+                逸晴命理提供一個專業的<strong>免費線上八字排盤系統</strong>，致力於設計最精準的命理分析工具。
                 我們提供<strong>真太陽時校正</strong>、<strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
             </p>
             <p style="font-size: 12px; color: #999; margin-top: 10px;">
                 關鍵字：八字排盤, 免費算命, 四柱八字, 線上排盤, 紫微斗數, 真太陽時, 
-                流年運勢, 2026運勢, 逸晴命理, Start8Words, 專業批命, 八字詳批.
+                流年運勢, 2026運勢, 逸晴命理, Start8Words.
             </p>
         </section>
 
@@ -361,11 +390,11 @@
         </div>
     </footer>
 
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=12"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
-        // ... (保留原本的 Firebase Logic，為了簡潔這裡省略，實際檔案生成時會包含) ...
+        // ... (保留原本的 Firebase Logic) ...
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
@@ -620,5 +649,7 @@
 </div>
 </body>
 </html>
+
+
 
 

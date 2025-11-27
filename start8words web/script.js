@@ -1031,3 +1031,75 @@ window.shareChart = async function(mode) {
 window.closeShareModal = function() {
     document.getElementById('shareModal').style.display = 'none';
 }
+// ==========================================
+// PWA 安裝邏輯 (新增)
+// ==========================================
+let deferredPrompt;
+
+// 1. 註冊 Service Worker (PWA 運作的基礎)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registered', reg))
+            .catch(err => console.log('Service Worker registration failed', err));
+    });
+}
+
+// 2. 處理安裝事件 (Android/PC Chrome)
+window.addEventListener('beforeinstallprompt', (e) => {
+    // 防止 Chrome 67 及更早版本自動顯示安裝提示
+    e.preventDefault();
+    // 儲存事件，以便稍後觸發
+    deferredPrompt = e;
+    // 顯示安裝按鈕
+    showInstallButton();
+});
+
+// 3. 顯示安裝按鈕的邏輯
+function showInstallButton() {
+    const btnInstall = document.getElementById('btnInstallApp');
+    if (btnInstall) {
+        btnInstall.style.display = 'inline-flex'; // 顯示按鈕
+        
+        // 綁定點擊事件
+        btnInstall.onclick = async () => {
+            if (deferredPrompt) {
+                // Android/PC: 觸發原生安裝提示
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+            } else if (isIOS()) {
+                // iOS: 顯示自訂教學彈窗
+                document.getElementById('iosInstallModal').style.display = 'flex';
+            }
+        };
+    }
+}
+
+// 4. iOS 偵測函數
+function isIOS() {
+    return [
+        'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
+    ].includes(navigator.platform)
+    // iPad on iOS 13 detection
+    || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+}
+
+// 5. 針對 iOS 顯示安裝按鈕 (因為 iOS 不會觸發 beforeinstallprompt)
+// 且確保只有在瀏覽器模式下才顯示 (Standalone 模式下隱藏)
+if (isIOS() && !window.navigator.standalone) {
+    // 稍微延遲顯示，確保 DOM 載入
+    setTimeout(showInstallButton, 1000);
+}
+
+// 6. 偵測是否已經是 APP 模式 (Standalone)
+window.addEventListener('appinstalled', () => {
+    // 安裝後隱藏按鈕
+    const btnInstall = document.getElementById('btnInstallApp');
+    if (btnInstall) btnInstall.style.display = 'none';
+    deferredPrompt = null;
+    console.log('PWA was installed');
+});
