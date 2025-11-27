@@ -41,11 +41,15 @@ body {
 
 .app-header {
     text-align: center;
-    font-size: 22px;
-    font-weight: 900;
     color: #000000;
     margin-bottom: 15px;
     letter-spacing: 1px;
+}
+/* SEO 優化：Header 使用 h1 */
+.app-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 900;
 }
 
 /* --- 帳戶管理欄 --- */
@@ -501,6 +505,35 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* =========================================
+   SEO 專用 Footer 樣式
+   ========================================= */
+.seo-footer {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+    color: #333;
+}
+.seo-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.seo-content h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #444;
+}
+.seo-content ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+.seo-content li {
+    margin-bottom: 5px;
+}
+
+/* =========================================
    【截圖專用模式 (Screenshot Mode)】
    修正手機版裁切問題：
    1. inline-flex 讓寬度隨內容撐開
@@ -602,6 +635,3 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     }
     #shareImgContainer { padding: 10px; }
 }
-
-
-
