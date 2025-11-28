@@ -710,6 +710,23 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     const el = document.getElementById(id);
     if (!el) return;
 
+    // 【動畫核心】1. 如果內容已存在，先加上淡出 class
+    const existingContent = el.querySelector('.pillar-content-wrapper');
+    if (existingContent) {
+        existingContent.classList.add('fading-out');
+        
+        // 2. 等待淡出動畫完成 (250ms) 再更新內容
+        setTimeout(() => {
+            performRender(el, id, gan, zhi, title, isDayPillar, infoText, hasEye);
+        }, 250);
+    } else {
+        // 第一次渲染，直接執行
+        performRender(el, id, gan, zhi, title, isDayPillar, infoText, hasEye);
+    }
+}
+
+// 抽離出的實際渲染邏輯
+function performRender(el, id, gan, zhi, title, isDayPillar, infoText, hasEye) {
     let displayGan = gan;
     let displayZhi = zhi;
     let displayShiShen = '';
@@ -736,7 +753,7 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     // 2. 藏干
     let cangganHtml = '';
     if (isHiddenMode) {
-         cangganHtml = `<div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div>`;
+        cangganHtml = `<div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div><div class="canggan-row" style="visibility:hidden;">&nbsp;</div>`;
     } else if (zhi !== '&nbsp;') {
         const hiddenGans = LOOKUP_HIDDEN[zhi] || [];
         hiddenGans.forEach(hGan => {
@@ -785,8 +802,9 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
         </div>
     `;
 
+    // 【動畫關鍵】初始加上 fading-out class (因為是新生成的，預設是透明)，然後馬上移除
     const contentHtml = `
-        <div id="pillarContent_${id}" class="pillar-content-wrapper">
+        <div id="pillarContent_${id}" class="pillar-content-wrapper fading-out">
             ${shishenHtml}
             <div class="gan" style="color:${ganColor}">${displayGan}</div>
             <div class="zhi" style="color:${zhiColor}">${displayZhi}</div>
@@ -796,6 +814,14 @@ function renderMainPillar(id, gan, zhi, title, isDayPillar, infoText, hasEye = f
     `;
     
     el.innerHTML = `${eyeHtml}${infoHtml}<div class="title-text">${title}</div>${contentHtml}`;
+
+    // 3. 強制重繪後移除 class，觸發淡入動畫
+    requestAnimationFrame(() => {
+        const newContent = el.querySelector('.pillar-content-wrapper');
+        if (newContent) {
+            newContent.classList.remove('fading-out');
+        }
+    });
 }
 
 function renderRailPillar(gan, zhi, title, infoText) {
