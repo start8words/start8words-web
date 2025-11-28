@@ -1,4 +1,4 @@
-/* ... (保留原本的 CSS 變數與 Header 等設定) ... */
+/* ... (保留原有的 :root 和 [data-theme="dark"] 設定) ... */
 :root {
     /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
@@ -37,9 +37,9 @@
     --text-color: #e0e0e0;
     --text-secondary: #aaaaaa;
     --border: #333333;
-    --accent: #66bb6a; /* 綠色調亮 */
+    --accent: #66bb6a;
     --highlight: #2c3e50;
-    --active-border: #64b5f6; /* 藍色調亮 */
+    --active-border: #64b5f6;
     --input-bg: #2d2d2d;
     --rail-bg: #2d2d2d;
     --pillar-bg: #252525;
@@ -48,7 +48,7 @@
     --modal-bg: #1e1e1e;
     --shadow-color: rgba(0,0,0,0.5);
 
-    /* 五行顏色 (深色底 - 需調亮以確保對比) */
+    /* 五行顏色 (深色底) */
     --color-wood: #81c784;
     --color-fire: #e57373;
     --color-earth: #a1887f;
@@ -69,10 +69,9 @@ body {
     padding: 15px;
     font-size: 15px; 
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease; /* 平滑過渡 */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ... (保留 app-container, header 等樣式) ... */
 .app-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -87,7 +86,7 @@ body {
     color: var(--text-color);
     margin-bottom: 15px;
     letter-spacing: 1px;
-    position: relative; /* 為了放暗黑按鈕 */
+    position: relative;
 }
 .app-header h1 {
     margin: 0;
@@ -95,10 +94,7 @@ body {
     font-weight: 900;
 }
 
-/* 暗黑模式切換按鈕 */
 .theme-toggle-btn {
-    /* position: absolute;  <-- 移除絕對定位，交由 JS 控制 */ 
-    /* top: 5px; right: 10px; */
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text-color);
@@ -114,10 +110,9 @@ body {
 }
 .theme-toggle-btn:hover {
     background-color: var(--highlight);
-    transform: rotate(15deg); /* 按鈕旋轉效果 */
+    transform: rotate(15deg);
 }
 
-/* ... (保留 auth-box, control-wrapper, toggle-row, tools-bar, tabs, input-row, button 樣式) ... */
 .auth-box {
     background-color: var(--panel-bg);
     padding: 15px 20px;
@@ -246,7 +241,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed var(--border); width: 100%; flex-wrap: nowrap; }
 .note { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
 
-/* ... (保留 info-dashboard, main-display, group-container 樣式) ... */
 .info-dashboard {
     display: none;
     grid-template-columns: 3.5fr 6.5fr; 
@@ -330,12 +324,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     justify-content: center;
     writing-mode: horizontal-tb;
     margin-top: 120px; 
-    transition: transform 0.3s; /* 箭頭旋轉動畫 */
+    transition: transform 0.3s;
 }
 
-/* =========================================
-   【動畫特效】Pillar & Content Transition
-   ========================================= */
 .pillar.main {
     display: flex;
     flex-direction: column;
@@ -349,10 +340,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     position: relative;
     overflow: hidden;
     height: auto; 
-    transition: background-color 0.3s, border-color 0.3s; /* 背景色過渡 */
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* 內容淡入淡出容器 */
 .pillar-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -360,16 +350,13 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     width: 100%;
     flex-grow: 1; 
     opacity: 1;
-    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out; /* 關鍵：透明度與位移過渡 */
+    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out; 
 }
 
-/* 淡出狀態 (由 JS 添加 class) */
 .pillar-content-wrapper.fading-out {
     opacity: 0;
-    transform: translateY(5px); /* 稍微往下沉，增加動感 */
+    transform: translateY(5px);
 }
-
-/* 淡入狀態 (移除 fading-out 後回復預設) */
 
 .top-info {
     min-height: 35px;
@@ -402,7 +389,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: var(--text-secondary); }
 
-/* ... (保留 shishen, gan, zhi, canggan 樣式) ... */
 .shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
@@ -489,9 +475,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding: 1px 0;
 }
 
-/* =========================================
-   【動畫特效】Rail Items Animation
-   ========================================= */
 .rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
 .rail-row { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; white-space: nowrap; }
 .rail-title { min-width: 30px; font-weight: bold; color: var(--text-secondary); text-align: center; font-size: 13px; background: var(--rail-bg); padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
@@ -504,23 +487,22 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     position: relative; 
     padding-top: 4px; 
     flex-shrink: 0;
-    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑過渡 */
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: scale(1);
 }
 .pillar.selectable:hover { 
     background: var(--pillar-header); 
     border-color: #ccc; 
-    transform: translateY(-2px); /* 懸停時輕微上浮 */
+    transform: translateY(-2px);
 }
 .pillar.active { 
     background: var(--highlight); 
     border-color: var(--active-border); 
     box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); 
-    transform: scale(1.05); /* 選中時稍微放大 */
+    transform: scale(1.05);
     z-index: 5;
 }
 
-/* ... (保留 rail-info 等樣式) ... */
 .rail-info { 
     font-size: 11px; 
     color: var(--text-secondary);
@@ -538,7 +520,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* ... (保留 Modal, Footer, Media Queries 等樣式) ... */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
 .modal-content { background: var(--modal-bg); width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-color); display: flex; flex-direction: column; overflow: hidden; }
 .modal-header { padding: 15px; border-bottom: 1px solid var(--border); background: var(--pillar-header); display: flex; flex-direction: column; gap: 10px; }
@@ -601,21 +582,74 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .ios-icon-row { color: var(--text-color); }
 .ios-arrow-down { color: var(--text-color); }
 
+/* --- 截圖模式強制變數重置 (Fix) --- */
+/* 當進入截圖模式時，無論是否為 Dark Mode，強制將變數重置為 Light Mode */
 .main-display.screenshot-mode {
-    background-color: #f4f6f8 !important; 
+    /* 1. 重置基礎變數為淺色版 */
+    --bg-color: #f4f6f8;
+    --panel-bg: #ffffff;
+    --text-color: #333333;
+    --text-secondary: #666666;
+    --border: #e0e0e0;
+    --accent: #4caf50;
+    --highlight: #e3f2fd;
+    --active-border: #2196f3;
+    --input-bg: #ffffff;
+    --rail-bg: #f1f1f1;
+    --pillar-bg: #ffffff;
+    --pillar-header: #f0f0f0;
+    --pillar-footer: #fafafa;
+    --modal-bg: #ffffff;
+    
+    /* 2. 重置五行顏色為淺色底版 */
+    --color-wood: #2e7d32;
+    --color-fire: #d32f2f;
+    --color-earth: #795548;
+    --color-metal: #d1a906;
+    --color-water: #1565c0;
+    
+    /* 3. 重置十神顏色 */
+    --color-shishen: #666; 
+    --color-daymaster: #000;
+    --rail-shishen: #888;
+
+    /* 4. 強制背景色與文字顏色，確保繼承正確 */
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
 }
+
+/* 強制子元素繼承正確顏色 */
 .main-display.screenshot-mode .group-container,
 .main-display.screenshot-mode .pillar.main {
-    background: #fff !important;
-    border-color: #e0e0e0 !important;
+    background: var(--panel-bg) !important;
+    border-color: var(--border) !important;
 }
+
 .main-display.screenshot-mode .title-text {
-    color: #333 !important;
-    background: #f0f0f0 !important;
+    color: var(--text-color) !important;
+    background: var(--pillar-header) !important;
 }
+
+.main-display.screenshot-mode .top-info,
+.main-display.screenshot-mode .canggan-shishen,
+.main-display.screenshot-mode .zhangsheng-text,
+.main-display.screenshot-mode .group-label {
+    color: var(--text-secondary) !important;
+}
+
+.main-display.screenshot-mode .shishen-top,
+.main-display.screenshot-mode .shensha-tag {
+    color: var(--color-shishen) !important;
+}
+
+.main-display.screenshot-mode .shishen-top.dm {
+    color: var(--color-daymaster) !important;
+}
+
 .main-display.screenshot-mode .gan { color: inherit !important; }
 .main-display.screenshot-mode .zhi { color: inherit !important; }
 
+/* Mobile */
 @media (max-width: 600px) {
     .auth-box { padding: 10px; gap: 5px; }
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
