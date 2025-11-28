@@ -1,3 +1,4 @@
+/* ... (保留原本的 CSS 變數與 Header 等設定) ... */
 :root {
     /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
@@ -71,6 +72,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease; /* 平滑過渡 */
 }
 
+/* ... (保留 app-container, header 等樣式) ... */
 .app-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -95,9 +97,8 @@ body {
 
 /* 暗黑模式切換按鈕 */
 .theme-toggle-btn {
-    position: absolute;
-    top: 5px;
-    right: 10px;
+    /* position: absolute;  <-- 移除絕對定位，交由 JS 控制 */ 
+    /* top: 5px; right: 10px; */
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text-color);
@@ -113,9 +114,10 @@ body {
 }
 .theme-toggle-btn:hover {
     background-color: var(--highlight);
+    transform: rotate(15deg); /* 按鈕旋轉效果 */
 }
 
-/* --- 帳戶管理欄 --- */
+/* ... (保留 auth-box, control-wrapper, toggle-row, tools-bar, tabs, input-row, button 樣式) ... */
 .auth-box {
     background-color: var(--panel-bg);
     padding: 15px 20px;
@@ -132,7 +134,6 @@ body {
 }
 .auth-hint { font-size: 14px; color: var(--text-secondary); font-weight: 500; text-align: left; flex: 1; }
 
-/* --- 輸入控制區 --- */
 .control-wrapper {
     background: var(--panel-bg);
     padding: 15px;
@@ -146,11 +147,10 @@ body {
 }
 .control-wrapper.collapsed { display: none; }
 
-/* 50:50 控制按鈕列 */
 .toggle-row {
     display: flex;
     width: 100%;
-    background: var(--border); /* 使用 border 顏色作為背景 */
+    background: var(--border); 
     border-radius: 0 0 12px 12px;
     border: 1px solid var(--border);
     border-top: none;
@@ -168,7 +168,7 @@ body {
     font-weight: bold;
     user-select: none;
     transition: background-color 0.2s;
-    background-color: var(--pillar-header); /* 淺灰背景 */
+    background-color: var(--pillar-header); 
 }
 
 .toggle-col:hover {
@@ -179,7 +179,6 @@ body {
     border-right: 1px solid var(--border);
 }
 
-/* --- 工具列 --- */
 .tools-bar {
     display: flex;
     align-items: center;
@@ -239,14 +238,15 @@ body {
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
 input, select { padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-color); border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
-button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; }
+button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; transition: background-color 0.2s; }
+button.action-btn:hover { filter: brightness(1.1); }
 button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%; }
 #mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; display: none; }
 .tst-section { background: var(--rail-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--border); display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
 .tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed var(--border); width: 100%; flex-wrap: nowrap; }
 .note { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
 
-/* --- 命主資訊 --- */
+/* ... (保留 info-dashboard, main-display, group-container 樣式) ... */
 .info-dashboard {
     display: none;
     grid-template-columns: 3.5fr 6.5fr; 
@@ -265,9 +265,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .info-label { font-weight: bold; color: var(--text-secondary); font-size: 13px; white-space: nowrap; }
 .info-val { font-weight: 600; color: var(--text-color); word-break: break-word; }
 
-/* =========================================
-   核心顯示區 (桌面版設定)
-   ========================================= */
 .main-display {
     display: flex;
     flex-direction: row; 
@@ -299,7 +296,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     flex: 4.3; 
 }
 
-/* 原局與隱藏鍵定位 */
 .group-label {
     display: flex;
     flex-direction: row; 
@@ -334,9 +330,12 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     justify-content: center;
     writing-mode: horizontal-tb;
     margin-top: 120px; 
+    transition: transform 0.3s; /* 箭頭旋轉動畫 */
 }
 
-/* 柱子結構 */
+/* =========================================
+   【動畫特效】Pillar & Content Transition
+   ========================================= */
 .pillar.main {
     display: flex;
     flex-direction: column;
@@ -350,9 +349,28 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     position: relative;
     overflow: hidden;
     height: auto; 
+    transition: background-color 0.3s, border-color 0.3s; /* 背景色過渡 */
 }
 
-/* 頂部資訊區 */
+/* 內容淡入淡出容器 */
+.pillar-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1; 
+    opacity: 1;
+    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out; /* 關鍵：透明度與位移過渡 */
+}
+
+/* 淡出狀態 (由 JS 添加 class) */
+.pillar-content-wrapper.fading-out {
+    opacity: 0;
+    transform: translateY(5px); /* 稍微往下沉，增加動感 */
+}
+
+/* 淡入狀態 (移除 fading-out 後回復預設) */
+
 .top-info {
     min-height: 35px;
     display: flex;
@@ -368,7 +386,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     line-height: 1.2;
 }
 
-/* 標題區域 */
 .title-text {
     font-size: 13px;
     font-weight: bold;
@@ -385,29 +402,19 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: var(--text-secondary); }
 
-/* 內容區 */
-.pillar-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    flex-grow: 1; 
-}
-
-/* 十神、天干、地支 */
+/* ... (保留 shishen, gan, zhi, canggan 樣式) ... */
 .shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
-/* 藏干區 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     width: 100%;
-    min-height: 60px; /* Desktop Default */
+    min-height: 60px;
     justify-content: flex-start;
     margin-bottom: 5px;
     padding-top: 5px;
@@ -417,7 +424,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .canggan-char { font-weight: bold; }
 .canggan-shishen { color: var(--text-secondary); font-size: 12px; }
 
-/* 眼仔按鈕 */
 .eye-btn {
     position: absolute;
     top: 6px; 
@@ -438,7 +444,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     color: var(--text-color);
 }
 
-/* --- 底部區域 --- */
 .pillar-bottom-section {
     width: 100%;
     display: flex;
@@ -451,7 +456,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding-bottom: 5px; 
 }
 
-/* 十二長生 */
 .zhangsheng-text {
     position: relative;
     width: 100%;
@@ -463,7 +467,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     background-color: transparent;
 }
 
-/* 神煞列表 */
 .shensha-list {
     display: flex;
     flex-direction: column;
@@ -486,19 +489,38 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding: 1px 0;
 }
 
-/* --- 軌道區 --- */
+/* =========================================
+   【動畫特效】Rail Items Animation
+   ========================================= */
 .rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
 .rail-row { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; white-space: nowrap; }
 .rail-title { min-width: 30px; font-weight: bold; color: var(--text-secondary); text-align: center; font-size: 13px; background: var(--rail-bg); padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
 .rail-items { display: flex; gap: 6px; padding-right: 10px; }
+
 .pillar.rail {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     width: 60px; height: 125px; background: var(--pillar-bg); border: 1px solid var(--border); border-radius: 6px;
-    cursor: pointer; transition: all 0.2s; position: relative; padding-top: 4px; flex-shrink: 0;
+    cursor: pointer; 
+    position: relative; 
+    padding-top: 4px; 
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑過渡 */
+    transform: scale(1);
 }
-.pillar.selectable:hover { background: var(--pillar-header); border-color: #ccc; }
-.pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
+.pillar.selectable:hover { 
+    background: var(--pillar-header); 
+    border-color: #ccc; 
+    transform: translateY(-2px); /* 懸停時輕微上浮 */
+}
+.pillar.active { 
+    background: var(--highlight); 
+    border-color: var(--active-border); 
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); 
+    transform: scale(1.05); /* 選中時稍微放大 */
+    z-index: 5;
+}
 
+/* ... (保留 rail-info 等樣式) ... */
 .rail-info { 
     font-size: 11px; 
     color: var(--text-secondary);
@@ -516,7 +538,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* Modal 與其他 */
+/* ... (保留 Modal, Footer, Media Queries 等樣式) ... */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
 .modal-content { background: var(--modal-bg); width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-color); display: flex; flex-direction: column; overflow: hidden; }
 .modal-header { padding: 15px; border-bottom: 1px solid var(--border); background: var(--pillar-header); display: flex; flex-direction: column; gap: 10px; }
@@ -538,7 +560,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .chart-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 .delete-btn { padding: 6px 10px; background: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
 
-/* --- Footer --- */
 .app-footer {
     margin-top: 40px;
     padding-top: 20px;
@@ -565,7 +586,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 ::-webkit-scrollbar-track { background: var(--rail-bg); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
-/* SEO Footer */
 .seo-footer {
     margin-top: 40px;
     padding: 20px;
@@ -575,16 +595,14 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 }
 .seo-content h2 { color: var(--text-color); }
 
-/* iOS Modal */
 .ios-prompt-modal { background: var(--modal-bg); box-shadow: 0 -2px 10px var(--shadow-color); }
 .ios-prompt-title { color: var(--text-color); }
 .ios-instruction { color: var(--text-secondary); }
 .ios-icon-row { color: var(--text-color); }
 .ios-arrow-down { color: var(--text-color); }
 
-/* Screenshot Mode */
 .main-display.screenshot-mode {
-    background-color: #f4f6f8 !important; /* 截圖強制淺色底，保證清晰 */
+    background-color: #f4f6f8 !important; 
 }
 .main-display.screenshot-mode .group-container,
 .main-display.screenshot-mode .pillar.main {
@@ -598,7 +616,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .main-display.screenshot-mode .gan { color: inherit !important; }
 .main-display.screenshot-mode .zhi { color: inherit !important; }
 
-/* Mobile */
 @media (max-width: 600px) {
     .auth-box { padding: 10px; gap: 5px; }
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
