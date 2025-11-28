@@ -17,6 +17,10 @@ window.currentDocId = null;
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM Ready");
+    
+    // --- Dark Mode Init ---
+    initTheme();
+
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
     const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
@@ -51,7 +55,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     populateGZ('gzYear'); populateGZ('gzMonth'); populateGZ('gzDay'); populateGZ('gzHour');
+    
+    // 綁定主題切換按鈕
+    const btnTheme = document.getElementById('themeToggle');
+    if (btnTheme) {
+        btnTheme.addEventListener('click', toggleTheme);
+    }
 });
+
+// ==========================================
+// 2.1 Dark Mode Logic (LocalStorage)
+// ==========================================
+function initTheme() {
+    // 優先讀取 LocalStorage
+    const savedTheme = localStorage.getItem('theme');
+    
+    // 如果有儲存的設定，直接套用
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    } else {
+        // 如果沒有，檢查系統偏好
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateThemeIcon('dark');
+        }
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme); // 儲存到瀏覽器
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+        btn.innerText = theme === 'dark' ? '☀️' : '🌙';
+    }
+}
 
 function populateGZ(idPrefix) {
     const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
