@@ -582,72 +582,32 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .ios-icon-row { color: var(--text-color); }
 .ios-arrow-down { color: var(--text-color); }
 
-/* --- 截圖模式強制變數重置 (Fix) --- */
-/* 當進入截圖模式時，無論是否為 Dark Mode，強制將變數重置為 Light Mode */
+/* --- 截圖專用模式 --- */
+/* 只處理版面配置，不強制顏色，實現「所見即所得」 */
 .main-display.screenshot-mode {
-    /* 1. 重置基礎變數為淺色版 */
-    --bg-color: #f4f6f8;
-    --panel-bg: #ffffff;
-    --text-color: #333333;
-    --text-secondary: #666666;
-    --border: #e0e0e0;
-    --accent: #4caf50;
-    --highlight: #e3f2fd;
-    --active-border: #2196f3;
-    --input-bg: #ffffff;
-    --rail-bg: #f1f1f1;
-    --pillar-bg: #ffffff;
-    --pillar-header: #f0f0f0;
-    --pillar-footer: #fafafa;
-    --modal-bg: #ffffff;
-    
-    /* 2. 重置五行顏色為淺色底版 */
-    --color-wood: #2e7d32;
-    --color-fire: #d32f2f;
-    --color-earth: #795548;
-    --color-metal: #d1a906;
-    --color-water: #1565c0;
-    
-    /* 3. 重置十神顏色 */
-    --color-shishen: #666; 
-    --color-daymaster: #000;
-    --rail-shishen: #888;
-
-    /* 4. 強制背景色與文字顏色，確保繼承正確 */
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
+    display: inline-flex !important; 
+    width: auto !important;
+    min-width: auto !important;
+    justify-content: flex-start !important; 
+    gap: 5px !important; 
+    background-color: var(--bg-color) !important; /* 使用當前主題背景 */
+    margin: 0 !important;
+    padding: 20px !important; 
+    border-bottom: none !important; 
+    overflow: visible !important;
 }
 
-/* 強制子元素繼承正確顏色 */
-.main-display.screenshot-mode .group-container,
+.main-display.screenshot-mode .group-container {
+    flex: 0 0 auto !important; 
+    width: auto !important;
+    max-width: none !important;
+}
+
 .main-display.screenshot-mode .pillar.main {
-    background: var(--panel-bg) !important;
-    border-color: var(--border) !important;
+    flex: 0 0 auto !important; 
+    width: 90px !important;    
+    min-width: 90px !important;
 }
-
-.main-display.screenshot-mode .title-text {
-    color: var(--text-color) !important;
-    background: var(--pillar-header) !important;
-}
-
-.main-display.screenshot-mode .top-info,
-.main-display.screenshot-mode .canggan-shishen,
-.main-display.screenshot-mode .zhangsheng-text,
-.main-display.screenshot-mode .group-label {
-    color: var(--text-secondary) !important;
-}
-
-.main-display.screenshot-mode .shishen-top,
-.main-display.screenshot-mode .shensha-tag {
-    color: var(--color-shishen) !important;
-}
-
-.main-display.screenshot-mode .shishen-top.dm {
-    color: var(--color-daymaster) !important;
-}
-
-.main-display.screenshot-mode .gan { color: inherit !important; }
-.main-display.screenshot-mode .zhi { color: inherit !important; }
 
 /* Mobile */
 @media (max-width: 600px) {
