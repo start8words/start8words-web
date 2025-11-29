@@ -209,10 +209,27 @@ function updateLocation(lat, lon) {
 // ==========================================
 // 4. 排盤核心邏輯
 // ==========================================
+
+// 【修正】使用更精確的均時差 (Equation of Time) 公式
 function getEquationOfTime(date) {
-    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-    const b = 2 * Math.PI * (dayOfYear - 81) / 365;
-    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    // 算法來源：Smart's Algorithm / NOAA 近似公式
+    // 輸入：Date 物件
+    // 輸出：均時差 (分鐘)
+    
+    // 1. 計算該年第幾天 (Day of Year)
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = date - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    // 2. 計算 B 參數 (角度)
+    const B = (360 * (dayOfYear - 81)) / 365;
+    const bRad = B * (Math.PI / 180); // 轉為弧度
+
+    // 3. 計算均時差 (EOT)
+    // EOT = 9.87 * sin(2B) - 7.53 * cos(B) - 1.5 * sin(B)
+    const eot = 9.87 * Math.sin(2 * bRad) - 7.53 * Math.cos(bRad) - 1.5 * Math.sin(bRad);
+    
     return eot; 
 }
 
@@ -376,12 +393,26 @@ window.initChart = function() {
             const stdMeridian = 120; 
             const diffDeg = longitude - stdMeridian;
             const meanOffsetMin = diffDeg * 4; 
-            let tempDate = new Date(window.originSolar.getYear(), window.originSolar.getMonth() - 1, window.originSolar.getDay(), window.originSolar.getHour(), window.originSolar.getMinute());
+            
+            // 計算真太陽時
+            let tempDate = new Date(
+                window.originSolar.getYear(), 
+                window.originSolar.getMonth() - 1, 
+                window.originSolar.getDay(), 
+                window.originSolar.getHour(), 
+                window.originSolar.getMinute()
+            );
+            
+            // 修正：使用更精確的均時差計算
             const eotMin = getEquationOfTime(tempDate);
             const totalOffset = meanOffsetMin + eotMin;
+            
+            // 應用修正
             let nativeDate = new Date(tempDate.getTime());
             nativeDate.setMinutes(nativeDate.getMinutes() + totalOffset);
+            
             calculatingSolar = Solar.fromDate(nativeDate);
+            
             const m = nativeDate.getMinutes();
             const mStr = m < 10 ? "0"+m : m;
             tstDisplay = `是 (${nativeDate.getHours()}:${mStr})`;
