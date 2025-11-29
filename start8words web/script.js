@@ -751,6 +751,7 @@ function renderDaYunRail() {
     }
     setTimeout(() => centerActiveItem(container), 0);
 }
+// 【修改】renderYearRail：點擊年柱時，自動跳轉到該年的「立春」日 (約 2月4日)
 function renderYearRail() {
     const box = document.getElementById('yearRail'); box.innerHTML = '';
     const dy = state.daYuns[state.selDaYunIdx];
@@ -765,12 +766,27 @@ function renderYearRail() {
         const age = y - birthYear + 1;
         const info = `${age}歲\n${y}年`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
-        el.onclick = () => { state.selYear = y; renderRailsCascadeFromMonth(); highlightSelection('yearRail', i); };
+        el.onclick = () => { 
+            // 修正：計算該年立春日
+            const liChun = Lunar.fromYmd(y, 1, 1).getJieQiTable()['立春'];
+            if (liChun) {
+                const solar = liChun.getSolar();
+                state.selYear = solar.getYear();
+                state.selMonth = solar.getMonth();
+                state.selDay = solar.getDay();
+            } else {
+                // Fallback (極少發生)
+                state.selYear = y; 
+            }
+            renderRailsCascadeFromMonth(); 
+            highlightSelection('yearRail', i); 
+        };
         if(y === state.selYear) el.classList.add('active');
         box.appendChild(el);
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
+// 【修改】renderMonthRail：點擊月柱時，自動跳轉到該月「節氣」開始的那一天
 function renderMonthRail() {
     const box = document.getElementById('monthRail'); box.innerHTML = '';
     const startYear = state.selYear;
@@ -779,10 +795,19 @@ function renderMonthRail() {
         const sample = Solar.fromYmd(y, m, 15); 
         const lunar = sample.getLunar();
         const gz = lunar.getMonthInGanZhi();
-        const prevJie = lunar.getPrevJie(true);
+        const prevJie = lunar.getPrevJie(true); // 取得該干支月開始的節氣
         const info = `${prevJie.getName()}\n${prevJie.getSolar().getDay()}/${prevJie.getSolar().getMonth()}`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
-        el.onclick = () => { state.selYear = y; state.selMonth = m; renderRailsCascadeFromDay(); highlightSelection('monthRail', i); };
+        el.onclick = () => { 
+            // 修正：強制設定日期為節氣開始日
+            const jieSolar = prevJie.getSolar();
+            state.selYear = jieSolar.getYear();
+            state.selMonth = jieSolar.getMonth();
+            state.selDay = jieSolar.getDay();
+            
+            renderRailsCascadeFromDay(); 
+            highlightSelection('monthRail', i); 
+        };
         if(m === state.selMonth) el.classList.add('active');
         box.appendChild(el);
     }
