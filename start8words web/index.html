@@ -22,7 +22,7 @@
     <meta name="apple-mobile-web-app-title" content="逸晴命理">
     
     <!-- SEO 設定 -->
-    <title>逸晴命理 - 免費八字排盤 | 真太陽時 | 流年大運分析</title>
+    <title>逸晴命理 (Start8Words) - 免費八字排盤 | 真太陽時 | 流年大運分析</title>
     <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。特色功能：真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞自動分析。介面簡潔，手機電腦皆適用。">
     <meta name="keywords" content="八字, 排盤, 免費算命, 八字排盤, 逸晴命理, Start8Words, 四柱八字, 流年運勢, 真太陽時, 子平八字, 命理工具, 線上排盤">
     <meta name="author" content="逸晴命理 Start8Words">
@@ -70,7 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
 
@@ -78,13 +78,19 @@
 
     <div class="app-header">
         <h1>逸晴命理</h1>
-        <div style="font-size: 14px; font-weight: normal; color: #555; margin-top: 5px;">免費八字排盤工具</div>
+        <div style="font-size: 14px; font-weight: normal; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
+        
+        <!-- 原本在 Header 的按鈕已移除，改由 JS 動態插入 -->
     </div>
 
     <div id="auth-container" class="auth-box">
         <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
-            <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
+                <!-- 這裡是用來放切換按鈕的容器 (未登入時) -->
+                <div id="themeBtnContainerLoggedOut"></div>
+            </div>
         </div>
         
         <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 15px; width: 100%; flex-wrap: wrap;">
@@ -93,12 +99,19 @@
                 <span id="userName" style="font-weight: bold; font-size: 15px;"></span>
             </div>
             
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 8px; align-items: center;">
                 <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
                 <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
+                <!-- 這裡是用來放切換按鈕的容器 (已登入時) -->
+                <div id="themeBtnContainerLoggedIn"></div>
             </div>
         </div>
     </div>
+
+    <!-- 隱藏的按鈕本體，等待 JS 移動 -->
+    <button id="themeToggle" class="theme-toggle-btn" aria-label="切換深色模式" style="position:static; margin-left: 5px; border-radius: 6px; width: 36px; height: 36px; padding: 0;">
+        🌙
+    </button>
 
     <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
@@ -141,29 +154,29 @@
             </div>
             <div style="display:flex; gap:5px; width:100%; align-items:center;">
                 <select id="lunarHour" style="flex:2"></select>
-                <label style="flex:1; font-size:12px; color:#666;"><input type="checkbox" id="isLeap"> 閏月</label>
+                <label style="flex:1; font-size:12px; color:var(--text-secondary);"><input type="checkbox" id="isLeap"> 閏月</label>
             </div>
         </div>
 
         <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
-            <div style="font-size:12px; color:#888; margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:#555;">年柱</span>
+                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">年柱</span>
                 <select id="gzYearGan" style="flex:1"></select>
                 <select id="gzYearZhi" style="flex:1"></select>
             </div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:#555;">月柱</span>
+                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">月柱</span>
                 <select id="gzMonthGan" style="flex:1"></select>
                 <select id="gzMonthZhi" style="flex:1"></select>
             </div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:#555;">日柱</span>
+                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">日柱</span>
                 <select id="gzDayGan" style="flex:1"></select>
                 <select id="gzDayZhi" style="flex:1"></select>
             </div>
             <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:#555;">時柱</span>
+                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">時柱</span>
                 <select id="gzHourGan" style="flex:1"></select>
                 <select id="gzHourZhi" style="flex:1"></select>
             </div>
@@ -177,7 +190,7 @@
             </div>
             
             <div class="tst-bottom-row">
-                <span style="font-size:12px; color:#555; white-space:nowrap;">經度:</span>
+                <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
                 <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
                 
                 <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
@@ -189,8 +202,8 @@
                 </label>
             </div>
 
-            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed #ddd; width:100%;">
-                <span style="font-size:12px; color:#555; font-weight:bold;">子時處理：</span>
+            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed var(--border); width:100%;">
+                <span style="font-size:12px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
                 <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
                     <input type="radio" name="zishiMode" value="23" checked style="width:auto; margin:0;"> 23:00 換日
                 </label>
@@ -311,7 +324,7 @@
                     <h3>📅 干支反推結果</h3>
                     <span class="close-modal" onclick="closeReverseModal()">×</span>
                 </div>
-                <div style="font-size:13px; color:#666;">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
+                <div style="font-size:13px; color:var(--text-secondary);">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
             </div>
             <div id="reverseList" class="chart-list">
                 <!-- 結果將插入這裡 -->
@@ -321,17 +334,17 @@
 
     <!-- 截圖分享 Modal -->
     <div id="shareModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 90%; width: 500px; background: #f4f6f8;">
+        <div class="modal-content" style="max-width: 90%; width: 500px; background: var(--bg-color);">
             <div class="modal-header">
                 <div class="modal-title-row">
                     <h3>📤 命盤截圖</h3>
                     <span class="close-modal" onclick="closeShareModal()">×</span>
                 </div>
-                <div style="font-size:13px; color:#666; margin-top:5px;">
+                <div style="font-size:13px; color:var(--text-secondary); margin-top:5px;">
                     長按下方圖片即可儲存或是分享給朋友。
                 </div>
             </div>
-            <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: #e0e0e0; min-height: 200px;">
+            <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: var(--border); min-height: 200px;">
                 <!-- 圖片生成後會出現在這裡 -->
             </div>
         </div>
@@ -347,7 +360,7 @@
                 </div>
             </div>
             <div style="padding: 20px; text-align: center;">
-                <p style="font-size: 15px; color: #555; line-height: 1.6;">
+                <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6;">
                     請點擊瀏覽器上方或下方的 <strong style="color:#2196f3">分享按鈕</strong>
                     <br>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 10px 0;">
@@ -373,7 +386,7 @@
                 逸晴命理提供一個專業的<strong>免費線上八字排盤系統</strong>，致力於設計最精準的命理分析工具。
                 我們提供<strong>真太陽時校正</strong>、<strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
             </p>
-            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
                 關鍵字：八字排盤, 免費算命, 四柱八字, 線上排盤, 紫微斗數, 真太陽時, 
                 流年運勢, 2026運勢, 逸晴命理, Start8Words.
             </p>
@@ -390,7 +403,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=12"></script>
+    <script src="script.js?v=13"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
@@ -407,6 +420,9 @@
         const modal = document.getElementById('chartModal');
         const chartList = document.getElementById('chartList');
         const searchInput = document.getElementById('searchInput');
+        const themeBtnContainerLoggedOut = document.getElementById('themeBtnContainerLoggedOut');
+        const themeBtnContainerLoggedIn = document.getElementById('themeBtnContainerLoggedIn');
+        const themeToggle = document.getElementById('themeToggle');
 
         let currentUser = null; 
         let allCharts = []; 
@@ -546,13 +562,13 @@
                 const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
                 const div = document.createElement('div');
                 div.className = 'chart-item';
-                const tagHtml = data.tags ? `<span style="background:#e3f2fd; color:#1976d2; padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
+                const tagHtml = data.tags ? `<span style="background:var(--highlight); color:var(--active-border); padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
                 
                 const genderStr = data.gender === 1 ? '男' : '女';
 
                 div.innerHTML = `
                     <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:#666;">(${genderStr})</span></div>
+                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:var(--text-secondary);">(${genderStr})</span></div>
                         <div class="chart-detail">${data.birthDate}</div>
                     </div>
                     <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
@@ -616,6 +632,15 @@
         }
 
         onAuthStateChanged(auth, (user) => {
+            // 移動按鈕邏輯
+            if (themeToggle && themeBtnContainerLoggedOut && themeBtnContainerLoggedIn) {
+                if (user) {
+                    themeBtnContainerLoggedIn.appendChild(themeToggle);
+                } else {
+                    themeBtnContainerLoggedOut.appendChild(themeToggle);
+                }
+            }
+
             if (user) {
                 currentUser = user;
                 if(loggedOutUI) loggedOutUI.style.display = 'none';
@@ -649,7 +674,3 @@
 </div>
 </body>
 </html>
-
-
-
-

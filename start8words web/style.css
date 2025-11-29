@@ -1,13 +1,23 @@
+/* ... (保留原有的 :root 和 [data-theme="dark"] 設定) ... */
 :root {
+    /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
     --panel-bg: #ffffff;
     --text-color: #333333;
+    --text-secondary: #666666;
     --border: #e0e0e0;
     --accent: #4caf50;
     --highlight: #e3f2fd;
     --active-border: #2196f3;
+    --input-bg: #ffffff;
+    --rail-bg: #f1f1f1;
+    --pillar-bg: #ffffff;
+    --pillar-header: #f0f0f0;
+    --pillar-footer: #fafafa;
+    --modal-bg: #ffffff;
+    --shadow-color: rgba(0,0,0,0.05);
     
-    /* 五行顏色 */
+    /* 五行顏色 (淺色底) */
     --color-wood: #2e7d32;
     --color-fire: #d32f2f;
     --color-earth: #795548;
@@ -20,6 +30,37 @@
     --rail-shishen: #888;
 }
 
+/* --- 暗黑模式變數覆寫 --- */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --panel-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    --border: #333333;
+    --accent: #66bb6a;
+    --highlight: #2c3e50;
+    --active-border: #64b5f6;
+    --input-bg: #2d2d2d;
+    --rail-bg: #2d2d2d;
+    --pillar-bg: #252525;
+    --pillar-header: #333333;
+    --pillar-footer: #2a2a2a;
+    --modal-bg: #1e1e1e;
+    --shadow-color: rgba(0,0,0,0.5);
+
+    /* 五行顏色 (深色底) */
+    --color-wood: #81c784;
+    --color-fire: #e57373;
+    --color-earth: #a1887f;
+    --color-metal: #fff176;
+    --color-water: #64b5f6;
+    
+    /* 十神顏色 */
+    --color-shishen: #999; 
+    --color-daymaster: #ffffff;
+    --rail-shishen: #aaa;
+}
+
 body {
     font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background-color: var(--bg-color);
@@ -28,6 +69,7 @@ body {
     padding: 15px;
     font-size: 15px; 
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app-container {
@@ -41,24 +83,42 @@ body {
 
 .app-header {
     text-align: center;
-    color: #000000;
+    color: var(--text-color);
     margin-bottom: 15px;
     letter-spacing: 1px;
+    position: relative;
 }
-/* SEO 優化：Header 使用 h1 */
 .app-header h1 {
     margin: 0;
     font-size: 22px;
     font-weight: 900;
 }
 
-/* --- 帳戶管理欄 --- */
+.theme-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+.theme-toggle-btn:hover {
+    background-color: var(--highlight);
+    transform: rotate(15deg);
+}
+
 .auth-box {
-    background-color: #ffffff;
+    background-color: var(--panel-bg);
     padding: 15px 20px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -67,15 +127,14 @@ body {
     width: 100%;
     box-sizing: border-box;
 }
-.auth-hint { font-size: 14px; color: #555; font-weight: 500; text-align: left; flex: 1; }
+.auth-hint { font-size: 14px; color: var(--text-secondary); font-weight: 500; text-align: left; flex: 1; }
 
-/* --- 輸入控制區 --- */
 .control-wrapper {
     background: var(--panel-bg);
     padding: 15px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
     margin-bottom: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -83,11 +142,10 @@ body {
 }
 .control-wrapper.collapsed { display: none; }
 
-/* 50:50 控制按鈕列 */
 .toggle-row {
     display: flex;
     width: 100%;
-    background: #e0e0e0;
+    background: var(--border); 
     border-radius: 0 0 12px 12px;
     border: 1px solid var(--border);
     border-top: none;
@@ -101,32 +159,31 @@ body {
     padding: 8px;
     cursor: pointer;
     font-size: 13px;
-    color: #555;
+    color: var(--text-secondary);
     font-weight: bold;
     user-select: none;
     transition: background-color 0.2s;
-    background-color: #e0e0e0;
+    background-color: var(--pillar-header); 
 }
 
 .toggle-col:hover {
-    background-color: #d0d0d0;
+    background-color: var(--border);
 }
 
 .toggle-col.left {
-    border-right: 1px solid #ccc;
+    border-right: 1px solid var(--border);
 }
 
-/* --- 工具列 --- */
 .tools-bar {
     display: flex;
     align-items: center;
     justify-content: flex-end; 
     gap: 10px;
     padding: 10px;
-    background: #f1f1f1; 
+    background: var(--rail-bg);
     border-radius: 8px;
     margin-bottom: 15px; 
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     animation: fadeIn 0.3s ease;
 }
 
@@ -137,14 +194,14 @@ body {
 
 .tool-label {
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: bold;
 }
 
 .tool-btn {
-    background-color: #fff;
+    background-color: var(--panel-bg);
     border: 1px solid var(--border);
-    color: #555;
+    color: var(--text-secondary);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 13px;
@@ -153,12 +210,12 @@ body {
     align-items: center;
     gap: 5px;
     transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px var(--shadow-color);
     white-space: nowrap;
 }
 
 .tool-btn:hover {
-    background-color: #f0f7ff;
+    background-color: var(--highlight);
     border-color: var(--active-border);
     color: var(--active-border);
 }
@@ -167,23 +224,23 @@ body {
     transform: translateY(1px);
 }
 
-.tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-.tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: #777; border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
+.tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 15px; }
+.tab { padding: 8px 10px; cursor: pointer; font-weight: bold; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -2px; flex: 1; text-align: center; }
 .tab.active { color: var(--active-border); border-color: var(--active-border); }
 
 .input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
 .input-row > * { flex: 1; min-width: 80px; }
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
-input, select { padding: 8px; background: #fff; border: 1px solid #ccc; color: #333; border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
+input, select { padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-color); border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
-button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; }
+button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; transition: background-color 0.2s; }
+button.action-btn:hover { filter: brightness(1.1); }
 button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%; }
-#mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px; display: none; }
-.tst-section { background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px dashed #ccc; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
-.tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed #ddd; width: 100%; flex-wrap: nowrap; }
-.note { font-size: 12px; color: #888; margin-top: 5px; }
+#mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; display: none; }
+.tst-section { background: var(--rail-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--border); display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
+.tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed var(--border); width: 100%; flex-wrap: nowrap; }
+.note { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
 
-/* --- 命主資訊 --- */
 .info-dashboard {
     display: none;
     grid-template-columns: 3.5fr 6.5fr; 
@@ -193,23 +250,19 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     border-radius: 10px;
     padding: 12px;
     margin-bottom: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px var(--shadow-color);
     font-size: 13px;
 }
 .info-col { display: flex; flex-direction: column; gap: 5px; }
-.info-col.left { border-right: 1px dashed #ddd; padding-right: 5px; }
+.info-col.left { border-right: 1px dashed var(--border); padding-right: 5px; }
 .info-item { display: flex; flex-direction: row; align-items: baseline; gap: 4px; }
-.info-label { font-weight: bold; color: #666; font-size: 13px; white-space: nowrap; }
-.info-val { font-weight: 600; color: #000; word-break: break-word; }
+.info-label { font-weight: bold; color: var(--text-secondary); font-size: 13px; white-space: nowrap; }
+.info-val { font-weight: 600; color: var(--text-color); word-break: break-word; }
 
-/* =========================================
-   核心顯示區 (桌面版設定)
-   ========================================= */
 .main-display {
     display: flex;
     flex-direction: row; 
     flex-wrap: nowrap;   
-    /* 【修改】縮小間距：從 15px 減至 4px (縮小約 70%) */
     gap: 4px; 
     margin-bottom: 20px;
     padding-bottom: 10px;
@@ -224,7 +277,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     background: var(--panel-bg);
     padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px var(--shadow-color);
     border: 1px solid var(--border);
     height: auto;
     flex: 4.7; 
@@ -237,7 +290,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     flex: 4.3; 
 }
 
-/* 原局與隱藏鍵定位 */
 .group-label {
     display: flex;
     flex-direction: row; 
@@ -250,7 +302,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     color: #999;
     font-weight: bold;
     letter-spacing: 2px;
-    border-right: 1px solid #eee;
+    border-right: 1px solid var(--border);
     margin-right: 5px;
     width: 24px;
     flex-shrink: 0;
@@ -259,9 +311,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .shensha-toggle-btn {
     cursor: pointer;
     font-size: 10px;
-    color: #555;
+    color: var(--text-secondary);
     border: none;
-    background: #E0E0E0;
+    background: var(--border);
     width: 18px;
     height: 18px;
     min-width: 18px;
@@ -272,27 +324,40 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     justify-content: center;
     writing-mode: horizontal-tb;
     margin-top: 120px; 
+    transition: transform 0.3s;
 }
 
-/* 柱子結構 */
 .pillar.main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* 桌面版：彈性伸展 */
     width: auto; 
     flex: 1; 
-    min-width: 70px; /* 稍微調小最小寬度，確保不撐爆 */
-    
-    background: #fff;
-    border: 1px solid #eee;
+    min-width: 70px; 
+    background: var(--pillar-bg);
+    border: 1px solid var(--border);
     border-radius: 6px;
     position: relative;
     overflow: hidden;
     height: auto; 
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* 頂部資訊區 */
+.pillar-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1; 
+    opacity: 1;
+    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out; 
+}
+
+.pillar-content-wrapper.fading-out {
+    opacity: 0;
+    transform: translateY(5px);
+}
+
 .top-info {
     min-height: 35px;
     display: flex;
@@ -302,68 +367,55 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     text-align: center;
     width: 100%;
     font-size: 11px;
-    color: #666;
+    color: var(--text-secondary);
     padding-bottom: 2px;
     white-space: pre-line;
     line-height: 1.2;
 }
 
-/* 標題區域 */
 .title-text {
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 2px;
-    color: #333;
+    color: var(--text-color);
     width: 100%;
     text-align: center;
 }
 .pillar.main .title-text {
-    background-color: #f0f0f0;
+    background-color: var(--pillar-header);
     padding: 6px 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
     border-radius: 4px 4px 0 0;
 }
-.pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: #999; }
+.pillar.rail .title-text { background: transparent; border: none; padding: 0; margin-bottom: 5px; color: var(--text-secondary); }
 
-/* 內容區 */
-.pillar-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    flex-grow: 1; 
-}
-
-/* 十神、天干、地支 */
 .shishen-top { font-size: 13px; color: var(--color-shishen); height: 18px; margin-bottom: 2px; font-weight: bold; white-space: nowrap; }
 .shishen-top.dm { color: var(--color-daymaster); font-weight: 900; }
 .gan { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 2px; }
 .zhi { font-size: 30px; font-weight: bold; line-height: 1.1; margin-bottom: 6px; }
 
-/* 藏干區 */
 .canggan-box {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
     width: 100%;
-    min-height: 60px; /* Desktop Default */
+    min-height: 60px;
     justify-content: flex-start;
     margin-bottom: 5px;
     padding-top: 5px;
-    border-top: 1px dashed #eee;
+    border-top: 1px dashed var(--border);
 }
 .canggan-row { display: flex; align-items: center; gap: 4px; font-size: 13px; }
 .canggan-char { font-weight: bold; }
-.canggan-shishen { color: #777; font-size: 12px; }
+.canggan-shishen { color: var(--text-secondary); font-size: 12px; }
 
-/* 眼仔按鈕 */
 .eye-btn {
     position: absolute;
     top: 6px; 
     left: 50%;
     transform: translateX(-50%);
-    background: #fff;
+    background: var(--pillar-bg);
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -372,37 +424,35 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     justify-content: center;
     cursor: pointer;
     font-size: 13px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     z-index: 20;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px var(--shadow-color);
+    color: var(--text-color);
 }
 
-/* --- 底部區域 --- */
 .pillar-bottom-section {
     width: 100%;
     display: flex;
     flex-direction: column;
     flex-grow: 1; 
-    background-color: #fafafa; 
-    border-top: 1px dashed #eee;
+    background-color: var(--pillar-footer);
+    border-top: 1px dashed var(--border);
     border-radius: 0 0 6px 6px;
     justify-content: flex-start;
     padding-bottom: 5px; 
 }
 
-/* 十二長生 */
 .zhangsheng-text {
     position: relative;
     width: 100%;
     text-align: center;
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
     padding: 6px 0;
     border-top: none; 
     background-color: transparent;
 }
 
-/* 神煞列表 */
 .shensha-list {
     display: flex;
     flex-direction: column;
@@ -411,43 +461,58 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     padding-bottom: 2px;
     background-color: transparent;
     gap: 1px;
-    border-top: 1px dashed #ccc; 
+    border-top: 1px dashed var(--border);
     margin-top: 2px;
     padding-top: 2px;
 }
 .shensha-list.hidden { display: none; border-top: none; } 
 .shensha-tag {
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     font-weight: 500;
     width: 100%;
     text-align: center;
     padding: 1px 0;
 }
 
-/* --- 軌道區 --- */
 .rail-container { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
 .rail-row { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); overflow-x: auto; white-space: nowrap; }
-.rail-title { min-width: 30px; font-weight: bold; color: #555; text-align: center; font-size: 13px; background: #eee; padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
+.rail-title { min-width: 30px; font-weight: bold; color: var(--text-secondary); text-align: center; font-size: 13px; background: var(--rail-bg); padding: 5px 2px; border-radius: 6px; writing-mode: vertical-rl; }
 .rail-items { display: flex; gap: 6px; padding-right: 10px; }
+
 .pillar.rail {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    width: 60px; height: 125px; background: #fff; border: 1px solid #eee; border-radius: 6px;
-    cursor: pointer; transition: all 0.2s; position: relative; padding-top: 4px; flex-shrink: 0;
+    width: 60px; height: 125px; background: var(--pillar-bg); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; 
+    position: relative; 
+    padding-top: 4px; 
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: scale(1);
 }
-.pillar.selectable:hover { background: #f5f5f5; border-color: #ccc; }
-.pillar.active { background: var(--highlight); border-color: var(--active-border); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); }
+.pillar.selectable:hover { 
+    background: var(--pillar-header); 
+    border-color: #ccc; 
+    transform: translateY(-2px);
+}
+.pillar.active { 
+    background: var(--highlight); 
+    border-color: var(--active-border); 
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2); 
+    transform: scale(1.05);
+    z-index: 5;
+}
 
 .rail-info { 
     font-size: 11px; 
-    color: #666; 
+    color: var(--text-secondary);
     text-align: center; 
     display: block; 
     white-space: pre; 
     line-height: 1.3; 
     height: 36px; 
     width: 100%; 
-    border-bottom: 1px dashed #eee; 
+    border-bottom: 1px dashed var(--border);
     margin-bottom: 3px; 
     padding-top: 4px;
 }
@@ -455,40 +520,38 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .rail-ss { font-size: 11px; color: var(--rail-shishen); width: 12px; text-align: center; font-weight: normal; }
 .rail-char { font-size: 22px; font-weight: bold; }
 
-/* Modal 與其他 */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
-.modal-content { background: #fff; width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
-.modal-header { padding: 15px; border-bottom: 1px solid #eee; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
+.modal-content { background: var(--modal-bg); width: 90%; max-width: 500px; max-height: 80vh; border-radius: 12px; box-shadow: 0 5px 15px var(--shadow-color); display: flex; flex-direction: column; overflow: hidden; }
+.modal-header { padding: 15px; border-bottom: 1px solid var(--border); background: var(--pillar-header); display: flex; flex-direction: column; gap: 10px; }
 .modal-title-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.modal-title-row h3 { margin: 0; font-size: 18px; color: #333; }
-.close-modal { font-size: 24px; cursor: pointer; color: #999; }
-.search-input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.modal-title-row h3 { margin: 0; font-size: 18px; color: var(--text-color); }
+.close-modal { font-size: 24px; cursor: pointer; color: var(--text-secondary); }
+.search-input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; box-sizing: border-box; background: var(--input-bg); color: var(--text-color); }
 .category-filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; white-space: nowrap; -webkit-overflow-scrolling: touch; width: 100%; }
 .category-filters::-webkit-scrollbar { display: none; }
-.filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; white-space: nowrap; }
-.filter-chip:hover { background: #f0f0f0; }
+.filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--panel-bg); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; white-space: nowrap; }
+.filter-chip:hover { background: var(--pillar-header); }
 .filter-chip.active { background: var(--active-border); color: white; border-color: var(--active-border); font-weight: bold; }
 .chart-list { padding: 10px; overflow-y: auto; flex: 1; }
-.chart-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; border-radius: 6px; }
-.chart-item:hover { background: #f0f7ff; }
+.chart-item { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; border-radius: 6px; }
+.chart-item:hover { background: var(--highlight); }
 .chart-info { flex: 1; }
-.chart-name { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 4px; }
-.chart-tags span { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
-.chart-detail { font-size: 12px; color: #666; margin-top: 2px; }
+.chart-name { font-weight: bold; font-size: 16px; color: var(--text-color); margin-bottom: 4px; }
+.chart-tags span { display: inline-block; background: var(--highlight); color: var(--active-border); font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+.chart-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 .delete-btn { padding: 6px 10px; background: #ff5252; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; }
 
-/* --- Footer --- */
 .app-footer {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
     text-align: center;
-    color: #888;
+    color: var(--text-secondary);
     font-size: 13px;
     width: 100%;
 }
 .app-footer a {
-    color: #333;
+    color: var(--text-color);
     text-decoration: none;
     font-weight: bold;
     display: inline-flex;
@@ -501,56 +564,37 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .ig-icon { width: 16px !important; height: 16px !important; fill: currentColor; }
 
 ::-webkit-scrollbar { height: 4px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-track { background: var(--rail-bg); }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
-/* =========================================
-   SEO 專用 Footer 樣式
-   ========================================= */
 .seo-footer {
     margin-top: 40px;
     padding: 20px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #ddd;
-    color: #333;
+    background-color: var(--pillar-header);
+    border-top: 1px solid var(--border);
+    color: var(--text-color);
 }
-.seo-content {
-    max-width: 800px;
-    margin: 0 auto;
-    font-size: 14px;
-    line-height: 1.6;
-}
-.seo-content h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #444;
-}
-.seo-content ul {
-    padding-left: 20px;
-    margin: 10px 0;
-}
-.seo-content li {
-    margin-bottom: 5px;
-}
+.seo-content h2 { color: var(--text-color); }
 
-/* =========================================
-   【截圖專用模式 (Screenshot Mode)】
-   修正手機版裁切問題：
-   1. inline-flex 讓寬度隨內容撐開
-   2. flex-start 確保從最左邊開始算
-   3. overflow: visible 允許超出螢幕
-   ========================================= */
+.ios-prompt-modal { background: var(--modal-bg); box-shadow: 0 -2px 10px var(--shadow-color); }
+.ios-prompt-title { color: var(--text-color); }
+.ios-instruction { color: var(--text-secondary); }
+.ios-icon-row { color: var(--text-color); }
+.ios-arrow-down { color: var(--text-color); }
+
+/* --- 截圖專用模式 --- */
+/* 只處理版面配置，不強制顏色，實現「所見即所得」 */
 .main-display.screenshot-mode {
     display: inline-flex !important; 
     width: auto !important;
     min-width: auto !important;
-    justify-content: flex-start !important; /* 改為靠左，避免置中導致左右超出視窗被切 */
+    justify-content: flex-start !important; 
     gap: 5px !important; 
-    background-color: #f4f6f8 !important; 
+    background-color: var(--bg-color) !important; /* 使用當前主題背景 */
     margin: 0 !important;
     padding: 20px !important; 
     border-bottom: none !important; 
-    overflow: visible !important; /* 關鍵：允許內容溢出容器邊界 */
+    overflow: visible !important;
 }
 
 .main-display.screenshot-mode .group-container {
@@ -564,100 +608,31 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     width: 90px !important;    
     min-width: 90px !important;
 }
-/* =========================================
-   【手機版專用樣式】(max-width: 600px)
-   ========================================= */
+
+/* Mobile */
 @media (max-width: 600px) {
-    
     .auth-box { padding: 10px; gap: 5px; }
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
     #btnLogin { font-size: 12px !important; padding: 6px 12px !important; width: auto !important; }
-
-    /* 重置核心顯示區：恢復水平捲動，不自動伸展 */
-    .main-display {
-        overflow-x: auto; 
-        gap: 2px;
-        justify-content: flex-start;
-    }
-    
-    /* 重置群組容器：不伸展，依內容大小 */
-    .group-container { 
-        padding: 4px 2px; 
-        gap: 1px; 
-        /* 手機版恢復為自動寬度，不依比例 */
-        flex: 0 0 auto; 
-    }
-    
-    .group-container.dynamic-group {
-        flex: 0 0 auto;
-    }
-    
+    .main-display { overflow-x: auto; gap: 2px; justify-content: flex-start; }
+    .group-container { padding: 4px 2px; gap: 1px; flex: 0 0 auto; }
+    .group-container.dynamic-group { flex: 0 0 auto; }
     .group-label { width: 18px; padding-top: 82px; font-size: 11px; }
     .shensha-toggle-btn { width: 16px; height: 16px; font-size: 10px; margin-top: 110px; }
-    
-    /* 重置柱子：固定寬度 */
-    .pillar.main { 
-        width: 52px; 
-        min-width: 52px; 
-        flex: 0 0 52px;
-    }
-    
+    .pillar.main { width: 52px; min-width: 52px; flex: 0 0 52px; }
     .gan { font-size: 24px; margin-bottom: 0; line-height: 1.1; margin-bottom: 2px;}
     .zhi { font-size: 24px; margin-bottom: 2px; line-height: 1.1; }
-    
     .shishen-top { font-size: 10px; height: 14px; margin-bottom: 4px; }
-    
     .canggan-row { font-size: 12px; gap: 1px; }
     .canggan-shishen { font-size: 10px; transform: none; }
-    
     .top-info { min-height: 28px; font-size: 10px; }
     .title-text { font-size: 11px; padding: 4px 0; }
-    
     .eye-btn { width: 16px; height: 16px; font-size: 10px; top: 4px; }
-    
     .canggan-box { height: 60px; min-height: 60px; margin-bottom: 2px; padding-top: 2px; }
-    
     .shensha-tag { font-size: 11px; }
     .zhangsheng-text { font-size: 10px; height: 20px; display: flex; align-items: center; justify-content: center; }
-    
     .pillar-bottom-section { padding-bottom: 2px; }
-
-    /* 【工具列手機適配】 */
-    .tools-bar {
-        justify-content: space-between; 
-        gap: 8px;
-    }
-    .tool-btn {
-        flex: 1; 
-        justify-content: center;
-        padding: 8px 0;
-        font-size: 12px;
-    }
+    .tools-bar { justify-content: space-between; gap: 8px; }
+    .tool-btn { flex: 1; justify-content: center; padding: 8px 0; font-size: 12px; }
     #shareImgContainer { padding: 10px; }
 }
-
-/* --- PWA Install Modal (iOS) --- */
-.ios-prompt-modal {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 2000;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    border-radius: 20px 20px 0 0;
-    animation: slideUp 0.3s ease-out;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.ios-prompt-header { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 15px; }
-.ios-prompt-title { font-weight: bold; font-size: 16px; color: #333; }
-.ios-instruction { font-size: 14px; color: #555; margin-bottom: 15px; line-height: 1.5; }
-.ios-icon-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; color: #333; }
-.share-icon-img { width: 20px; height: 20px; }
-.ios-arrow-down { font-size: 24px; color: #333; animation: bounce 2s infinite; margin-top: 10px; }
-@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
