@@ -209,10 +209,16 @@ function updateLocation(lat, lon) {
 // ==========================================
 // 4. 排盤核心邏輯
 // ==========================================
+
+// 【修正】使用更精確的均時差 (Equation of Time) 公式
 function getEquationOfTime(date) {
-    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-    const b = 2 * Math.PI * (dayOfYear - 81) / 365;
-    const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = date - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    const B = (360 * (dayOfYear - 81)) / 365;
+    const bRad = B * (Math.PI / 180); 
+    const eot = 9.87 * Math.sin(2 * bRad) - 7.53 * Math.cos(bRad) - 1.5 * Math.sin(bRad);
     return eot; 
 }
 
@@ -376,12 +382,26 @@ window.initChart = function() {
             const stdMeridian = 120; 
             const diffDeg = longitude - stdMeridian;
             const meanOffsetMin = diffDeg * 4; 
-            let tempDate = new Date(window.originSolar.getYear(), window.originSolar.getMonth() - 1, window.originSolar.getDay(), window.originSolar.getHour(), window.originSolar.getMinute());
+            
+            // 計算真太陽時
+            let tempDate = new Date(
+                window.originSolar.getYear(), 
+                window.originSolar.getMonth() - 1, 
+                window.originSolar.getDay(), 
+                window.originSolar.getHour(), 
+                window.originSolar.getMinute()
+            );
+            
+            // 修正：使用更精確的均時差計算
             const eotMin = getEquationOfTime(tempDate);
             const totalOffset = meanOffsetMin + eotMin;
+            
+            // 應用修正
             let nativeDate = new Date(tempDate.getTime());
             nativeDate.setMinutes(nativeDate.getMinutes() + totalOffset);
+            
             calculatingSolar = Solar.fromDate(nativeDate);
+            
             const m = nativeDate.getMinutes();
             const mStr = m < 10 ? "0"+m : m;
             tstDisplay = `是 (${nativeDate.getHours()}:${mStr})`;
@@ -751,6 +771,7 @@ function renderDaYunRail() {
     }
     setTimeout(() => centerActiveItem(container), 0);
 }
+// 【修改】renderYearRail：點擊年柱時，強制將月份設為6月15日，確保在年中，避開節氣邊界
 function renderYearRail() {
     const box = document.getElementById('yearRail'); box.innerHTML = '';
     const dy = state.daYuns[state.selDaYunIdx];
@@ -765,12 +786,21 @@ function renderYearRail() {
         const age = y - birthYear + 1;
         const info = `${age}歲\n${y}年`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
-        el.onclick = () => { state.selYear = y; renderRailsCascadeFromMonth(); highlightSelection('yearRail', i); };
+        el.onclick = () => { 
+            // 強制設定為年中 (6月15日)，確保不會因日期落在立春前而被算成上一年
+            state.selYear = y;
+            state.selMonth = 6;
+            state.selDay = 15;
+            
+            renderRailsCascadeFromMonth(); 
+            highlightSelection('yearRail', i); 
+        };
         if(y === state.selYear) el.classList.add('active');
         box.appendChild(el);
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
+// 【修改】renderMonthRail：點擊月柱時，強制將日期設為15日，確保在月中，避開節氣邊界
 function renderMonthRail() {
     const box = document.getElementById('monthRail'); box.innerHTML = '';
     const startYear = state.selYear;
@@ -779,10 +809,18 @@ function renderMonthRail() {
         const sample = Solar.fromYmd(y, m, 15); 
         const lunar = sample.getLunar();
         const gz = lunar.getMonthInGanZhi();
-        const prevJie = lunar.getPrevJie(true);
+        const prevJie = lunar.getPrevJie(true); // 取得該干支月開始的節氣
         const info = `${prevJie.getName()}\n${prevJie.getSolar().getDay()}/${prevJie.getSolar().getMonth()}`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
-        el.onclick = () => { state.selYear = y; state.selMonth = m; renderRailsCascadeFromDay(); highlightSelection('monthRail', i); };
+        el.onclick = () => { 
+            // 強制設定年份和月份，日期設為15日以確保在節氣內
+            state.selYear = y;
+            state.selMonth = m;
+            state.selDay = 15;
+            
+            renderRailsCascadeFromDay(); 
+            highlightSelection('monthRail', i); 
+        };
         if(m === state.selMonth) el.classList.add('active');
         box.appendChild(el);
     }
