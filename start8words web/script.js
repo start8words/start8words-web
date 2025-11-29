@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     populateGZ('gzYear'); populateGZ('gzMonth'); populateGZ('gzDay'); populateGZ('gzHour');
     
+    // 綁定主題切換按鈕
     const btnTheme = document.getElementById('themeToggle');
     if (btnTheme) {
         btnTheme.addEventListener('click', toggleTheme);
@@ -898,7 +899,10 @@ function highlightSelection(id, idx) {
     if(c[idx]) c[idx].classList.add('active');
 }
 
-// ... (後續分享功能等代碼保持不變) ...
+// ==========================================
+// 6. 截圖分享功能 (終極修復：替身截圖法)
+// ==========================================
+
 window.shareChart = async function(mode) {
     if (typeof html2canvas === 'undefined') {
         alert("系統載入中，請稍後再試...");
@@ -924,7 +928,10 @@ window.shareChart = async function(mode) {
     ghostContainer.style.left = '-9999px';
     ghostContainer.style.width = 'max-content'; // 關鍵：讓容器隨內容撐開，不受螢幕限制
     ghostContainer.style.zIndex = '-9999';
-    ghostContainer.style.backgroundColor = '#f4f6f8'; // 確保背景色
+    
+    // 【修改】動態獲取背景顏色，確保暗黑模式下截圖背景正確
+    const currentBg = getComputedStyle(document.body).getPropertyValue('--bg-color');
+    ghostContainer.style.backgroundColor = currentBg;
     
     // 2. 複製命盤內容
     // 我們複製整個 topDisplay，這樣可以保持所有樣式結構
@@ -947,7 +954,7 @@ window.shareChart = async function(mode) {
         clone.style.display = 'inline-flex';
         clone.style.padding = '20px';
         clone.style.gap = '10px';
-        clone.style.backgroundColor = '#f4f6f8';
+        clone.style.backgroundColor = currentBg;
         
     } else {
         // 模式二：原局 + 運歲 (六柱)
@@ -972,7 +979,7 @@ window.shareChart = async function(mode) {
         // 因為 ghostContainer 寬度足夠，html2canvas 不會裁切
         const canvas = await html2canvas(clone, {
             scale: 2, // 高解析度
-            backgroundColor: '#f4f6f8',
+            backgroundColor: currentBg, // 【修改】確保 canvas 背景色正確
             logging: false,
             useCORS: true
         });
