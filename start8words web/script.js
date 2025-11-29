@@ -212,24 +212,13 @@ function updateLocation(lat, lon) {
 
 // 【修正】使用更精確的均時差 (Equation of Time) 公式
 function getEquationOfTime(date) {
-    // 算法來源：Smart's Algorithm / NOAA 近似公式
-    // 輸入：Date 物件
-    // 輸出：均時差 (分鐘)
-    
-    // 1. 計算該年第幾天 (Day of Year)
     const start = new Date(date.getFullYear(), 0, 0);
     const diff = date - start;
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor(diff / oneDay);
-
-    // 2. 計算 B 參數 (角度)
     const B = (360 * (dayOfYear - 81)) / 365;
-    const bRad = B * (Math.PI / 180); // 轉為弧度
-
-    // 3. 計算均時差 (EOT)
-    // EOT = 9.87 * sin(2B) - 7.53 * cos(B) - 1.5 * sin(B)
+    const bRad = B * (Math.PI / 180); 
     const eot = 9.87 * Math.sin(2 * bRad) - 7.53 * Math.cos(bRad) - 1.5 * Math.sin(bRad);
-    
     return eot; 
 }
 
@@ -782,7 +771,7 @@ function renderDaYunRail() {
     }
     setTimeout(() => centerActiveItem(container), 0);
 }
-// 【修改】renderYearRail：點擊年柱時，自動跳轉到該年的「立春」日 (約 2月4日)
+// 【修改】renderYearRail：點擊年柱時，強制將月份設為6月15日，確保在年中，避開節氣邊界
 function renderYearRail() {
     const box = document.getElementById('yearRail'); box.innerHTML = '';
     const dy = state.daYuns[state.selDaYunIdx];
@@ -798,17 +787,11 @@ function renderYearRail() {
         const info = `${age}歲\n${y}年`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
         el.onclick = () => { 
-            // 修正：計算該年立春日
-            const liChun = Lunar.fromYmd(y, 1, 1).getJieQiTable()['立春'];
-            if (liChun) {
-                const solar = liChun.getSolar();
-                state.selYear = solar.getYear();
-                state.selMonth = solar.getMonth();
-                state.selDay = solar.getDay();
-            } else {
-                // Fallback (極少發生)
-                state.selYear = y; 
-            }
+            // 強制設定為年中 (6月15日)，確保不會因日期落在立春前而被算成上一年
+            state.selYear = y;
+            state.selMonth = 6;
+            state.selDay = 15;
+            
             renderRailsCascadeFromMonth(); 
             highlightSelection('yearRail', i); 
         };
@@ -817,7 +800,7 @@ function renderYearRail() {
     }
     setTimeout(() => centerActiveItem(box), 0);
 }
-// 【修改】renderMonthRail：點擊月柱時，自動跳轉到該月「節氣」開始的那一天
+// 【修改】renderMonthRail：點擊月柱時，強制將日期設為15日，確保在月中，避開節氣邊界
 function renderMonthRail() {
     const box = document.getElementById('monthRail'); box.innerHTML = '';
     const startYear = state.selYear;
@@ -830,11 +813,10 @@ function renderMonthRail() {
         const info = `${prevJie.getName()}\n${prevJie.getSolar().getDay()}/${prevJie.getSolar().getMonth()}`;
         const el = createRailEl(gz.charAt(0), gz.charAt(1), '', info);
         el.onclick = () => { 
-            // 修正：強制設定日期為節氣開始日
-            const jieSolar = prevJie.getSolar();
-            state.selYear = jieSolar.getYear();
-            state.selMonth = jieSolar.getMonth();
-            state.selDay = jieSolar.getDay();
+            // 強制設定年份和月份，日期設為15日以確保在節氣內
+            state.selYear = y;
+            state.selMonth = m;
+            state.selDay = 15;
             
             renderRailsCascadeFromDay(); 
             highlightSelection('monthRail', i); 
