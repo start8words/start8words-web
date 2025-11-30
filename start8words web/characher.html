@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 八字能量分析儀 ✨</title>
+    <!-- 引入 Lunar.js (排盤庫) -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.2.37/lunar.js"></script>
+    <!-- 引入 Chart.js (雷達圖用) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入可愛的圓體字型 (如果有) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zcool+KuaiLe&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FF6B6B; /* 活潑紅 */
+            --secondary-color: #4ECDC4; /* 清新綠 */
+            --accent-color: #FFE66D; /* 亮黃 */
+            --dark-bg: #1A1A2E; /* 深紫背景 */
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #2C3E50;
+        }
+
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: radial-gradient(circle at center, #2E2157 0%, #050508 100%); /* 夢幻星空背景 */
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            color: white;
+        }
+        
+        /* === 左上角控制面板 (可愛卡片風) === */
+        #ui-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 280px;
+            padding: 20px;
+            z-index: 10;
+            
+            background: var(--card-bg);
+            border-radius: 25px; /* 大圓角 */
+            border: 4px solid #fff;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.5);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* 彈性動畫 */
+            color: var(--text-main);
+        }
+
+        h1 { 
+            margin: 0 0 15px 0; 
+            font-size: 1.3rem; 
+            color: #FF6B6B; 
+            text-align: center;
+            font-weight: 900; 
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #ffe66d;
+        }
+
+        .input-group label { 
+            display: block; 
+            font-size: 0.85rem; 
+            color: #666; 
+            margin-bottom: 5px; 
+            font-weight: 700;
+        }
+        
+        input[type="datetime-local"] {
+            width: 100%;
+            background: #f0f3f8;
+            border: 2px solid #e0e0e0;
+            color: #333;
+            padding: 10px;
+            border-radius: 15px; /* 藥丸形狀 */
+            font-family: inherit;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        input[type="datetime-local"]:focus {
+            border-color: var(--secondary-color);
+            background: #fff;
+        }
+
+        /* 性別選擇 - 氣泡按鈕 */
+        .gender-group { display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; }
+        .gender-option { flex: 1; }
+        .gender-radio { display: none; }
+        .gender-label {
+            display: block; text-align: center; padding: 8px;
+            background: #eee; border: 2px solid transparent;
+            border-radius: 15px; cursor: pointer; font-size: 0.9rem; color: #888;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: bold;
+        }
+        .gender-radio:checked + .gender-label {
+            background: var(--secondary-color); 
+            color: #fff; 
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+        #gender-f:checked + .gender-label {
+            background: #FF6B6B;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* 按鈕樣式 - 果凍感 */
+        button.action-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #4ECDC4, #556270);
+            color: #fff;
+            font-weight: 900;
+            cursor: pointer;
+            border: none;
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 50px; /* 完全圓角 */
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        button.action-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4); 
+        }
+        button.action-btn:active { transform: translateY(1px); }
+        
+        /* RPG 按鈕 - 特殊樣式 */
+        button.rpg-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            margin-top: 15px;
+            animation: pulse 2s infinite;
+        }
+        button.rpg-btn:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .bazi-text {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 15px;
+            line-height: 1.6;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed #ccc;
+        }
+
+        .date-confirm { font-size: 0.75rem; color: var(--secondary-color); margin-top: 4px; display: block; font-weight: bold; }
+
+        /* 圖例區 */
+        #legend-container {
+            display: none;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px dashed #eee;
+        }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px currentColor; }
+        .bar-container { flex-grow: 1; height: 8px; background: #eee; margin: 0 10px; border-radius: 4px; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .count-text { width: 40px; text-align: right; font-family: 'Nunito', monospace; opacity: 0.8; font-size: 0.8rem; }
+
+        .toggle-details-btn {
+            background: transparent;
+            border: 2px solid #eee;
+            color: #888;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            padding: 6px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .toggle-details-btn:hover { background: #eee; color: #555; }
+
+        /* === RPG 角色卡 Modal (遊戲風) === */
+        #rpg-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 20, 30, 0.85); z-index: 100; justify-content: center; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .rpg-card {
+            width: 750px; max-width: 95%; height: 480px;
+            background: #1a1a2e; /* 深色卡片背景 */
+            border-radius: 30px;
+            display: flex; overflow: hidden;
+            box-shadow: 
+                0 0 0 5px #1a1a2e,
+                0 0 0 8px #FF6B6B, /* 外框 */
+                0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* 左側：角色圖片區域 */
+        .rpg-visual {
+            width: 40%; 
+            background: radial-gradient(circle at center, #333, #000);
+            position: relative; display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            border-right: 4px solid #1a1a2e;
+        }
+        .rpg-rarity-badge {
+            position: absolute; top: 20px; left: 20px;
+            padding: 8px 18px; border-radius: 12px;
+            font-weight: 900; font-style: italic; font-size: 1.8rem;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+            z-index: 2;
+            transform: rotate(-5deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .rarity-SSR { background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; border: 3px solid #fff; }
+        .rarity-SR { background: linear-gradient(45deg, #D980FA, #9980FA); color: #fff; border: 2px solid #fff; }
+        .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
+
+        /* 右側：資訊區域 */
+        .rpg-info {
+            width: 60%; padding: 30px;
+            display: flex; flex-direction: column;
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            color: white;
+        }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; font-size: 2.5rem; cursor: pointer; color: #fff; z-index: 10;
+            background: rgba(0,0,0,0.2); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; line-height: 0; padding-bottom: 5px;
+            transition: 0.2s;
+        }
+        .close-modal:hover { background: #FF6B6B; transform: rotate(90deg); }
+
+        .rpg-header { margin-bottom: 10px; border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .rpg-class-type { font-size: 0.9rem; color: #FFE66D; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .rpg-class-name { font-size: 2.2rem; font-weight: 900; margin: 5px 0; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .rpg-desc { 
+            font-size: 0.95rem; color: #ddd; line-height: 1.6; 
+            background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px;
+            margin-bottom: 15px; border-left: 4px solid #FFE66D;
+        }
+
+        .chart-wrapper { flex-grow: 1; position: relative; width: 100%; max-height: 180px; }
+        
+        .stats-list {
+            display: flex; justify-content: space-between; margin-top: 10px;
+            background: rgba(255,255,255,0.1); padding: 12px; border-radius: 15px;
+        }
+        .stat-item { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.1); }
+        .stat-item:last-child { border-right: none; }
+        .stat-item span { display: block; font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
+        .stat-item b { display: block; font-size: 1.2rem; color: #fff; margin-top: 2px; text-shadow: 0 0 10px currentColor; }
+
+        @media (max-width: 700px) {
+            .rpg-card { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; width: 90%; }
+            .rpg-visual { width: 100%; height: 180px; border-right: none; border-bottom: 4px solid #1a1a2e; }
+            .rpg-info { width: 100%; padding: 20px; }
+            #ui-container { width: auto; left: 15px; right: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左上角 UI -->
+    <div id="ui-container">
+        <h1>✨ 八字能量分析儀 ✨</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label>🎂 你的出生時間 (西曆)</label>
+                <input type="datetime-local" id="birth-input">
+            </div>
+            
+            <div class="gender-group">
+                <div class="gender-option">
+                    <input type="radio" name="gender" id="gender-m" value="1" class="gender-radio" checked>
+                    <label for="gender-m" class="gender-label">👦 男生</label>
+                </div>
+                <div class="gender-option">
+                    <input type="radio" name="gender" id="gender-f" value="0" class="gender-radio">
+                    <label for="gender-f" class="gender-label">👧 女生</label>
+                </div>
+            </div>
+
+            <button class="action-btn" onclick="calculateBazi()">
+                🔮 開始分析能量
+            </button>
+        </div>
+
+        <div class="bazi-text" id="bazi-desc">
+            請輸入日期以查看能量
+        </div>
+
+        <button class="action-btn rpg-btn" onclick="showRPGCard()">
+            ⚔️ 召喚 RPG 角色卡
+        </button>
+
+        <button class="toggle-details-btn" id="btn-toggle-legend" onclick="toggleLegend()">
+            📊 顯示詳細數據 ▼
+        </button>
+        
+        <div id="legend-container"></div>
+    </div>
+
+    <!-- RPG 角色卡 Modal -->
+    <div id="rpg-modal" onclick="closeRPGModal(event)">
+        <div class="rpg-card">
+            <span class="close-modal" onclick="document.getElementById('rpg-modal').style.display='none'">&times;</span>
+            
+            <!-- 左側：視覺圖 -->
+            <div class="rpg-visual">
+                <div id="rarity-badge" class="rpg-rarity-badge rarity-SSR">SSR</div>
+                <!-- 這裡使用顏色區塊代替圖片，實際應用可替換為 img src -->
+                <div id="class-visual-bg" style="width:100%; height:100%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 6rem; text-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    🗡️
+                </div>
+            </div>
+
+            <!-- 右側：資訊 -->
+            <div class="rpg-info">
+                <div class="rpg-header">
+                    <div class="rpg-class-type" id="rpg-main-type">MAIN CLASS</div>
+                    <div class="rpg-class-name" id="rpg-job-name">職業名稱</div>
+                </div>
+                
+                <div class="rpg-desc" id="rpg-job-desc">
+                    職業描述...
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="statsChart"></canvas>
+                </div>
+
+                <div class="stats-list" id="stats-text-row">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- 1. RPG 職業數據庫 ---
+        // (保持數據不變，僅為顯示效果，icon 可換成更有趣的)
+        const RPG_DATA = {
+            wood: {
+                label: "木系 (Wood)", color: "#2ecc71",
+                mainA: { name: "🏹 遊俠系 (Ranger)", icon: "🏹" },
+                mainB: { name: "🌿 德魯伊系 (Druid)", icon: "🌿" },
+                branches: {
+                    wood:  [{ n:"🧝 精靈遊俠", d:"箭術出神入化，百發百中，森林的守護者。" }, { n:"🌲 森林之子", d:"能與大自然溝通，召喚樹人與藤蔓纏繞敵人。" }],
+                    metal: [{ n:"🎯 狙擊手", d:"使用穿甲箭，專門針對高防禦目標。" }, { n:"🥀 荊棘術士", d:"操控帶刺的金屬植物，造成物理流血傷害。" }],
+                    water: [{ n:"🌫️ 霧影獵手", d:"在迷霧中潛行，殺人於無形。" }, { n:"🌊 潮汐使者", d:"融合水的治癒力，強大的群體治療師。" }],
+                    fire:  [{ n:"💥 爆裂箭手", d:"箭矢附帶爆炸效果，造成範圍濺射傷害。" }, { n:"☀️ 烈陽薩滿", d:"借助太陽之力，為隊友提供強大的攻擊Buff。" }],
+                    earth: [{ n:"🍃 叢林守護者", d:"擅長佈置荊棘陷阱與利用地形困住敵人。" }, { n:"🗿 山嶺巨人", d:"變身為巨大的岩石生物，承擔隊伍傷害。" }]
+                }
+            },
+            fire: {
+                label: "火系 (Fire)", color: "#ff3d00",
+                mainA: { name: "🔥 炎魔導系 (Pyromancer)", icon: "🔥" },
+                mainB: { name: "😡 狂戰士系 (Berserker)", icon: "😡" },
+                branches: {
+                    fire:  [{ n:"☄️ 毀滅之王", d:"極致的火焰爆發，燃盡一切。" }, { n:"👹 修羅", d:"燃燒生命值換取攻擊力，血量越低傷害越高。" }],
+                    metal: [{ n:"⚡ 電漿術士", d:"將火焰壓縮成高溫電漿，貫穿力極強。" }, { n:"⚔️ 戰神", d:"精通各種武器，戰鬥技巧無人能敵。" }],
+                    wood:  [{ n:"🕯️ 野火祭司", d:"利用植物助燃，火焰會傳染並持續燃燒。" }, { n:"🧛 血魔", d:"攻擊附帶強大的吸血效果，續航力極強。" }],
+                    water: [{ n:"💨 蒸汽術士", d:"水火相剋產生高溫蒸汽，造成燙傷視線模糊。" }, { n:"🛡️ 維京海盜", d:"擁有極高的異常狀態抗性，不畏懼寒冷。" }],
+                    earth: [{ n:"🌋 熔岩領主", d:"召喚隕石與岩漿改變地形，封鎖敵人。" }, { n:"💪 蠻王", d:"擁有不屈的意志，免疫死亡一段時間。" }]
+                }
+            },
+            earth: {
+                label: "土系 (Earth)", color: "#ffc107",
+                mainA: { name: "🛡️ 聖騎士系 (Paladin)", icon: "🛡️" },
+                mainB: { name: "⚗️ 煉金術士系 (Alchemist)", icon: "⚗️" },
+                branches: {
+                    earth: [{ n:"🕍 不動明王", d:"絕對的防禦，能反彈受到的物理傷害。" }, { n:"🤖 魔像大師", d:"製造巨大的岩石傀儡協助戰鬥。" }],
+                    metal: [{ n:"🏰 聖殿騎士", d:"擅長防守反擊，用盾牌猛擊敵人造成暈眩。" }, { n:"🦾 鋼之煉金師", d:"能夠分解與重組物質，改變戰場地形。" }],
+                    wood:  [{ n:"✨ 光之守衛", d:"擁有強大的自我恢復能力，幾乎不死的存在。" }, { n:"🧪 藥劑大師", d:"投擲各種藥水，能治療隊友也能毒殺敵人。" }],
+                    water: [{ n:"⚖️ 審判官", d:"擁有淨化能力，能驅散隊友的負面狀態。" }, { n:"📖 賢者", d:"擁有無盡的知識，能看穿敵人的弱點。" }],
+                    fire:  [{ n:"🌅 黎明使者", d:"散發神聖光環，對周圍不死生物造成灼燒。" }, { n:"💣 炸彈狂人", d:"癡迷於火藥研究，製造不穩定的危險爆炸物。" }]
+                }
+            },
+            metal: {
+                label: "金系 (Metal)", color: "#e0e0e0",
+                mainA: { name: "⚔️ 劍聖系 (Blade Master)", icon: "⚔️" },
+                mainB: { name: "🤖 機械師系 (Machinist)", icon: "🤖" },
+                branches: {
+                    metal: [{ n:"🗡️ 無極劍神", d:"人劍合一，追求極致的物理破壞力。" }, { n:"🚜 機甲戰神", d:"駕駛重型機甲，擁有最高的物理防禦與火力。" }],
+                    wood:  [{ n:"🍃 疾風劍豪", d:"劍如疾風，擁有極高的閃避率與連擊數。" }, { n:"🦠 生化戰士", d:"結合機械與生物科技，擅長毒素與自我修復。" }],
+                    water: [{ n:"❄️ 霜寒劍士", d:"劍氣附帶寒冰，攻擊時凍結對手。" }, { n:"🤿 深海潛航者", d:"使用高壓水刀與液態冷卻系統，擅長持久戰。" }],
+                    fire:  [{ n:"🔥 魔劍士", d:"劍刃燃燒著烈火，造成物理與魔法混合傷害。" }, { n:"🧨 爆破專家", d:"瘋狂投擲炸彈與燃燒彈，大範圍破壞專家。" }],
+                    earth: [{ n:"🛡️ 重裝劍士", d:"放棄速度換取防禦，手持巨劍橫掃戰場。" }, { n:"🚧 攻城坦克", d:"移動緩慢但射程極遠的重砲手，陣地戰王者。" }]
+                }
+            },
+            water: {
+                label: "水系 (Water)", color: "#0091ea",
+                mainA: { name: "🗡️ 影舞者系 (Shadow Dancer)", icon: "🗡️" },
+                mainB: { name: "🔮 占星師系 (Astrologer)", icon: "🔮" },
+                branches: {
+                    water: [{ n:"👻 幻影刺客", d:"如幻影般無法捉摸，極致的閃避與單體爆發。" }, { n:"👑 冰雪女皇", d:"凍結萬物，擁有最強的群體控制與減速能力。" }],
+                    metal: [{ n:"🩸 處刑者", d:"冷酷無情，攻擊附帶流血與重傷效果。" }, { n:"🪞 鏡像法師", d:"製造幻象與反射傷害，讓敵人自食其果。" }],
+                    wood:  [{ n:"☠️ 劇毒之刃", d:"武器塗滿致命毒藥，擅長持續消耗對手。" }, { n:"👁️ 預言家", d:"洞察未來，為隊友提供幸運與迴避Buff。" }],
+                    fire:  [{ n:"🥷 紅蓮忍者", d:"結合火遁忍術的刺客，爆發力極強。" }, { n:"🌠 星火術士", d:"召喚宇宙星辰之力，造成無視抗性的傷害。" }],
+                    earth: [{ n:"🏜️ 沙暴行者", d:"利用沙塵遮蔽視野，降低敵人命中率。" }, { n:"🪐 重力操縱者", d:"操控引力場，強行位移或壓制敵人。" }]
+                }
+            }
+        };
+
+        // --- 2. 排盤邏輯 ---
+        const GAN_WUXING = { '甲':'wood','乙':'wood','丙':'fire','丁':'fire','戊':'earth','己':'earth','庚':'metal','辛':'metal','壬':'water','癸':'water' };
+        
+        // 增加中文對應
+        const ELEMENT_CN = { 'wood':'木', 'fire':'火', 'earth':'土', 'metal':'金', 'water':'水' };
+
+        const ZHI_CANGGAN = {
+            '子':{water:100}, '丑':{earth:60,water:25,metal:15}, '寅':{wood:60,fire:30,earth:10},
+            '卯':{wood:100}, '辰':{earth:60,wood:25,water:15}, '巳':{fire:60,earth:25,metal:15},
+            '午':{fire:70,earth:30}, '未':{earth:60,fire:30,wood:10}, '申':{metal:60,water:30,earth:10},
+            '酉':{metal:100}, '戌':{earth:60,metal:30,fire:10}, '亥':{water:70,wood:30}
+        };
+
+        const baseTotal = 2500;
+        let currentRatios = { wood: 0.2, fire: 0.2, earth: 0.2, metal: 0.2, water: 0.2 };
+        let currentChart = null;
+
+        const elementsDef = [
+            { id: 'wood',  name: '木', cssColor: '#00d26a', baseH: 0.38, baseS: 0.85, baseL: 0.40 },
+            { id: 'fire',  name: '火', cssColor: '#ff3d00', baseH: 0.02, baseS: 0.95, baseL: 0.45 },
+            { id: 'earth', name: '土', cssColor: '#ffc107', baseH: 0.11, baseS: 0.90, baseL: 0.45 },
+            { id: 'metal', name: '金', cssColor: '#e0e0e0', baseH: 0.55, baseS: 0.10, baseL: 0.65 },
+            { id: 'water', name: '水', cssColor: '#0091ea', baseH: 0.60, baseS: 0.90, baseL: 0.50 }
+        ];
+
+        function calculateBazi() {
+            const input = document.getElementById('birth-input').value;
+            if (!input) { alert("請輸入日期！"); return; }
+            const date = new Date(input);
+            const solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+            const bazi = solar.getLunar().getEightChar();
+            
+            const pillars = [
+                { gan: bazi.getYearGan(), zhi: bazi.getYearZhi(), weight: 1.0 },
+                { gan: bazi.getMonthGan(), zhi: bazi.getMonthZhi(), weight: 2.5 },
+                { gan: bazi.getDayGan(), zhi: bazi.getDayZhi(), weight: 1.2 },
+                { gan: bazi.getTimeGan(), zhi: bazi.getTimeZhi(), weight: 1.0 }
+            ];
+
+            const baziStr = pillars.map(p => p.gan + p.zhi).join(' ');
+            const dayMaster = pillars[2].gan; 
+            const dateStr = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            
+            const genderVal = document.querySelector('input[name="gender"]:checked').value;
+            const genderText = genderVal == "1" ? "男生" : "女生";
+
+            // 使用 ELEMENT_CN 進行中文轉換
+            const masterElement = GAN_WUXING[dayMaster];
+            const masterElementCN = ELEMENT_CN[masterElement];
+
+            document.getElementById('bazi-desc').innerHTML = `<strong>🔮 八字：</strong>${baziStr}<br><strong>🧒 日主：</strong>${dayMaster} (${masterElementCN}) / ${genderText}<br><span class="date-confirm">📅 西曆：${dateStr}</span>`;
+
+            let scores = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+            const GAN_BASE = 15; const ZHI_BASE = 30;
+
+            pillars.forEach(p => {
+                if (GAN_WUXING[p.gan]) scores[GAN_WUXING[p.gan]] += GAN_BASE * p.weight;
+                const hidden = ZHI_CANGGAN[p.zhi];
+                if (hidden) {
+                    for (const [el, pct] of Object.entries(hidden)) scores[el] += (ZHI_BASE * (pct / 100)) * p.weight;
+                }
+            });
+
+            let total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+            currentRatios = {
+                wood: scores.wood / total,
+                fire: scores.fire / total,
+                earth: scores.earth / total,
+                metal: scores.metal / total,
+                water: scores.water / total
+            };
+            updateSystem();
+        }
+
+        // --- 3. RPG 系統 (稀有度 + 屬性修正) ---
+
+        function calculateRPG() {
+            // 1. 職業判定
+            const sorted = Object.entries(currentRatios).sort((a,b) => b[1] - a[1]);
+            const mainKey = sorted[0][0]; 
+            const mainVal = sorted[0][1]; 
+            const subKey = sorted[1][0];  
+            const subVal = sorted[1][1];
+
+            const typeIndex = mainVal > 0.35 ? 0 : 1; 
+            const mainClassData = RPG_DATA[mainKey];
+            const classCategory = typeIndex === 0 ? mainClassData.mainA : mainClassData.mainB;
+
+            let finalSubKey = subKey;
+            if (mainVal > 0.5 || mainVal > subVal * 2) {
+                finalSubKey = mainKey;
+            }
+            const branchData = mainClassData.branches[finalSubKey][typeIndex];
+            
+            // 2. 稀有度判定 (Rarity)
+            let rarity = 'R';
+            let rarityColor = '#3498db';
+            let focusScore = mainVal + (subVal * 0.5); // 專注度
+
+            if (mainVal > 0.45) { // 極度專精
+                rarity = 'SSR'; rarityColor = '#FFD700';
+            } else if (mainVal > 0.35 || focusScore > 0.55) { // 強勢
+                rarity = 'SR'; rarityColor = '#9b59b6';
+            }
+
+            // 3. 屬性計算 (修正版: 更難達到 100)
+            const r = currentRatios;
+            const calcStat = (val) => Math.min(99, Math.round(30 + val * 120)); 
+
+            const rawSTR = r.metal * 1.0 + r.earth * 0.4 + r.fire * 0.2;
+            const rawINT = r.water * 1.0 + r.fire * 0.4 + r.wood * 0.2;
+            const rawAGI = r.wood * 1.0 + r.water * 0.4 + r.metal * 0.2;
+            const rawVIT = r.earth * 1.0 + r.metal * 0.4 + r.wood * 0.2;
+            
+            const values = Object.values(r);
+            const mean = values.reduce((a,b)=>a+b,0) / 5;
+            const variance = values.reduce((a,b)=>a + Math.pow(b-mean, 2), 0) / 5;
+            const stdDev = Math.sqrt(variance); 
+            const rawLUK = 0.2 + (0.4 - stdDev); 
+
+            const s = {
+                STR: calcStat(rawSTR),
+                INT: calcStat(rawINT),
+                AGI: calcStat(rawAGI),
+                VIT: calcStat(rawVIT),
+                LUK: calcStat(rawLUK)
+            };
+
+            return {
+                mainName: classCategory.name,
+                mainIcon: classCategory.icon,
+                jobName: branchData.n,
+                jobDesc: branchData.d,
+                stats: s,
+                rarity: rarity,
+                mainColor: RPG_DATA[mainKey].color,
+                mainElement: mainKey
+            };
+        }
+
+        function showRPGCard() {
+            const data = calculateRPG();
+            const genderVal = document.querySelector('input[name="gender"]:checked').value;
+            const genderSuffix = genderVal == "1" ? "male" : "female";
+
+            // 設置稀有度樣式
+            const badge = document.getElementById('rarity-badge');
+            badge.className = `rpg-rarity-badge rarity-${data.rarity}`;
+            badge.innerText = data.rarity;
+
+            // 設置視覺背景色
+            const visualBg = document.getElementById('class-visual-bg');
+            visualBg.style.background = data.mainColor;
+            visualBg.innerHTML = data.mainIcon;
+
+            document.getElementById('rpg-main-type').innerText = data.mainName;
+            document.getElementById('rpg-job-name').innerText = data.jobName;
+            document.getElementById('rpg-job-desc').innerText = data.jobDesc;
+            
+            // 更新屬性文字
+            const s = data.stats;
+            const statsHtml = `
+                <div class="stat-item"><b style="color:#e74c3c">${s.STR}</b><span>STR</span></div>
+                <div class="stat-item"><b style="color:#3498db">${s.INT}</b><span>INT</span></div>
+                <div class="stat-item"><b style="color:#2ecc71">${s.AGI}</b><span>AGI</span></div>
+                <div class="stat-item"><b style="color:#f1c40f">${s.VIT}</b><span>VIT</span></div>
+                <div class="stat-item"><b style="color:#9b59b6">${s.LUK}</b><span>LUK</span></div>
+            `;
+            document.getElementById('stats-text-row').innerHTML = statsHtml;
+
+            // 繪製雷達圖
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            if (currentChart) currentChart.destroy();
+
+            currentChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['STR', 'INT', 'AGI', 'VIT', 'LUK'],
+                    datasets: [{
+                        label: '能力值',
+                        data: [s.STR, s.INT, s.AGI, s.VIT, s.LUK],
+                        backgroundColor: `${data.mainColor}33`, 
+                        borderColor: data.mainColor,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ccc', font: { size: 12, family: 'Nunito' } },
+                            ticks: { display: false, max: 100, min: 0 },
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            document.getElementById('rpg-modal').style.display = 'flex';
+        }
+
+        function closeRPGModal(e) {
+            if (e.target.id === 'rpg-modal' || e.target.className.includes('close-modal')) {
+                document.getElementById('rpg-modal').style.display = 'none';
+            }
+        }
+
+        function toggleLegend() {
+            const legend = document.getElementById('legend-container');
+            const btn = document.getElementById('btn-toggle-legend');
+            if (legend.style.display === 'block') {
+                legend.style.display = 'none';
+                btn.innerText = '📊 顯示詳細數據 ▼';
+            } else {
+                legend.style.display = 'block';
+                btn.innerText = '📊 隱藏詳細數據 ▲';
+            }
+        }
+
+        // --- 4. Three.js Visuals ---
+        let particleSystem, particleAttributes;
+        const scene = new THREE.Scene();
+        // 霧氣顏色要配合背景漸變的中間色
+        scene.fog = new THREE.FogExp2(0x1A1A2E, 0.002);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000);
+        camera.position.z = 45;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = 0.8;
+
+        function getSoftParticleTexture() {
+            const cvs = document.createElement('canvas'); cvs.width=64; cvs.height=64;
+            const ctx = cvs.getContext('2d');
+            const grd = ctx.createRadialGradient(32,32,0,32,32,32);
+            grd.addColorStop(0,'rgba(255,255,255,1)'); grd.addColorStop(0.15,'rgba(255,255,255,0.9)'); 
+            grd.addColorStop(0.4,'rgba(255,255,255,0.3)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle = grd; ctx.fillRect(0,0,64,64);
+            const tex = new THREE.Texture(cvs); tex.needsUpdate = true; return tex;
+        }
+
+        function updateSystem() {
+            if (particleSystem) scene.remove(particleSystem);
+            const counts = {}; let total = 0;
+            elementsDef.forEach(el => {
+                let c = Math.round(baseTotal * currentRatios[el.id]);
+                counts[el.id] = c; total += c;
+            });
+
+            const lDiv = document.getElementById('legend-container'); lDiv.innerHTML = '';
+            elementsDef.forEach(el => {
+                const pct = total>0 ? (counts[el.id]/total*100).toFixed(1) : 0;
+                lDiv.innerHTML += `<div class="legend-item"><div class="dot" style="background:${el.cssColor}"></div><div style="width:50px">${el.name}</div><div class="bar-container"><div class="bar" style="width:${pct}%;background:${el.cssColor}"></div></div><div class="count-text">${counts[el.id]}</div></div>`;
+            });
+
+            const geo = new THREE.BufferGeometry();
+            const pos=[], col=[], siz=[], pha=[], baseSiz=[];
+            const tmpCol = new THREE.Color();
+
+            elementsDef.forEach(el => {
+                for(let i=0; i<counts[el.id]; i++){
+                    const r = 12 + Math.random()*14;
+                    const theta = Math.random()*Math.PI*2;
+                    const phi = Math.acos(2*Math.random()-1);
+                    pos.push(r*Math.sin(phi)*Math.cos(theta), r*Math.sin(phi)*Math.sin(theta), r*Math.cos(phi));
+                    
+                    let h=el.baseH+(Math.random()-0.5)*0.06;
+                    let s=Math.max(0.3, Math.min(1.0, el.baseS+(Math.random()-0.5)*0.2));
+                    let l=Math.max(0.2, Math.min(0.7, el.baseL+(Math.random()-0.5)*0.2));
+                    tmpCol.setHSL(h,s,l);
+                    col.push(tmpCol.r, tmpCol.g, tmpCol.b);
+
+                    const bs = 2.5+Math.random()*3.5;
+                    siz.push(bs); baseSiz.push(bs); pha.push(Math.random()*Math.PI*2);
+                }
+            });
+
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(col,3));
+            geo.setAttribute('size', new THREE.Float32BufferAttribute(siz,1));
+            geo.setAttribute('phase', new THREE.Float32BufferAttribute(pha,1));
+            geo.setAttribute('baseSize', new THREE.Float32BufferAttribute(baseSiz,1));
+
+            const mat = new THREE.PointsMaterial({
+                size: 3.0, vertexColors: true, map: getSoftParticleTexture(),
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.45, sizeAttenuation: true
+            });
+
+            particleSystem = new THREE.Points(geo, mat);
+            scene.add(particleSystem);
+            particleAttributes = particleSystem.geometry.attributes;
+        }
+
+        // Init: Set to NOW
+        setTimeout(() => {
+            if (typeof Solar !== 'undefined') {
+                const now = new Date();
+                const offset = now.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+                document.getElementById('birth-input').value = localISOTime;
+                calculateBazi();
+            }
+        }, 500);
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02;
+            if (particleSystem && particleAttributes) {
+                const s = particleAttributes.size.array;
+                const bs = particleAttributes.baseSize.array;
+                const p = particleAttributes.phase.array;
+                for(let i=0; i<s.length; i++) s[i] = Math.max(0.1, bs[i] + Math.sin(time*2.5+p[i])*4.5);
+                particleAttributes.size.needsUpdate = true;
+                particleSystem.rotation.y += 0.0015;
+            }
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        window.onresize = () => {
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
+</body>
+</html>
