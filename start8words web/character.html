@@ -16,7 +16,7 @@
             --primary-color: #FF6B6B;
             --secondary-color: #4ECDC4;
             --accent-color: #FFE66D;
-            --card-bg: rgba(255, 255, 255, 0.95); /* 稍微不透明一點 */
+            --card-bg: rgba(255, 255, 255, 0.95);
             --text-main: #2C3E50;
         }
 
@@ -37,11 +37,9 @@
             display: flex;
             align-items: flex-start;
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            /* 關鍵修正：確保寬度包含內容 */
             width: auto; 
         }
 
-        /* 電腦版收起邏輯：只保留按鈕寬度 (40px) */
         #ui-wrapper.collapsed {
             transform: translateX(calc(-100% + 40px));
         }
@@ -59,7 +57,7 @@
             backdrop-filter: blur(12px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             color: var(--text-main);
-            box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
+            box-sizing: border-box;
             
             scrollbar-width: none; 
             -ms-overflow-style: none;
@@ -82,7 +80,7 @@
             margin-top: 20px; 
             transition: background 0.2s;
             z-index: 11;
-            flex-shrink: 0; /* 防止被擠壓 */
+            flex-shrink: 0;
         }
         .toggle-panel-btn:hover { background: #f0f0f0; }
 
@@ -145,7 +143,8 @@
             font-size: 0.9rem; color: #555; margin-top: 15px; line-height: 1.6;
             background: #f8f9fa; padding: 10px; border-radius: 12px; border: 1px dashed #ccc;
         }
-        .date-confirm { font-size: 0.75rem; color: var(--secondary-color); margin-top: 4px; display: block; font-weight: bold; }
+        
+        .date-confirm { font-size: 0.75rem; color: var(--secondary-color); margin-top: 8px; display: block; font-weight: bold; border-top: 1px dashed #ddd; padding-top: 5px; }
 
         #legend-container { display: none; margin-top: 15px; padding-top: 10px; border-top: 2px dashed #eee; }
         .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; }
@@ -153,6 +152,11 @@
         .bar-container { flex-grow: 1; height: 8px; background: #eee; margin: 0 10px; border-radius: 4px; overflow: hidden; }
         .bar { height: 100%; border-radius: 4px; transition: width 0.6s ease-out; }
         .count-text { width: 40px; text-align: right; font-family: 'Nunito', monospace; opacity: 0.8; font-size: 0.8rem; }
+
+        /* 免責聲明 */
+        .disclaimer {
+            font-size: 0.65rem; color: #bbb; margin-top: 10px; text-align: center; line-height: 1.4; font-style: italic;
+        }
 
         .toggle-details-btn {
             background: transparent; border: 2px solid #eee; color: #888;
@@ -188,6 +192,17 @@
             display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; transition: color 0.2s;
         }
         #app-footer a:hover { color: #E1306C; }
+        
+        .brand-link-footer {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .brand-link-footer:hover { color: #fff; }
+
         .ig-icon { width: 14px; height: 14px; fill: currentColor; }
 
         /* === RPG Modal === */
@@ -246,36 +261,33 @@
 
         /* === 手機版響應式設定 === */
         @media (max-width: 600px) {
-            /* 1. 將 UI 放在頂部 (Top Sheet) 並左右留白 */
             #ui-wrapper {
                 top: 0;
                 left: 0;
                 width: 100%;
-                flex-direction: column; /* 內容在上，按鈕在下 */
+                flex-direction: column;
                 align-items: center;
                 transform: translateY(0);
-                padding-top: 10px; /* 頂部留一點空間 */
-                pointer-events: none; /* 讓 wrapper 不擋點擊，內部元素開啟 pointer-events */
+                padding-top: 10px;
+                pointer-events: none;
             }
             
             #ui-wrapper.collapsed {
-                /* 手機版收起：向上移動，只留按鈕 (30px) */
                 transform: translateY(calc(-100% + 30px));
             }
 
             #ui-container {
                 pointer-events: auto;
-                width: 94%; /* 左右留白 3% */
+                width: 94%;
                 max-width: 400px;
-                border-radius: 20px; /* 四角都圓 */
+                border-radius: 20px;
                 border: 2px solid rgba(255,255,255,0.8);
                 padding: 20px;
-                max-height: 65vh; /* 增加高度限制 */
+                max-height: 65vh;
                 box-shadow: 0 10px 40px rgba(0,0,0,0.5);
                 margin: 0 auto;
             }
 
-            /* 手機版隱藏按鈕：變成下拉標籤 */
             .toggle-panel-btn {
                 pointer-events: auto;
                 width: 60px;
@@ -292,11 +304,10 @@
 
             h1 { font-size: 1.2rem; margin-bottom: 10px; }
 
-            /* 2. 調整 RPG 角色卡，增加左右留白 */
             .rpg-card { 
                 flex-direction: column; 
                 height: 80vh; 
-                width: 90%; /* 左右留白 */
+                width: 90%; 
                 max-width: 400px;
                 overflow: hidden; 
                 border-radius: 20px;
@@ -304,7 +315,7 @@
             
             .rpg-visual { 
                 width: 100%; 
-                height: 200px; /* 增加圖片高度 */
+                height: 200px;
                 border-right: none; 
                 border-bottom: 3px solid #1a1a2e; 
                 flex-shrink: 0;
@@ -324,7 +335,6 @@
             .stats-list { padding: 8px; }
             .stat-item b { font-size: 1rem; }
             
-            /* 3. 頁尾墊高 */
             #app-footer {
                 padding-bottom: 30px;
                 background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
@@ -349,15 +359,15 @@
                 <div class="gender-group">
                     <div class="gender-option">
                         <input type="radio" name="gender" id="gender-m" value="1" class="gender-radio" checked>
-                        <label for="gender-m" class="gender-label">👦 男生</label>
+                        <label for="gender-m" class="gender-label">♂ 男生</label>
                     </div>
                     <div class="gender-option">
                         <input type="radio" name="gender" id="gender-f" value="0" class="gender-radio">
-                        <label for="gender-f" class="gender-label">👧 女生</label>
+                        <label for="gender-f" class="gender-label">♀ 女生</label>
                     </div>
                 </div>
 
-                <button class="action-btn" onclick="calculateBazi()">
+                <button class="action-btn" onclick="calculateBazi(true)">
                     🔮 開始分析能量
                 </button>
             </div>
@@ -374,7 +384,14 @@
                 📊 顯示詳細數據 ▼
             </button>
             
-            <div id="legend-container"></div>
+            <div id="legend-container">
+                <!-- 數據條會插在這裡 -->
+            </div>
+            
+            <!-- 免責聲明 -->
+            <div id="disclaimer-text" class="disclaimer" style="display:none;">
+                五行能量沒有精確科技計算，只供參考及娛樂
+            </div>
         </div>
         
         <!-- 隱藏/顯示按鈕 -->
@@ -390,6 +407,9 @@
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
                 @start_8words
+            </a>
+            <a href="https://start8words.com" target="_blank" class="brand-link-footer">
+                專業八字排盤工具 start8words.com
             </a>
         </div>
     </footer>
@@ -434,23 +454,24 @@
     <script>
         // --- JS Logic Updates for Panel Toggle ---
         
-        function togglePanel() {
+        function togglePanel(forceState = null) {
             const wrapper = document.getElementById('ui-wrapper');
             const btn = document.querySelector('.toggle-panel-btn');
             const isMobile = window.innerWidth <= 600;
             
-            wrapper.classList.toggle('collapsed');
+            // 如果指定了狀態，就使用該狀態，否則切換
+            if (forceState !== null) {
+                if (forceState === 'collapse') wrapper.classList.add('collapsed');
+                else wrapper.classList.remove('collapsed');
+            } else {
+                wrapper.classList.toggle('collapsed');
+            }
+            
             const isCollapsed = wrapper.classList.contains('collapsed');
 
             if (isMobile) {
-                // Mobile: Panel at Top. Collapsed = Up.
-                // Expanded (Normal) -> Button shows ▲ (to collapse up)
-                // Collapsed (Up) -> Button shows ▼ (to expand down)
                 btn.innerText = isCollapsed ? '▼' : '▲';
             } else {
-                // Desktop: Panel at Left.
-                // Expanded -> Button shows ◀ (to collapse left)
-                // Collapsed -> Button shows ▶ (to expand right)
                 btn.innerText = isCollapsed ? '▶' : '◀';
             }
         }
@@ -541,7 +562,7 @@
             { id: 'water', name: '水', cssColor: '#0091ea', baseH: 0.60, baseS: 0.90, baseL: 0.50 }
         ];
 
-        function calculateBazi() {
+        function calculateBazi(isUserAction = false) {
             const input = document.getElementById('birth-input').value;
             if (!input) { alert("請輸入日期！"); return; }
             const date = new Date(input);
@@ -557,12 +578,14 @@
 
             const baziStr = pillars.map(p => p.gan + p.zhi).join(' ');
             const dayMaster = pillars[2].gan; 
-            const dateStr = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            // 修改：使用純數字日期格式
+            const dateStr = `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
             const genderVal = document.querySelector('input[name="gender"]:checked').value;
-            const genderText = genderVal == "1" ? "男生" : "女生";
+            const genderText = genderVal == "1" ? "♂" : "♀";
             const masterElement = GAN_WUXING[dayMaster];
             const masterElementCN = ELEMENT_CN[masterElement];
 
+            // 修改：改回簡潔的單行八字顯示
             document.getElementById('bazi-desc').innerHTML = `<strong>🔮 八字：</strong>${baziStr}<br><strong>🧒 日主：</strong>${dayMaster} (${masterElementCN}) / ${genderText}<br><span class="date-confirm">📅 西曆：${dateStr}</span>`;
 
             let scores = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
@@ -585,6 +608,11 @@
                 water: scores.water / total
             };
             updateSystem();
+
+            // 自動隱藏面板 (僅當用戶點擊按鈕時)
+            if (isUserAction) {
+                togglePanel('collapse');
+            }
         }
 
         // --- 3. RPG 系統 ---
@@ -727,12 +755,16 @@
 
         function toggleLegend() {
             const legend = document.getElementById('legend-container');
+            const disclaimer = document.getElementById('disclaimer-text');
             const btn = document.getElementById('btn-toggle-legend');
+            
             if (legend.style.display === 'block') {
                 legend.style.display = 'none';
+                if(disclaimer) disclaimer.style.display = 'none';
                 btn.innerText = '📊 顯示詳細數據 ▼';
             } else {
                 legend.style.display = 'block';
+                if(disclaimer) disclaimer.style.display = 'block';
                 btn.innerText = '📊 隱藏詳細數據 ▲';
             }
         }
