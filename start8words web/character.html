@@ -16,7 +16,7 @@
             --primary-color: #FF6B6B;
             --secondary-color: #4ECDC4;
             --accent-color: #FFE66D;
-            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.95); /* 稍微不透明一點 */
             --text-main: #2C3E50;
         }
 
@@ -28,37 +28,39 @@
             color: white;
         }
         
-        /* === UI 控制面板外層容器 (負責定位與動畫) === */
+        /* === UI 控制面板外層容器 === */
         #ui-wrapper {
             position: absolute;
             top: 20px;
             left: 20px;
             z-index: 10;
             display: flex;
-            align-items: flex-start; /* 桌面版：頂部對齊 */
+            align-items: flex-start;
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* 關鍵修正：確保寬度包含內容 */
+            width: auto; 
         }
 
-        /* 桌面版收起：向左移出 */
+        /* 電腦版收起邏輯：只保留按鈕寬度 (40px) */
         #ui-wrapper.collapsed {
-            transform: translateX(-340px);
+            transform: translateX(calc(-100% + 40px));
         }
 
         /* === 內容區塊 === */
         #ui-container {
             width: 280px;
-            max-height: 85vh; /* 避免太長 */
+            max-height: 85vh; 
             overflow-y: auto;
             padding: 20px;
             
             background: var(--card-bg);
             border-radius: 25px;
-            border: 4px solid #fff;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.5);
+            border: 3px solid rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             color: var(--text-main);
+            box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
             
-            /* 隱藏捲軸但保留功能 */
             scrollbar-width: none; 
             -ms-overflow-style: none;
         }
@@ -69,7 +71,7 @@
             width: 40px;
             height: 40px;
             background: #fff;
-            border-radius: 0 12px 12px 0; /* 桌面版：右側圓角 */
+            border-radius: 0 12px 12px 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -80,6 +82,7 @@
             margin-top: 20px; 
             transition: background 0.2s;
             z-index: 11;
+            flex-shrink: 0; /* 防止被擠壓 */
         }
         .toggle-panel-btn:hover { background: #f0f0f0; }
 
@@ -241,77 +244,90 @@
         .stat-item span { display: block; font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
         .stat-item b { display: block; font-size: 1.2rem; color: #fff; margin-top: 2px; }
 
-        /* === 手機版響應式設定 (Bottom Navigation & Top Sheet) === */
+        /* === 手機版響應式設定 === */
         @media (max-width: 600px) {
-            /* 1. 將 UI 放在頂部 (Top Sheet) */
+            /* 1. 將 UI 放在頂部 (Top Sheet) 並左右留白 */
             #ui-wrapper {
                 top: 0;
-                bottom: auto;
                 left: 0;
                 width: 100%;
                 flex-direction: column; /* 內容在上，按鈕在下 */
                 align-items: center;
-                transform: translateY(0); /* 預設展開 */
+                transform: translateY(0);
+                padding-top: 10px; /* 頂部留一點空間 */
+                pointer-events: none; /* 讓 wrapper 不擋點擊，內部元素開啟 pointer-events */
             }
             
-            /* 收起時：向上移動，只留按鈕 */
             #ui-wrapper.collapsed {
-                /* 移動距離 = -100% + 按鈕高度(25px) + 一點緩衝 */
-                transform: translateY(calc(-100% + 25px));
+                /* 手機版收起：向上移動，只留按鈕 (30px) */
+                transform: translateY(calc(-100% + 30px));
             }
 
             #ui-container {
-                width: 100%; 
-                border-radius: 0 0 25px 25px; /* 只圓下面 */
-                border: none;
-                border-bottom: 4px solid #fff;
-                padding: 15px 15px 10px 15px;
-                max-height: 60vh; /* 限制高度 */
-                box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+                pointer-events: auto;
+                width: 94%; /* 左右留白 3% */
+                max-width: 400px;
+                border-radius: 20px; /* 四角都圓 */
+                border: 2px solid rgba(255,255,255,0.8);
+                padding: 20px;
+                max-height: 65vh; /* 增加高度限制 */
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                margin: 0 auto;
             }
 
             /* 手機版隱藏按鈕：變成下拉標籤 */
             .toggle-panel-btn {
+                pointer-events: auto;
                 width: 60px;
-                height: 25px;
+                height: 30px;
                 border-radius: 0 0 15px 15px;
                 background: #fff;
-                margin-top: -2px; /* 接合處 */
-                box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+                margin-top: -2px; 
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
                 font-size: 14px;
                 color: var(--text-main);
+                border: 1px solid #ddd;
+                border-top: none;
             }
 
-            h1 { font-size: 1.1rem; margin-bottom: 10px; }
+            h1 { font-size: 1.2rem; margin-bottom: 10px; }
 
-            /* 2. 調整 RPG 角色卡，防止超出螢幕 */
+            /* 2. 調整 RPG 角色卡，增加左右留白 */
             .rpg-card { 
                 flex-direction: column; 
-                height: 85vh; 
-                width: 95%;
+                height: 80vh; 
+                width: 90%; /* 左右留白 */
+                max-width: 400px;
                 overflow: hidden; 
+                border-radius: 20px;
             }
+            
             .rpg-visual { 
                 width: 100%; 
-                height: 180px; 
+                height: 200px; /* 增加圖片高度 */
                 border-right: none; 
-                border-bottom: 4px solid #1a1a2e; 
+                border-bottom: 3px solid #1a1a2e; 
                 flex-shrink: 0;
             }
-            .rpg-rarity-badge { font-size: 1.4rem; padding: 5px 12px; }
+            
+            .rpg-rarity-badge { font-size: 1.2rem; padding: 6px 12px; }
+            
             .rpg-info { 
                 width: 100%; 
-                padding: 15px; 
+                padding: 20px; 
                 flex: 1; 
                 overflow-y: auto; 
             }
-            .rpg-class-name { font-size: 1.6rem; }
-            .chart-wrapper { min-height: 150px; }
+
+            .rpg-class-name { font-size: 1.8rem; margin: 5px 0 10px 0; }
+            .chart-wrapper { min-height: 160px; }
+            .stats-list { padding: 8px; }
+            .stat-item b { font-size: 1rem; }
             
             /* 3. 頁尾墊高 */
             #app-footer {
-                padding-bottom: 25px;
-                background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+                padding-bottom: 30px;
+                background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
                 z-index: 20;
             }
         }
@@ -377,6 +393,39 @@
             </a>
         </div>
     </footer>
+
+    <!-- RPG 角色卡 Modal -->
+    <div id="rpg-modal" onclick="closeRPGModal(event)">
+        <div class="rpg-card">
+            <span class="close-modal" onclick="document.getElementById('rpg-modal').style.display='none'">&times;</span>
+            
+            <div class="rpg-visual">
+                <div id="rarity-badge" class="rpg-rarity-badge rarity-SSR">SSR</div>
+                <div id="class-visual-bg" style="width:100%; height:100%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 6rem; text-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    🗡️
+                </div>
+            </div>
+
+            <div class="rpg-info">
+                <div class="rpg-header">
+                    <div class="rpg-class-type" id="rpg-main-type">MAIN CLASS</div>
+                    <div class="rpg-class-name" id="rpg-job-name">職業名稱</div>
+                </div>
+                
+                <div class="rpg-desc" id="rpg-job-desc">
+                    職業描述...
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="statsChart"></canvas>
+                </div>
+
+                <div class="stats-list" id="stats-text-row">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -598,16 +647,26 @@
         function showRPGCard() {
             const data = calculateRPG();
             const badge = document.getElementById('rarity-badge');
-            badge.className = `rpg-rarity-badge rarity-${data.rarity}`;
-            badge.innerText = data.rarity;
+            
+            if (badge) {
+                badge.className = `rpg-rarity-badge rarity-${data.rarity}`;
+                badge.innerText = data.rarity;
+            }
 
             const visualBg = document.getElementById('class-visual-bg');
-            visualBg.style.background = data.mainColor;
-            visualBg.innerHTML = data.mainIcon;
+            if (visualBg) {
+                visualBg.style.background = data.mainColor;
+                visualBg.innerHTML = data.mainIcon;
+            }
 
-            document.getElementById('rpg-main-type').innerText = data.mainName;
-            document.getElementById('rpg-job-name').innerText = data.jobName;
-            document.getElementById('rpg-job-desc').innerText = data.jobDesc;
+            const elMainType = document.getElementById('rpg-main-type');
+            if (elMainType) elMainType.innerText = data.mainName;
+            
+            const elJobName = document.getElementById('rpg-job-name');
+            if (elJobName) elJobName.innerText = data.jobName;
+            
+            const elJobDesc = document.getElementById('rpg-job-desc');
+            if (elJobDesc) elJobDesc.innerText = data.jobDesc;
             
             const s = data.stats;
             const statsHtml = `
@@ -617,42 +676,47 @@
                 <div class="stat-item"><b style="color:#f1c40f">${s.VIT}</b><span>VIT</span></div>
                 <div class="stat-item"><b style="color:#9b59b6">${s.LUK}</b><span>LUK</span></div>
             `;
-            document.getElementById('stats-text-row').innerHTML = statsHtml;
+            const elStatsRow = document.getElementById('stats-text-row');
+            if (elStatsRow) elStatsRow.innerHTML = statsHtml;
 
-            const ctx = document.getElementById('statsChart').getContext('2d');
-            if (currentChart) currentChart.destroy();
+            const canvas = document.getElementById('statsChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (currentChart) currentChart.destroy();
 
-            currentChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['STR', 'INT', 'AGI', 'VIT', 'LUK'],
-                    datasets: [{
-                        label: '能力值',
-                        data: [s.STR, s.INT, s.AGI, s.VIT, s.LUK],
-                        backgroundColor: `${data.mainColor}33`, 
-                        borderColor: data.mainColor,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#fff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            pointLabels: { color: '#ccc', font: { size: 12, family: 'Nunito' } },
-                            ticks: { display: false, max: 100, min: 0 },
-                            suggestedMax: 100
-                        }
+                currentChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['STR', 'INT', 'AGI', 'VIT', 'LUK'],
+                        datasets: [{
+                            label: '能力值',
+                            data: [s.STR, s.INT, s.AGI, s.VIT, s.LUK],
+                            backgroundColor: `${data.mainColor}33`, 
+                            borderColor: data.mainColor,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#fff',
+                            borderWidth: 2
+                        }]
                     },
-                    plugins: { legend: { display: false } }
-                }
-            });
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#ccc', font: { size: 12, family: 'Nunito' } },
+                                ticks: { display: false, max: 100, min: 0 },
+                                suggestedMax: 100
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
 
-            document.getElementById('rpg-modal').style.display = 'flex';
+            const modal = document.getElementById('rpg-modal');
+            if (modal) modal.style.display = 'flex';
         }
 
         function closeRPGModal(e) {
