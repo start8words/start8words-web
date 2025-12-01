@@ -1,676 +1,1117 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <!-- Google Tag Manager / Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WW024NHKJF"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-WW024NHKJF');
-    </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨ 八字能量分析儀 ✨</title>
+    <!-- 引入 Lunar.js (排盤庫) -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.2.37/lunar.js"></script>
+    <!-- 引入 Chart.js (雷達圖用) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入字型 -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zcool+KuaiLe&display=swap" rel="stylesheet">
     
-    <!-- PWA 設定 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
-    <!-- iOS PWA 支援 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="逸晴命理">
-    
-    <!-- SEO 設定 -->
-    <title>逸晴命理 (Start8Words) - 免費八字排盤 | 真太陽時 | 流年大運分析</title>
-    <meta name="description" content="逸晴命理 (Start8Words) 提供專業、精準且免費的線上八字排盤服務。特色功能：真太陽時校正、早夜子時處理、六柱排盤（含流年流月流日）、十神藏干與神煞自動分析。介面簡潔，手機電腦皆適用。">
-    <meta name="keywords" content="八字, 排盤, 免費算命, 八字排盤, 逸晴命理, Start8Words, 四柱八字, 流年運勢, 真太陽時, 子平八字, 命理工具, 線上排盤">
-    <meta name="author" content="逸晴命理 Start8Words">
-    <link rel="canonical" href="https://start8words.com/" />
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4ECDC4;
+            --accent-color: #FFE66D;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2C3E50;
+        }
 
-    <!-- Icon 設定 -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
-    <link rel="apple-touch-icon" href="/icon.png">
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: radial-gradient(circle at center, #2E2157 0%, #050508 100%);
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            color: white;
+        }
 
-    <!-- 社群分享預覽 -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="逸晴命理 - 免費八字排盤工具">
-    <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
-    <meta property="og:url" content="https://start8words.com/">
-    <meta property="og:site_name" content="逸晴命理 Start8Words">
-    <meta property="og:image" content="https://start8words.com/icon.png">
+        /* === 新增：浮動標題樣式 === */
+        .floating-title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
+            font-weight: 900;
+            z-index: 5;
+            pointer-events: none; /* 確保唔會阻住滑鼠轉動地球 */
+            letter-spacing: 3px;
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            opacity: 0.8;
+            animation: breathe 4s ease-in-out infinite;
+        }
 
-    <!-- JSON-LD 結構化資料 -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "逸晴命理 (Start8Words)",
-      "operatingSystem": "Web",
-      "applicationCategory": "LifestyleApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "HKD"
-      },
-      "description": "專業的線上八字排盤工具，支援真太陽時、流年流月流日排盤。",
-      "author": {
-        "@type": "Person",
-        "name": "逸晴命理"
-      },
-      "image": "https://start8words.com/icon.png"
-    }
-    </script>
+        @keyframes breathe {
+            0%, 100% { opacity: 0.8; text-shadow: 0 0 15px rgba(255, 107, 107, 0.6); }
+            50% { opacity: 1; text-shadow: 0 0 25px rgba(255, 230, 109, 0.8); }
+        }
+        
+        /* === UI 控制面板外層容器 === */
+        #ui-wrapper {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: flex-start;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: auto; 
+        }
 
-    <!-- 核心庫 -->
-    <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        #ui-wrapper.collapsed {
+            transform: translateX(calc(-100% + 40px));
+        }
 
-    <link rel="stylesheet" href="style.css?v=13">
+        /* === 內容區塊 === */
+        #ui-container {
+            width: 280px;
+            max-height: 85vh; 
+            overflow-y: auto;
+            padding: 20px;
+            
+            background: var(--card-bg);
+            border-radius: 25px;
+            border: 3px solid rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            color: var(--text-main);
+            box-sizing: border-box;
+            
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        #ui-container::-webkit-scrollbar { display: none; }
+
+        /* === 隱藏/顯示按鈕 === */
+        .toggle-panel-btn {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 0 12px 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-top: 20px; 
+            transition: background 0.2s;
+            z-index: 11;
+            flex-shrink: 0;
+        }
+        .toggle-panel-btn:hover { background: #f0f0f0; }
+
+        h1 { 
+            margin: 0 0 15px 0; 
+            font-size: 1.3rem; 
+            color: #FF6B6B; 
+            text-align: center;
+            font-weight: 900; 
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #ffe66d;
+        }
+
+        .input-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: 700; }
+        
+        input[type="datetime-local"] {
+            width: 100%;
+            background: #f0f3f8;
+            border: 2px solid #e0e0e0;
+            color: #333;
+            padding: 10px;
+            border-radius: 15px;
+            font-family: inherit;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        input[type="datetime-local"]:focus { border-color: var(--secondary-color); background: #fff; }
+
+        .gender-group { display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; }
+        .gender-option { flex: 1; }
+        .gender-radio { display: none; }
+        .gender-label {
+            display: block; text-align: center; padding: 8px;
+            background: #eee; border: 2px solid transparent;
+            border-radius: 15px; cursor: pointer; font-size: 0.9rem; color: #888;
+            transition: all 0.2s; font-weight: bold;
+        }
+        .gender-radio:checked + .gender-label { background: var(--secondary-color); color: #fff; transform: scale(1.05); box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4); }
+        #gender-f:checked + .gender-label { background: #FF6B6B; box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4); }
+
+        button.action-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #4ECDC4, #556270);
+            color: #fff; font-weight: 900; cursor: pointer; border: none;
+            margin-top: 10px; padding: 12px; border-radius: 50px;
+            font-size: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        button.action-btn:active { transform: translateY(1px); }
+        
+        button.rpg-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            margin-top: 15px; animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); } }
+
+        .bazi-text {
+            font-size: 0.9rem; color: #555; margin-top: 15px; line-height: 1.6;
+            background: #f8f9fa; padding: 10px; border-radius: 12px; border: 1px dashed #ccc;
+        }
+        
+        .date-confirm { font-size: 0.75rem; color: var(--secondary-color); margin-top: 8px; display: block; font-weight: bold; border-top: 1px dashed #ddd; padding-top: 5px; }
+
+        #legend-container { display: none; margin-top: 15px; padding-top: 10px; border-top: 2px dashed #eee; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px currentColor; }
+        .bar-container { flex-grow: 1; height: 8px; background: #eee; margin: 0 10px; border-radius: 4px; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; transition: width 0.6s ease-out; }
+        .count-text { width: 40px; text-align: right; font-family: 'Nunito', monospace; opacity: 0.8; font-size: 0.8rem; }
+
+        /* 免責聲明 */
+        .disclaimer {
+            font-size: 0.65rem; color: #bbb; margin-top: 10px; text-align: center; line-height: 1.4; font-style: italic;
+        }
+
+        .toggle-details-btn {
+            background: transparent; border: 2px solid #eee; color: #888;
+            border-radius: 20px; margin-top: 15px; font-size: 0.8rem; padding: 6px;
+            width: 100%; cursor: pointer; font-weight: bold;
+        }
+
+        /* === 頁尾 (Footer) === */
+        #app-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        #app-footer .footer-content {
+            pointer-events: auto;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(3px);
+            gap: 5px;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #app-footer a {
+            color: #fff; text-decoration: none; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s;
+        }
+        #app-footer a:hover { color: #E1306C; }
+        
+        .copyright-text {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 2px;
+        }
+
+        .brand-link-footer {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.8) !important;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .brand-link-footer:hover { color: #fff !important; }
+
+        .ig-icon { width: 14px; height: 14px; fill: currentColor; }
+
+        /* === RPG Modal === */
+        #rpg-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 20, 30, 0.85); z-index: 100; justify-content: center; align-items: center;
+            backdrop-filter: blur(8px); padding: 20px; box-sizing: border-box;
+        }
+
+        .rpg-card {
+            width: 750px; max-width: 100%; height: 480px;
+            background: #1a1a2e; border-radius: 30px;
+            display: flex; overflow: hidden;
+            box-shadow: 0 0 0 5px #1a1a2e, 0 0 0 8px #FF6B6B, 0 20px 50px rgba(0,0,0,0.8);
+            position: relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.8) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .rpg-visual {
+            width: 40%; background: radial-gradient(circle at center, #333, #000);
+            position: relative; display: flex; align-items: center; justify-content: center;
+            border-right: 4px solid #1a1a2e; flex-shrink: 0;
+            overflow: hidden; /* 確保圖片不溢出 */
+        }
+        
+        /* 角色圖片樣式 */
+        .rpg-character-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 確保整張圖完整顯示 */
+            position: relative;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+        /* 當圖片載入失敗時顯示的 Emoji 容器 */
+        .rpg-fallback-icon {
+            font-size: 6rem; 
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: none; /* 預設隱藏，只有圖片失敗才顯示 */
+        }
+
+        .rpg-rarity-badge {
+            position: absolute; top: 20px; left: 20px; padding: 8px 18px; border-radius: 12px;
+            font-weight: 900; font-style: italic; font-size: 1.8rem;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3); z-index: 2; transform: rotate(-5deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .rarity-SSR { background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; border: 3px solid #fff; }
+        .rarity-SR { background: linear-gradient(45deg, #D980FA, #9980FA); color: #fff; border: 2px solid #fff; }
+        .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
+
+        .rpg-info {
+            width: 60%; padding: 30px; display: flex; flex-direction: column;
+            background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; z-index: 10;
+            background: rgba(0,0,0,0.5); 
+            width: 40px; height: 40px; 
+            min-width: 40px; min-height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; 
+            line-height: 1;
+            flex-shrink: 0; 
+        }
+
+        .rpg-header { margin-bottom: 10px; border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .rpg-class-type { font-size: 0.9rem; color: #FFE66D; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .rpg-class-name { font-size: 2.2rem; font-weight: 900; margin: 5px 0; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .rpg-desc { font-size: 0.95rem; color: #ddd; line-height: 1.6; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #FFE66D; }
+        .chart-wrapper { position: relative; width: 100%; min-height: 180px; }
+        .stats-list { display: flex; justify-content: space-between; margin-top: 10px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 15px; }
+        .stat-item { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.1); }
+        .stat-item:last-child { border-right: none; }
+        .stat-item span { display: block; font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
+        .stat-item b { display: block; font-size: 1.2rem; color: #fff; margin-top: 2px; }
+
+        /* === 手機版響應式設定 === */
+        @media (max-width: 600px) {
+            /* 調整浮動標題在手機上的位置，避免被 UI 遮住 */
+            .floating-title {
+                top: 80px;
+                font-size: 1.5rem;
+            }
+
+            #ui-wrapper {
+                top: 0;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                transform: translateY(0);
+                padding-top: 10px;
+                pointer-events: none;
+            }
+            
+            #ui-wrapper.collapsed {
+                transform: translateY(calc(-100% + 30px));
+            }
+
+            #ui-container {
+                pointer-events: auto;
+                width: 94%;
+                max-width: 400px;
+                border-radius: 20px;
+                border: 2px solid rgba(255,255,255,0.8);
+                padding: 20px;
+                max-height: 65vh;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                margin: 0 auto;
+            }
+
+            .toggle-panel-btn {
+                pointer-events: auto;
+                width: 60px;
+                height: 30px;
+                border-radius: 0 0 15px 15px;
+                background: #fff;
+                margin-top: -2px; 
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                font-size: 14px;
+                color: var(--text-main);
+                border: 1px solid #ddd;
+                border-top: none;
+            }
+
+            h1 { font-size: 1.2rem; margin-bottom: 10px; }
+
+            .rpg-card { 
+                flex-direction: column; 
+                height: 80vh; 
+                width: 90%; 
+                max-width: 400px;
+                overflow: hidden; 
+                border-radius: 20px;
+            }
+            
+            .rpg-visual { 
+                width: 100%; 
+                height: 200px;
+                border-right: none; 
+                border-bottom: 3px solid #1a1a2e; 
+                flex-shrink: 0;
+            }
+            
+            .rpg-rarity-badge { font-size: 1.2rem; padding: 6px 12px; }
+            
+            .rpg-info { 
+                width: 100%; 
+                padding: 20px; 
+                flex: 1; 
+                overflow-y: auto; 
+                align-items: center;
+                text-align: center;
+                box-sizing: border-box; 
+            }
+
+            .rpg-header {
+                width: 100%;
+                text-align: left;
+                align-self: flex-start;
+            }
+
+            .rpg-class-name { font-size: 1.8rem; margin: 5px 0 10px 0; }
+            
+            .chart-wrapper { 
+                min-height: 160px; 
+                margin: 0 auto;
+                width: 100%;
+            }
+            
+            .stats-list { 
+                padding: 8px; 
+                width: 100%;
+                box-sizing: border-box; 
+            }
+            .stat-item b { font-size: 1rem; }
+            
+            #app-footer {
+                padding-bottom: 30px;
+                background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+                z-index: 20;
+            }
+        }
+    </style>
 </head>
 <body>
+    
+    <!-- 新增：浮動標題 -->
+    <div class="floating-title">您的專屬能量球</div>
 
-<div class="app-container">
-
-    <div class="app-header">
-        <h1>逸晴命理</h1>
-        <div style="font-size: 14px; font-weight: normal; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
-        
-        <!-- 原本在 Header 的按鈕已移除，改由 JS 動態插入 -->
-    </div>
-
-    <div id="auth-container" class="auth-box">
-        <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
-                <!-- 這裡是用來放切換按鈕的容器 (未登入時) -->
-                <div id="themeBtnContainerLoggedOut"></div>
-            </div>
-        </div>
-        
-        <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 15px; width: 100%; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-right: auto;">
-                <img id="userAvatar" src="" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd;">
-                <span id="userName" style="font-weight: bold; font-size: 15px;"></span>
-            </div>
+    <!-- UI 控制面板 Wrapper -->
+    <div id="ui-wrapper">
+        <div id="ui-container">
+            <h1>✨ 八字能量分析儀 ✨</h1>
             
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
-                <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
-                <!-- 這裡是用來放切換按鈕的容器 (已登入時) -->
-                <div id="themeBtnContainerLoggedIn"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 隱藏的按鈕本體，等待 JS 移動 -->
-    <button id="themeToggle" class="theme-toggle-btn" aria-label="切換深色模式" style="position:static; margin-left: 5px; border-radius: 6px; width: 36px; height: 36px; padding: 0;">
-        🌙
-    </button>
-
-    <div class="control-wrapper" id="inputWrapper">
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('solar')">西曆</div>
-            <div class="tab" onclick="switchTab('lunar')">農曆</div>
-            <div class="tab" onclick="switchTab('ganzhi')">干支</div>
-        </div>
-
-        <div class="input-row">
-            <span>稱呼：</span>
-            <input type="text" id="nameInput" placeholder="輸入姓名" style="width: 100px;">
-            
-            <span>分類：</span>
-            <select id="tagsInput" style="width: 100px;">
-                <option value="自己">自己</option>
-                <option value="家人">家人</option>
-                <option value="朋友">朋友</option>
-                <option value="客戶">客戶</option>
-                <option value="名人">名人</option>
-                <option value="案例">案例</option>
-            </select>
-
-            <select id="gender" style="width: 100px;">
-                <option value="1">男 (乾造)</option>
-                <option value="0">女 (坤造)</option>
-            </select>
-        </div>
-
-        <div class="input-row" id="panelSolar">
-            <span>西曆：</span>
-            <input type="datetime-local" id="birthDate">
-        </div>
-
-        <div class="input-row" id="panelLunar" style="display:none;">
-            <span>農曆：</span>
-            <div style="display:flex; gap:5px; width:100%;">
-                <input type="number" id="lunarYear" placeholder="年" style="flex:1">
-                <select id="lunarMonth" style="flex:1"></select>
-                <select id="lunarDay" style="flex:1"></select>
-            </div>
-            <div style="display:flex; gap:5px; width:100%; align-items:center;">
-                <select id="lunarHour" style="flex:2"></select>
-                <label style="flex:1; font-size:12px; color:var(--text-secondary);"><input type="checkbox" id="isLeap"> 閏月</label>
-            </div>
-        </div>
-
-        <div class="input-row" id="panelGanZhi" style="display:none; flex-direction:column; gap:10px;">
-            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:5px;">* 系統將搜尋1800-2100年間符合的日期</div>
-            <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">年柱</span>
-                <select id="gzYearGan" style="flex:1"></select>
-                <select id="gzYearZhi" style="flex:1"></select>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">月柱</span>
-                <select id="gzMonthGan" style="flex:1"></select>
-                <select id="gzMonthZhi" style="flex:1"></select>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">日柱</span>
-                <select id="gzDayGan" style="flex:1"></select>
-                <select id="gzDayZhi" style="flex:1"></select>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center; width:100%;">
-                <span style="width:30px; font-weight:bold; color:var(--text-secondary);">時柱</span>
-                <select id="gzHourGan" style="flex:1"></select>
-                <select id="gzHourZhi" style="flex:1"></select>
-            </div>
-        </div>
-
-        <div class="tst-section">
-            <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
-            <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="輸入地點(如：香港)，點選定位" style="flex:1;">
-                <button class="map-btn" onclick="searchLocation()" style="width:60px;">定位</button>
-            </div>
-            
-            <div class="tst-bottom-row">
-                <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
-                <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
-                
-                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
-                    <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
-                </label>
-
-                <label id="lblSaveChart" class="disabled-label" style="font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:15px; transition: all 0.3s;">
-                    <input type="checkbox" id="saveChartCheck" disabled style="width:auto; margin:0;"> 保存命盤
-                </label>
-            </div>
-
-            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed var(--border); width:100%;">
-                <span style="font-size:12px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
-                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                    <input type="radio" name="zishiMode" value="23" checked style="width:auto; margin:0;"> 23:00 換日
-                </label>
-                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                    <input type="radio" name="zishiMode" value="00" style="width:auto; margin:0;"> 00:00 換日
-                </label>
-            </div>
-        </div>
-
-        <div id="mapContainer"></div>
-        <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
-
-        <div style="margin-top:15px; text-align:center;">
-            <button class="action-btn" onclick="startNewChart()">即時排盤 / 搜尋</button>
-        </div>
-        <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
-    </div>
-
-    <!-- 50:50 控制列 -->
-    <div class="toggle-row">
-        <div class="toggle-col left" id="toggleInputBtn" onclick="toggleInputs()">
-            ▼ 收起輸入區
-        </div>
-        <div class="toggle-col right" id="toggleToolsBtn" onclick="toggleTools()">
-            ▼ 展開工具列
-        </div>
-    </div>
-
-    <!-- 截圖與 APP 安裝工具列 -->
-    <div id="toolsBar" class="tools-bar" style="display: none;">
-        <!-- PWA 安裝按鈕 (預設隱藏，由 JS 控制顯示) -->
-        <button id="btnInstallApp" class="tool-btn" style="display:none; border-color: #4caf50; color: #2e7d32; background: #e8f5e9;">
-            📲 安裝 APP
-        </button>
-        
-        <div class="tool-label">分享截圖：</div>
-        <button class="tool-btn" onclick="shareChart('origin')">
-            📷 原局四柱
-        </button>
-        <button class="tool-btn" onclick="shareChart('main')">
-            📷 原局運歲六柱
-        </button>
-    </div>
-
-    <div id="infoDashboard" class="info-dashboard">
-        <div class="info-col left">
-            <div class="info-item"><span class="info-label">稱呼:</span><span class="info-val" id="dispName">-</span></div>
-            <div class="info-item"><span class="info-label">男/女:</span><span class="info-val" id="dispGender">-</span></div>
-            <div class="info-item"><span class="info-label">出生地點:</span><span class="info-val" id="dispLoc">-</span></div>
-        </div>
-        <div class="info-col">
-            <div class="info-item"><span class="info-label">公曆:</span><span class="info-val" id="dispSolar">-</span></div>
-            <div class="info-item"><span class="info-label">農曆:</span><span class="info-val" id="dispLunar">-</span></div>
-            <div class="info-item"><span class="info-label">真太陽時:</span><span class="info-val" id="dispTST">-</span></div>
-        </div>
-    </div>
-
-    <div class="main-display" id="topDisplay" style="display:none;">
-        <div class="group-container">
-            <div class="group-label">
-    原局
-    <div id="btnToggleShenSha" class="shensha-toggle-btn" onclick="toggleShenShaAll()">▼</div>
-</div>
-            <div class="pillar main" id="baseHour"></div>
-            <div class="pillar main" id="baseDay"></div>
-            <div class="pillar main" id="baseMonth"></div>
-            <div class="pillar main" id="baseYear"></div>
-        </div>
-        <div class="group-container dynamic-group">
-            <div class="pillar main" id="activeDaYun"></div>
-            <div class="pillar main" id="activeYear"></div>
-            <div class="pillar main" id="activeMonth"></div>
-            <div class="pillar main" id="activeDay"></div>
-            <div class="pillar main" id="activeHour"></div>
-        </div>
-    </div>
-
-    <div class="rail-container" id="rails" style="display:none;">
-        <div class="rail-row"><div class="rail-title">大運</div><div class="rail-items" id="dayunRail"></div></div>
-        <div class="rail-row"><div class="rail-title">流年</div><div class="rail-items" id="yearRail"></div></div>
-        <div class="rail-row"><div class="rail-title">流月</div><div class="rail-items" id="monthRail"></div></div>
-        <div class="rail-row"><div class="rail-title">流日</div><div class="rail-items" id="dayRail"></div></div>
-        <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
-    </div>
-
-    <!-- 我的命盤 Modal -->
-    <div id="chartModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-row">
-                    <h3>📂 我的命盤紀錄</h3>
-                    <span class="close-modal" onclick="closeChartModal()">×</span>
+            <div class="input-section">
+                <div class="input-group">
+                    <label>🎂 你的出生時間 (西曆)</label>
+                    <input type="datetime-local" id="birth-input">
                 </div>
                 
-                <input type="text" id="searchInput" class="search-input" placeholder="搜尋姓名或年份...">
-                
-                <div class="category-filters">
-                    <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
-                    <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
-                    <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
-                    <button class="filter-chip" onclick="filterCategory('朋友')">朋友</button>
-                    <button class="filter-chip" onclick="filterCategory('客戶')">客戶</button>
-                    <button class="filter-chip" onclick="filterCategory('名人')">名人</button>
-                    <button class="filter-chip" onclick="filterCategory('案例')">案例</button>
+                <div class="gender-group">
+                    <div class="gender-option">
+                        <input type="radio" name="gender" id="gender-m" value="1" class="gender-radio" checked>
+                        <label for="gender-m" class="gender-label">♂ 男生</label>
+                    </div>
+                    <div class="gender-option">
+                        <input type="radio" name="gender" id="gender-f" value="0" class="gender-radio">
+                        <label for="gender-f" class="gender-label">♀ 女生</label>
+                    </div>
                 </div>
+
+                <button class="action-btn" onclick="calculateBazi(true)">
+                    🔮 開始分析能量
+                </button>
             </div>
-            <div id="chartList" class="chart-list">
-                <p style="text-align:center; color:#999;">載入中...</p>
+
+            <div class="bazi-text" id="bazi-desc">
+                請輸入日期以查看能量
+            </div>
+
+            <button class="action-btn rpg-btn" onclick="showRPGCard()">
+                ⚔️ 召喚 RPG 角色卡
+            </button>
+
+            <button class="toggle-details-btn" id="btn-toggle-legend" onclick="toggleLegend()">
+                📊 顯示詳細數據 ▼
+            </button>
+            
+            <div id="legend-container">
+                <!-- 數據條會插在這裡 -->
+            </div>
+            
+            <!-- 免責聲明 -->
+            <div id="disclaimer-text" class="disclaimer" style="display:none;">
+                五行能量沒有精確科技計算，只供參考及娛樂
             </div>
         </div>
+        
+        <!-- 隱藏/顯示按鈕 -->
+        <div class="toggle-panel-btn" onclick="togglePanel()">◀</div>
     </div>
 
-    <!-- 反推結果 Modal -->
-    <div id="reverseResultModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-row">
-                    <h3>📅 干支反推結果</h3>
-                    <span class="close-modal" onclick="closeReverseModal()">×</span>
-                </div>
-                <div style="font-size:13px; color:var(--text-secondary);">請選擇一個符合的日期進行排盤 (1800-2100)：</div>
-            </div>
-            <div id="reverseList" class="chart-list">
-                <!-- 結果將插入這裡 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- 截圖分享 Modal -->
-    <div id="shareModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 90%; width: 500px; background: var(--bg-color);">
-            <div class="modal-header">
-                <div class="modal-title-row">
-                    <h3>📤 命盤截圖</h3>
-                    <span class="close-modal" onclick="closeShareModal()">×</span>
-                </div>
-                <div style="font-size:13px; color:var(--text-secondary); margin-top:5px;">
-                    長按下方圖片即可儲存或是分享給朋友。
-                </div>
-            </div>
-            <div id="shareImgContainer" style="padding: 15px; display: flex; justify-content: center; align-items: center; overflow: auto; background: var(--border); min-height: 200px;">
-                <!-- 圖片生成後會出現在這裡 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- iOS 安裝教學 Modal (新增) -->
-    <div id="iosInstallModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content ios-install-content">
-            <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
-                <div class="modal-title-row">
-                    <h3>安裝到 iPhone / iPad</h3>
-                    <span class="close-modal" onclick="document.getElementById('iosInstallModal').style.display='none'">×</span>
-                </div>
-            </div>
-            <div style="padding: 20px; text-align: center;">
-                <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6;">
-                    請點擊瀏覽器上方或下方的 <strong style="color:#2196f3">分享按鈕</strong>
-                    <br>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2196f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 10px 0;">
-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                        <polyline points="16 6 12 2 8 6"></polyline>
-                        <line x1="12" y1="2" x2="12" y2="15"></line>
+    <!-- 頁尾 (Footer) -->
+    <footer id="app-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://instagram.com/start_8words" target="_blank">
+                    <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
-                    <br>
-                    然後選擇 <strong>「加入主畫面」</strong> 即可。
-                </p>
-                <div style="margin-top: 10px; font-size: 12px; color: #999;">
-                    (Add to Home Screen)
-                </div>
+                    @start_8words
+                </a>
+                <a href="https://start8words.com" target="_blank" class="brand-link-footer">
+                    專業八字排盤工具 start8words.com
+                </a>
             </div>
-        </div>
-    </div>
-
-    <!-- SEO 頁尾內容區 -->
-    <footer class="seo-footer">
-        <section class="seo-content">
-            <h2>關於逸晴命理 (Start8Words)</h2>
-            <p>
-                逸晴命理提供一個專業的<strong>免費線上八字排盤系統</strong>，致力於設計最精準的命理分析工具。
-                我們提供<strong>真太陽時校正</strong>、<strong>經緯度定位</strong>以及直觀的<strong>流年、流月、流日大運分析</strong>。
-            </p>
-            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
-                關鍵字：八字排盤, 免費算命, 四柱八字, 線上排盤, 紫微斗數, 真太陽時, 
-                流年運勢, 2026運勢, 逸晴命理, Start8Words.
-            </p>
-        </section>
-
-        <div class="app-footer">
-            <p>© 2025 逸晴命理 All Rights Reserved.</p>
-            <a href="https://instagram.com/start_8words" target="_blank">
-                <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                @start_8words
-            </a>
+            
+            <div class="copyright-text">
+                © 2025 逸晴命理 All Rights Reserved.
+            </div>
         </div>
     </footer>
 
-    <script src="script.js?v=13"></script>
-    <script type="module">
-        import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
+    <!-- RPG 角色卡 Modal -->
+    <div id="rpg-modal" onclick="closeRPGModal(event)">
+        <div class="rpg-card">
+            <span class="close-modal" onclick="document.getElementById('rpg-modal').style.display='none'">&times;</span>
+            
+            <div class="rpg-visual">
+                <div id="rarity-badge" class="rpg-rarity-badge rarity-SSR">SSR</div>
+                <!-- 容器：顯示圖片 -->
+                <div id="class-visual-container" style="width:100%; height:100%; display: flex; align-items: center; justify-content: center;">
+                    <!-- 圖片 -->
+                    <img id="class-visual-img" class="rpg-character-img" src="" style="display:none;" onerror="this.style.display='none'; document.getElementById('class-visual-icon').style.display='block';">
+                    <!-- 備用 Emoji (當圖片不存在時顯示) -->
+                    <div id="class-visual-icon" class="rpg-fallback-icon">
+                        🗡️
+                    </div>
+                </div>
+            </div>
 
-        // ... (保留原本的 Firebase Logic) ...
-        const btnLogin = document.getElementById('btnLogin');
-        const btnLogout = document.getElementById('btnLogout');
-        const btnMyCharts = document.getElementById('btnMyCharts');
-        const saveChartCheck = document.getElementById('saveChartCheck');
-        const lblSaveChart = document.getElementById('lblSaveChart');
-        const userProfile = document.getElementById('userProfile');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
-        const loggedOutUI = document.getElementById('loggedOutUI');
-        const modal = document.getElementById('chartModal');
-        const chartList = document.getElementById('chartList');
-        const searchInput = document.getElementById('searchInput');
-        const themeBtnContainerLoggedOut = document.getElementById('themeBtnContainerLoggedOut');
-        const themeBtnContainerLoggedIn = document.getElementById('themeBtnContainerLoggedIn');
-        const themeToggle = document.getElementById('themeToggle');
+            <div class="rpg-info">
+                <div class="rpg-header">
+                    <div class="rpg-class-type" id="rpg-main-type">MAIN CLASS</div>
+                    <div class="rpg-class-name" id="rpg-job-name">職業名稱</div>
+                </div>
+                
+                <div class="rpg-desc" id="rpg-job-desc">
+                    職業描述...
+                </div>
 
-        let currentUser = null; 
-        let allCharts = []; 
-        let currentCategory = '全部';
+                <div class="chart-wrapper">
+                    <canvas id="statsChart"></canvas>
+                </div>
 
-        if (btnLogin) {
-            btnLogin.addEventListener('click', () => {
-                signInWithPopup(auth, provider).catch((error) => alert(error.message));
-            });
+                <div class="stats-list" id="stats-text-row">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- JS Logic Updates for Panel Toggle ---
+        
+        function togglePanel(forceState = null) {
+            const wrapper = document.getElementById('ui-wrapper');
+            const btn = document.querySelector('.toggle-panel-btn');
+            const isMobile = window.innerWidth <= 600;
+            
+            // 如果指定了狀態，就使用該狀態，否則切換
+            if (forceState !== null) {
+                if (forceState === 'collapse') wrapper.classList.add('collapsed');
+                else wrapper.classList.remove('collapsed');
+            } else {
+                wrapper.classList.toggle('collapsed');
+            }
+            
+            const isCollapsed = wrapper.classList.contains('collapsed');
+
+            if (isMobile) {
+                btn.innerText = isCollapsed ? '▼' : '▲';
+            } else {
+                btn.innerText = isCollapsed ? '▶' : '◀';
+            }
         }
 
-        if (btnLogout) {
-            btnLogout.addEventListener('click', () => {
-                signOut(auth).then(() => { location.reload(); });
-            });
-        }
-
-        window.handleAutoSave = async () => {
-            if (!window.currentBaziData) return;
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const dataToSave = {
-                userId: user.uid,
-                userEmail: user.email,
-                ...window.currentBaziData,
-                timestamp: new Date()
-            };
-
-            try {
-                await addDoc(collection(db, "charts"), dataToSave);
-                setTimeout(() => {
-                    alert("✅ 命盤已自動保存！");
-                    resetInputs();
-                }, 100);
-            } catch (e) {
-                console.error("Auto save failed:", e);
-                alert("自動保存失敗: " + e.message);
+        // --- 1. RPG 職業數據庫 (已新增 imgId 和 icon) ---
+        // imgId 是圖片檔名, icon 是後備 Emoji
+        const RPG_DATA = {
+            wood: {
+                label: "木系 (Wood)", color: "#2ecc71",
+                mainA: { name: "🏹 遊俠系 (Ranger)", icon: "🏹" },
+                mainB: { name: "🌿 德魯伊系 (Druid)", icon: "🌿" },
+                branches: {
+                    wood:  [
+                        { n:"🧝 精靈遊俠", id: "elf_ranger", icon: "🧝", d:"自稱森林管理員，射箭準過開Aimbot。不過成日為咗邊個樹窿好瞓啲同松鼠開片，認真無聊。" }, 
+                        { n:"🌲 森林之子", id: "forest_child", icon: "🌲", d:"識同植物傾計，但聽講啲樹成日投訴畀狗通街屙尿。打交嗰陣叫隻樹人出嚟頂，自己縮喺後面嘆花茶。" }
+                    ],
+                    metal: [
+                        { n:"🎯 狙擊手", id: "sniper", icon: "🎯", d:"專用穿甲箭爆硬嘢。成日懶型話「I see you」，其實係近視深到淨係睇到個Scope入面，除眼鏡就盲。" }, 
+                        { n:"🥀 荊棘術士", id: "thorn_warlock", icon: "🥀", d:"鐘意玩尖嘢嘅危險人物。佢種啲花唔開花淨係生刺，有S傾向，非常重口味。" }
+                    ],
+                    water: [
+                        { n:"🌫️ 霧影獵手", id: "mist_hunter", icon: "🌫️", d:"玩捉伊人世界冠軍，隱形隱到連隊友都當佢透明，嗌外賣永遠預少佢嗰份，慘過做兵。" }, 
+                        { n:"🌊 潮汐使者", id: "tide_bringer", icon: "🌊", d:"全隊最強奶媽，水多到浸死人。雖然補血勁，但成日唔小心沖走埋隊友，搞到要Call埋水警。" }
+                    ],
+                    fire:  [
+                        { n:"💥 爆裂箭手", id: "burst_archer", icon: "💥", d:"嫌射箭太Dry，硬要加火藥。支箭飛出去似放煙花多過殺人，不過係會炸死人嗰隻煙花囉。" }, 
+                        { n:"☀️ 烈陽薩滿", id: "solar_shaman", icon: "☀️", d:"帶住個流動小太陽出街。Buff係勁，但光到隊友都要戴黑超打交，唔係集體雪盲都有之。" }
+                    ],
+                    earth: [
+                        { n:"🍃 叢林守護者", id: "jungle_guardian", icon: "🍃", d:"環保L入血，陷阱set得仲講究過佢間房。唔好踩佢啲草呀，唔係淨係拮死你，仲要聽佢講三個鐘耶穌。" }, 
+                        { n:"🗿 山嶺巨人", id: "mountain_giant", icon: "🗿", d:"平時係舊石，打交係舊好嬲嘅石。皮硬到蚊針佢都斷針。唯一煩惱係成日畀遊客當景點影相打卡。" }
+                    ]
+                }
+            },
+            fire: {
+                label: "火系 (Fire)", color: "#ff3d00",
+                mainA: { name: "🔥 炎魔導系 (Pyromancer)", icon: "🔥" },
+                mainB: { name: "😡 狂戰士系 (Berserker)", icon: "😡" },
+                branches: {
+                    fire:  [
+                        { n:"☄️ 毀滅之王", id: "lord_of_destruction", icon: "☄️", d:"破壞狂魔，人生格言係「爆啦」。行過嘅地方寸草不生，連地皮都起埋，環保團體頭號通緝犯。" }, 
+                        { n:"👹 修羅", id: "asura", icon: "👹", d:"覺得滿血係廢柴，殘血先係真男人嘅痴線佬。打交嗰陣係咁叫「打我啦笨」，醫生見到都頭痛。" }
+                    ],
+                    metal: [
+                        { n:"⚡ 電漿術士", id: "plasma_mage", icon: "⚡", d:"玩火玩到變電漿，熱到瞬間蒸發牛扒。唔好問佢借火食煙，分分鐘連個肺都氣化埋。" }, 
+                        { n:"⚔️ 戰神", id: "god_of_war", icon: "⚔️", d:"十八般武藝樣樣精，勁到無朋友。聽講佢用隻匙羹都殺到人，搞到食飯無人敢搶佢個布丁。" }
+                    ],
+                    wood:  [
+                        { n:"🕯️ 野火祭司", id: "wildfire_priest", icon: "🕯️", d:"信奉火可以淨化一切，尤其係對面條血。佢啲火會傳染，隊友見到佢都自帶Social Distance，驚變助燃物。" }, 
+                        { n:"🧛 血魔", id: "blood_demon", icon: "🧛", d:"吸血鬼啲親戚，打交當食Buffet。只要有人未死佢就唔會餓死，慳伙食費首選隊友。" }
+                    ],
+                    water: [
+                        { n:"💨 蒸汽術士", id: "steam_wizard", icon: "💨", d:"水火混合嘅怪才，戰場搞到成個桑拿房咁。雖然會燙傷人，但打完仗大家皮膚好咗，算係福利？" }, 
+                        { n:"🛡️ 維京海盜", id: "viking_pirate", icon: "🛡️", d:"天不怕地不怕，最怕無酒飲。因為長期酒精上腦，連痛覺都麻痺埋，所以唔怕痛唔怕暈。" }
+                    ],
+                    earth: [
+                        { n:"🌋 熔岩領主", id: "lava_lord", icon: "🌋", d:"鐘意玩幾千度嘅泥沙。無啦啦召喚隕石扑人，完全無理過修路工人嘅感受，極度缺德。" }, 
+                        { n:"💪 蠻王", id: "barbarian_king", icon: "💪", d:"肌肉生上腦嘅代表。因為太蠢，死神嚟收命佢都唔知自己死咗，所以仲可以打多陣，痴線。" }
+                    ]
+                }
+            },
+            earth: {
+                label: "土系 (Earth)", color: "#ffc107",
+                mainA: { name: "🛡️ 聖騎士系 (Paladin)", icon: "🛡️" },
+                mainB: { name: "⚗️ 煉金術士系 (Alchemist)", icon: "⚗️" },
+                branches: {
+                    earth: [
+                        { n:"🕍 不動明王", id: "immovable_king", icon: "🕍", d:"企定定畀你打，打到你手軟佢仲挖緊鼻屎。反傷勁到對面以為打緊塊長滿刺嘅鏡，痛過自殘。" }, 
+                        { n:"🤖 魔像大師", id: "golem_master", icon: "🤖", d:"手作達人，搓泥玩到有戰鬥力。自己縮後面遙控，堅信「有事弟子服其勞」，個弟子咪舊石囉。" }
+                    ],
+                    metal: [
+                        { n:"🏰 聖殿騎士", id: "templar_knight", icon: "🏰", d:"塊盾大過個人，專長用盾「輕輕」扑暈人。不過佢個「輕輕」通常都伴隨著重度腦震盪。" }, 
+                        { n:"🦾 鋼之煉金師", id: "fullmetal_alchemist", icon: "🦾", d:"信等價交換，通常係用敵人條命換佢開心。戰場當積木砌，路痴隊友嘅惡夢。" }
+                    ],
+                    wood:  [
+                        { n:"✨ 光之守衛", id: "light_guardian", icon: "✨", d:"自帶美顏Filter，點打都唔死。小強級生命力加埋偶像派登場，唔知愛佢定恨佢好。" }, 
+                        { n:"🧪 藥劑大師", id: "potion_master", icon: "🧪", d:"癲佬科學家，揸住堆紅紅綠綠嘅水。話係藥水，飲落似過期奶，反正死唔去就算成功啦。" }
+                    ],
+                    water: [
+                        { n:"⚖️ 審判官", id: "inquisitor", icon: "⚖️", d:"極度潔癖，見到Debuff就要清。對隊友身上嘅負面狀態零容忍，有時連隊友幾日無沖涼陣味都想淨化埋。" }, 
+                        { n:"📖 賢者", id: "sage", icon: "📖", d:"讀書讀壞腦，但因為讀得多，連你著咩色底褲都知。睇穿弱點係因為佢背熟晒敵人圖鑑，屈機。" }
+                    ],
+                    fire:  [
+                        { n:"🌅 黎明使者", id: "dawn_bringer", icon: "🌅", d:"行走的燈泡，喪屍剋星。因為太光，夜晚訓教要自閉喺個唔透光嘅箱入面，如果在唔係會被人投訴光污染。" }, 
+                        { n:"💣 炸彈狂人", id: "mad_bomber", icon: "💣", d:"覺得爆炸係藝術嘅恐怖份子。同佢一隊要小心地下，分分鐘連你個袋都畀佢塞咗個驚喜包。" }
+                    ]
+                }
+            },
+            metal: {
+                label: "金系 (Metal)", color: "#e0e0e0",
+                mainA: { name: "⚔️ 劍聖系 (Blade Master)", icon: "⚔️" },
+                mainB: { name: "🤖 機械師系 (Machinist)", icon: "🤖" },
+                branches: {
+                    metal: [
+                        { n:"🗡️ 無極劍神", id: "infinity_blader", icon: "🗡️", d:"覺得防禦係懦夫，一劍破萬法。因為無視防禦，斬坦克同斬豆腐一樣，都係一劈就開。" }, 
+                        { n:"🚜 機甲戰神", id: "mecha_god", icon: "🚜", d:"揸高達係男人嘅浪漫。防禦高火力猛，唯一缺點係維修費貴到佢成日要食土。" }
+                    ],
+                    wood:  [
+                        { n:"🍃 疾風劍豪", id: "wind_blader", icon: "🍃", d:"快樂風男，滑嚟滑去捉佢唔到。閃避高到懷疑佢開掛，或者單純係過度活躍症。" }, 
+                        { n:"🦠 生化戰士", id: "bio_warrior", icon: "🦠", d:"改造成半人半機械嘅怪胎。受傷唔用膠布，直接拿士巴拿同偈油整兩整就得，慳返唔少醫藥費。" }
+                    ],
+                    water: [
+                        { n:"❄️ 霜寒劍士", id: "frost_swordsman", icon: "❄️", d:"冷氣機成精。每一劍都自帶雪房效果，夏天最受歡迎隊友，冬天大家即刻踢佢出隊。" }, 
+                        { n:"🤿 深海潛航者", id: "deep_sea_diver", icon: "🤿", d:"著潛水衫喺陸地跑嘅怪人。用水刀切人當切西瓜，雖然大家都R頭佢啲水到底喺邊度抽過嚟。" }
+                    ],
+                    fire:  [
+                        { n:"🔥 魔劍士", id: "magic_swordsman", icon: "🔥", d:"物魔雙修嘅學霸。把劍著火好似好型，其實好幾次唔小心燒燶自己條眉。" }, 
+                        { n:"🧨 爆破專家", id: "demolition_expert", icon: "🧨", d:"炸彈狂人個Friend，但鐘意大場面。掟炸彈似派傳單，致力將地圖每一個凸起嘅地方都炸平。" }
+                    ],
+                    earth: [
+                        { n:"🛡️ 重裝劍士", id: "heavy_swordsman", icon: "🛡️", d:"揸住塊門板咁大嘅劍，行得慢過隻龜。雖然慢，但畀佢揩中一下基本上可以直接投胎。" }, 
+                        { n:"🚧 攻城坦克", id: "siege_tank", icon: "🚧", d:"坐定定打交嘅極致。射程遠到隔籬地圖都打到你，但敵人衝到埋嚟佢可能連轉身都未轉到。" }
+                    ]
+                }
+            },
+            water: {
+                label: "水系 (Water)", color: "#0091ea",
+                mainA: { name: "🗡️ 影舞者系 (Shadow Dancer)", icon: "🗡️" },
+                mainB: { name: "🔮 占星師系 (Astrologer)", icon: "🔮" },
+                branches: {
+                    water: [
+                        { n:"👻 幻影刺客", id: "phantom_assassin", icon: "👻", d:"存在感低到自動門都感應唔到。爆發力勁，打完就閃，典型「射後不理」嘅渣男。" }, 
+                        { n:"👑 冰雪女皇", id: "ice_queen", icon: "👑", d:"高冷女王，真係物理上嘅高冷。戰場變溜冰場，最鐘意睇敵人在冰上面仆親。" }
+                    ],
+                    metal: [
+                        { n:"🩸 處刑者", id: "executioner", icon: "🩸", d:"鐘意睇人流血嘅變態。專打痛位，畀佢打未必死，但一定痛到懷疑人生。" }, 
+                        { n:"🪞 鏡像法師", id: "mirror_mage", icon: "🪞", d:"鐘意玩分身。你以為打中佢，其實係鏡；你以為係鏡，其實係炸彈。同佢打交極度考驗智商。" }
+                    ],
+                    wood:  [
+                        { n:"☠️ 劇毒之刃", id: "poison_blade", icon: "☠️", d:"全身都係毒。同佢食飯要用銀針試毒，連汗都有腐蝕性，生人勿近，單身實力派。" }, 
+                        { n:"👁️ 預言家", id: "prophet", icon: "👁️", d:"神棍...啊唔係，先知。成日神神化化講埋啲聽唔明嘅嘢，然後幫你上Buff。預言唔準就話係時間線變動囉。" }
+                    ],
+                    fire:  [
+                        { n:"🥷 紅蓮忍者", id: "red_lotus_ninja", icon: "🥷", d:"雖然係忍者但完全唔低調，忍術全部都係爆炸同火。信奉「炸死晒目擊者就係完美潛入」。" }, 
+                        { n:"🌠 星火術士", id: "starfire_mage", icon: "🌠", d:"嫌地球啲火唔夠勁，要借星星火。威力大到無視抗性，但因為借嘅係高利貸(法力)，成日將自己榨乾。" }
+                    ],
+                    earth: [
+                        { n:"🏜️ 沙暴行者", id: "sandstorm_walker", icon: "🏜️", d:"自帶沙塵暴BGM。同佢打交似喺沙灘食飯，成口沙，命中低到懷疑自己發雞盲。" }, 
+                        { n:"🪐 重力操縱者", id: "gravity_master", icon: "🪐", d:"牛頓死對頭。想你飛就飛，想你跪就跪。心情唔靚將你體重變三倍，減肥人士惡夢。" }
+                    ]
+                }
             }
         };
-        
-        function resetInputs() {
-            document.getElementById('nameInput').value = '';
-            const now = new Date();
-            const offset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
-            document.getElementById('birthDate').value = localISOTime;
+
+        // --- 2. 排盤邏輯 ---
+        const GAN_WUXING = { '甲':'wood','乙':'wood','丙':'fire','丁':'fire','戊':'earth','己':'earth','庚':'metal','辛':'metal','壬':'water','癸':'water' };
+        const ELEMENT_CN = { 'wood':'木', 'fire':'火', 'earth':'土', 'metal':'金', 'water':'水' };
+        const ZHI_CANGGAN = {
+            '子':{water:100}, '丑':{earth:60,water:25,metal:15}, '寅':{wood:60,fire:30,earth:10},
+            '卯':{wood:100}, '辰':{earth:60,wood:25,water:15}, '巳':{fire:60,earth:25,metal:15},
+            '午':{fire:70,earth:30}, '未':{earth:60,fire:30,wood:10}, '申':{metal:60,water:30,earth:10},
+            '酉':{metal:100}, '戌':{earth:60,metal:30,fire:10}, '亥':{water:70,wood:30}
+        };
+
+        const baseTotal = 2500;
+        let currentRatios = { wood: 0.2, fire: 0.2, earth: 0.2, metal: 0.2, water: 0.2 };
+        let currentChart = null;
+        let hasAnalyzed = false; // 新增：是否已分析旗標
+
+        const elementsDef = [
+            { id: 'wood',  name: '木', cssColor: '#00d26a', baseH: 0.38, baseS: 0.85, baseL: 0.40 },
+            { id: 'fire',  name: '火', cssColor: '#ff3d00', baseH: 0.02, baseS: 0.95, baseL: 0.45 },
+            { id: 'earth', name: '土', cssColor: '#ffc107', baseH: 0.11, baseS: 0.90, baseL: 0.45 },
+            { id: 'metal', name: '金', cssColor: '#e0e0e0', baseH: 0.55, baseS: 0.10, baseL: 0.65 },
+            { id: 'water', name: '水', cssColor: '#0091ea', baseH: 0.60, baseS: 0.90, baseL: 0.50 }
+        ];
+
+        function calculateBazi(isUserAction = false) {
+            const input = document.getElementById('birth-input').value;
+            // 替換原本的 alert 為 UI 顯示，避免 Block UI
+            if (!input) { 
+                document.getElementById('bazi-desc').innerHTML = '<span style="color:var(--primary-color); font-weight:bold;">⚠️ 請先輸入出生日期！</span>';
+                return; 
+            }
             
-            document.getElementById('locationName').value = '';
-            document.getElementById('longitude').value = '120.0';
-            document.getElementById('useTST').checked = false;
-            if (saveChartCheck) saveChartCheck.checked = false;
+            // 如果是使用者點擊，標記為已分析
+            if (isUserAction) {
+                hasAnalyzed = true;
+            }
+
+            const date = new Date(input);
+            const solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+            const bazi = solar.getLunar().getEightChar();
             
-            window.currentDocId = null;
-        }
+            const pillars = [
+                { gan: bazi.getYearGan(), zhi: bazi.getYearZhi(), weight: 1.0 },
+                { gan: bazi.getMonthGan(), zhi: bazi.getMonthZhi(), weight: 2.5 },
+                { gan: bazi.getDayGan(), zhi: bazi.getDayZhi(), weight: 1.2 },
+                { gan: bazi.getTimeGan(), zhi: bazi.getTimeZhi(), weight: 1.0 }
+            ];
 
-        if (btnMyCharts) {
-            btnMyCharts.addEventListener('click', async () => {
-                if (!auth.currentUser) return;
-                modal.style.display = 'flex'; 
-                chartList.innerHTML = '<p style="text-align:center; padding:20px;">載入中...</p>';
-                
-                searchInput.value = ''; 
-                window.filterCategory('全部'); 
+            const baziStr = pillars.map(p => p.gan + p.zhi).join(' ');
+            const dayMaster = pillars[2].gan; 
+            // 修改：使用純數字日期格式
+            const dateStr = `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            const genderVal = document.querySelector('input[name="gender"]:checked').value;
+            const genderText = genderVal == "1" ? "♂" : "♀";
+            const masterElement = GAN_WUXING[dayMaster];
+            const masterElementCN = ELEMENT_CN[masterElement];
 
-                try {
-                    const q = query(
-                        collection(db, "charts"), 
-                        where("userId", "==", auth.currentUser.uid),
-                        orderBy("timestamp", "desc")
-                    );
-                    
-                    const querySnapshot = await getDocs(q);
-                    allCharts = []; 
-                    
-                    if (querySnapshot.empty) {
-                        chartList.innerHTML = '<p style="text-align:center; padding:20px;">暫無儲存紀錄</p>';
-                        return;
-                    }
+            // 修改：改回簡潔的單行八字顯示
+            document.getElementById('bazi-desc').innerHTML = `<strong>🔮 八字：</strong>${baziStr}<br><strong>🧒 日主：</strong>${dayMaster} (${masterElementCN}) / ${genderText}<br><span class="date-confirm">📅 西曆：${dateStr}</span>`;
 
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        data.id = docSnap.id;
-                        allCharts.push(data);
-                    });
+            let scores = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+            const GAN_BASE = 15; const ZHI_BASE = 30;
 
-                    applyFilters();
-
-                } catch (e) {
-                    console.error(e);
-                    if(e.message && e.message.includes("requires an index")) {
-                        alert("系統索引建立中，請稍後再試。");
-                    } else {
-                        chartList.innerHTML = '<p style="text-align:center; color:red;">讀取失敗</p>';
-                    }
+            pillars.forEach(p => {
+                if (GAN_WUXING[p.gan]) scores[GAN_WUXING[p.gan]] += GAN_BASE * p.weight;
+                const hidden = ZHI_CANGGAN[p.zhi];
+                if (hidden) {
+                    for (const [el, pct] of Object.entries(hidden)) scores[el] += (ZHI_BASE * (pct / 100)) * p.weight;
                 }
             });
+
+            let total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+            currentRatios = {
+                wood: scores.wood / total,
+                fire: scores.fire / total,
+                earth: scores.earth / total,
+                metal: scores.metal / total,
+                water: scores.water / total
+            };
+            updateSystem();
+
+            // 自動隱藏面板 (僅當用戶點擊按鈕時)
+            if (isUserAction) {
+                togglePanel('collapse');
+            }
         }
 
-        function applyFilters() {
-            const term = searchInput.value.toLowerCase();
-            const filtered = allCharts.filter(c => {
-                const nameMatch = (c.name || '').toLowerCase().includes(term);
-                const yearMatch = (c.birthDate || '').includes(term);
-                const isSearchMatch = nameMatch || yearMatch;
-                const isCategoryMatch = (currentCategory === '全部') || (c.tags === currentCategory);
-                return isSearchMatch && isCategoryMatch;
-            });
-            renderChartList(filtered);
+        // --- 3. RPG 系統 ---
+        function calculateRPG() {
+            const sorted = Object.entries(currentRatios).sort((a,b) => b[1] - a[1]);
+            const mainKey = sorted[0][0]; 
+            const mainVal = sorted[0][1]; 
+            const subKey = sorted[1][0];  
+            const subVal = sorted[1][1];
+
+            const typeIndex = mainVal > 0.35 ? 0 : 1; 
+            const mainClassData = RPG_DATA[mainKey];
+            const classCategory = typeIndex === 0 ? mainClassData.mainA : mainClassData.mainB;
+
+            let finalSubKey = subKey;
+            if (mainVal > 0.5 || mainVal > subVal * 2) {
+                finalSubKey = mainKey;
+            }
+            const branchData = mainClassData.branches[finalSubKey][typeIndex];
+            
+            let rarity = 'R';
+            let focusScore = mainVal + (subVal * 0.5); 
+            if (mainVal > 0.45) rarity = 'SSR';
+            else if (mainVal > 0.35 || focusScore > 0.55) rarity = 'SR';
+
+            const r = currentRatios;
+            const calcStat = (val) => Math.min(99, Math.round(30 + val * 120)); 
+
+            const rawSTR = r.metal * 1.0 + r.earth * 0.4 + r.fire * 0.2;
+            const rawINT = r.water * 1.0 + r.fire * 0.4 + r.wood * 0.2;
+            const rawAGI = r.wood * 1.0 + r.water * 0.4 + r.metal * 0.2;
+            const rawVIT = r.earth * 1.0 + r.metal * 0.4 + r.wood * 0.2;
+            
+            const values = Object.values(r);
+            const mean = values.reduce((a,b)=>a+b,0) / 5;
+            const variance = values.reduce((a,b)=>a + Math.pow(b-mean, 2), 0) / 5;
+            const stdDev = Math.sqrt(variance); 
+            const rawLUK = 0.2 + (0.4 - stdDev); 
+
+            const s = {
+                STR: calcStat(rawSTR),
+                INT: calcStat(rawINT),
+                AGI: calcStat(rawAGI),
+                VIT: calcStat(rawVIT),
+                LUK: calcStat(rawLUK)
+            };
+
+            return {
+                mainName: classCategory.name,
+                mainIcon: classCategory.icon,
+                jobName: branchData.n,
+                jobDesc: branchData.d,
+                jobImgId: branchData.id,
+                jobIcon: branchData.icon,
+                stats: s,
+                rarity: rarity,
+                mainColor: RPG_DATA[mainKey].color,
+                mainElement: mainKey
+            };
         }
 
-        window.filterCategory = function(category) {
-            currentCategory = category;
-            const chips = document.querySelectorAll('.filter-chip');
-            chips.forEach(chip => {
-                if (chip.innerText === category) {
-                    chip.classList.add('active');
-                } else {
-                    chip.classList.remove('active');
+        function showRPGCard() {
+            // 新增：檢查是否已分析
+            if (!hasAnalyzed) {
+                const baziDesc = document.getElementById('bazi-desc');
+                baziDesc.innerHTML = '<span style="color:#FF6B6B; font-weight:bold;">⚠️ 請先按「開始分析能量」確認日期！</span>';
+                // 可以選擇將面板展開，提示用戶
+                const wrapper = document.getElementById('ui-wrapper');
+                if (wrapper.classList.contains('collapsed')) {
+                    togglePanel();
                 }
-            });
-            applyFilters();
-        }
-
-        searchInput.addEventListener('input', () => {
-            applyFilters();
-        });
-
-        function renderChartList(charts) {
-            chartList.innerHTML = '';
-            if (charts.length === 0) {
-                chartList.innerHTML = '<p style="text-align:center; padding:20px; color:#999;">沒有符合的資料</p>';
                 return;
             }
 
-            charts.forEach(data => {
-                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
-                const div = document.createElement('div');
-                div.className = 'chart-item';
-                const tagHtml = data.tags ? `<span style="background:var(--highlight); color:var(--active-border); padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
-                
-                const genderStr = data.gender === 1 ? '男' : '女';
+            const data = calculateRPG();
+            const badge = document.getElementById('rarity-badge');
+            
+            if (badge) {
+                badge.className = `rpg-rarity-badge rarity-${data.rarity}`;
+                badge.innerText = data.rarity;
+            }
 
-                div.innerHTML = `
-                    <div class="chart-info">
-                        <div class="chart-name">${data.name} ${tagHtml} <span style="font-size:12px; color:var(--text-secondary);">(${genderStr})</span></div>
-                        <div class="chart-detail">${data.birthDate}</div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteChart(event, '${data.id}')">刪除</button>
-                `;
+            const visualBg = document.getElementById('class-visual-container');
+            const bgContainer = document.querySelector('.rpg-visual');
+            if (bgContainer) {
+                bgContainer.style.background = data.mainColor;
+            }
+            
+            // 處理圖片邏輯
+            const imgElement = document.getElementById('class-visual-img');
+            const iconElement = document.getElementById('class-visual-icon');
+            
+            if (imgElement && iconElement) {
+                // 嘗試設定圖片
+                imgElement.src = `images/${data.jobImgId}.png`;
+                imgElement.style.display = 'block';
+                iconElement.style.display = 'none'; // 先隱藏 Icon
                 
-                div.querySelector('.chart-info').addEventListener('click', () => {
-                    loadChartData(data);
-                    modal.style.display = 'none';
+                // 設定後備 Icon (如果圖片加載失敗會自動觸發 onerror，但我們也預設文字)
+                iconElement.innerText = data.jobIcon;
+            }
+
+            const elMainType = document.getElementById('rpg-main-type');
+            if (elMainType) elMainType.innerText = data.mainName;
+            
+            const elJobName = document.getElementById('rpg-job-name');
+            if (elJobName) elJobName.innerText = data.jobName;
+            
+            const elJobDesc = document.getElementById('rpg-job-desc');
+            if (elJobDesc) elJobDesc.innerText = data.jobDesc;
+            
+            const s = data.stats;
+            // 修正 3: 將顯示文字改為中文
+            const statsHtml = `
+                <div class="stat-item"><b style="color:#e74c3c">${s.STR}</b><span>力量</span></div>
+                <div class="stat-item"><b style="color:#3498db">${s.INT}</b><span>智力</span></div>
+                <div class="stat-item"><b style="color:#2ecc71">${s.AGI}</b><span>敏捷</span></div>
+                <div class="stat-item"><b style="color:#f1c40f">${s.VIT}</b><span>體力</span></div>
+                <div class="stat-item"><b style="color:#9b59b6">${s.LUK}</b><span>幸運</span></div>
+            `;
+            const elStatsRow = document.getElementById('stats-text-row');
+            if (elStatsRow) elStatsRow.innerHTML = statsHtml;
+
+            const canvas = document.getElementById('statsChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (currentChart) currentChart.destroy();
+
+                currentChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        // 修正 3: 圖表標籤改為中文
+                        labels: ['力量', '智力', '敏捷', '體力', '幸運'],
+                        datasets: [{
+                            label: '能力值',
+                            data: [s.STR, s.INT, s.AGI, s.VIT, s.LUK],
+                            backgroundColor: `${data.mainColor}33`, 
+                            borderColor: data.mainColor,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#ccc', font: { size: 12, family: 'Nunito' } },
+                                ticks: { display: false, max: 100, min: 0 },
+                                suggestedMax: 100
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
                 });
+            }
 
-                chartList.appendChild(div);
-            });
+            const modal = document.getElementById('rpg-modal');
+            if (modal) modal.style.display = 'flex';
         }
 
-        function loadChartData(data) {
-            document.getElementById('nameInput').value = data.name || '';
-            document.getElementById('gender').value = data.gender;
-            document.getElementById('locationName').value = data.location || '';
-            document.getElementById('useTST').checked = data.useTST || false;
+        function closeRPGModal(e) {
+            if (e.target.id === 'rpg-modal' || e.target.className.includes('close-modal')) {
+                document.getElementById('rpg-modal').style.display = 'none';
+            }
+        }
+
+        function toggleLegend() {
+            const legend = document.getElementById('legend-container');
+            const disclaimer = document.getElementById('disclaimer-text');
+            const btn = document.getElementById('btn-toggle-legend');
             
-            const tagsSelect = document.getElementById('tagsInput');
-            if (tagsSelect) tagsSelect.value = data.tags || '自己';
-
-            if (saveChartCheck) saveChartCheck.checked = false;
-            
-            if (data.zishiMode) {
-                const radios = document.getElementsByName('zishiMode');
-                for (let r of radios) {
-                    if (r.value === data.zishiMode) r.checked = true;
-                }
-            }
-
-            window.switchTab('solar'); 
-            const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
-            document.getElementById('birthDate').value = isoTime;
-
-            window.currentDocId = data.id;
-            window.initChart();
-        }
-
-        window.deleteChart = async (e, docId) => {
-            e.stopPropagation();
-            if(!confirm("確定要刪除嗎？")) return;
-            try {
-                await deleteDoc(doc(db, "charts", docId));
-                if (window.currentDocId === docId) {
-                    window.currentDocId = null;
-                }
-                const idx = allCharts.findIndex(c => c.id === docId);
-                if (idx > -1) {
-                    allCharts.splice(idx, 1);
-                    applyFilters(); 
-                }
-            } catch (err) {
-                alert("刪除失敗");
-            }
-        }
-
-        window.closeChartModal = () => {
-            document.getElementById('chartModal').style.display = 'none';
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            // 移動按鈕邏輯
-            if (themeToggle && themeBtnContainerLoggedOut && themeBtnContainerLoggedIn) {
-                if (user) {
-                    themeBtnContainerLoggedIn.appendChild(themeToggle);
-                } else {
-                    themeBtnContainerLoggedOut.appendChild(themeToggle);
-                }
-            }
-
-            if (user) {
-                currentUser = user;
-                if(loggedOutUI) loggedOutUI.style.display = 'none';
-                if(userProfile) {
-                    userProfile.style.display = 'flex';
-                    if(userName) userName.innerText = user.displayName;
-                    if(userAvatar) userAvatar.src = user.photoURL;
-                }
-                if(saveChartCheck) {
-                    saveChartCheck.disabled = false;
-                }
-                if(lblSaveChart) {
-                    lblSaveChart.classList.remove('disabled-label');
-                    lblSaveChart.style.color = 'var(--active-border)';
-                    lblSaveChart.style.cursor = 'pointer';
-                }
+            if (legend.style.display === 'block') {
+                legend.style.display = 'none';
+                if(disclaimer) disclaimer.style.display = 'none';
+                btn.innerText = '📊 顯示詳細數據 ▼';
             } else {
-                currentUser = null;
-                if(loggedOutUI) loggedOutUI.style.display = 'flex';
-                if(userProfile) userProfile.style.display = 'none';
-                if(saveChartCheck) {
-                    saveChartCheck.disabled = true;
-                    saveChartCheck.checked = false;
-                }
-                if(lblSaveChart) {
-                    lblSaveChart.classList.add('disabled-label');
-                }
+                legend.style.display = 'block';
+                if(disclaimer) disclaimer.style.display = 'block';
+                btn.innerText = '📊 隱藏詳細數據 ▲';
             }
-        });
+        }
+
+        // --- 4. Three.js Visuals ---
+        let particleSystem, particleAttributes;
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x1A1A2E, 0.002);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000);
+        camera.position.z = 45;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = 0.8;
+
+        function getSoftParticleTexture() {
+            const cvs = document.createElement('canvas'); cvs.width=64; cvs.height=64;
+            const ctx = cvs.getContext('2d');
+            const grd = ctx.createRadialGradient(32,32,0,32,32,32);
+            grd.addColorStop(0,'rgba(255,255,255,1)'); grd.addColorStop(0.15,'rgba(255,255,255,0.9)'); 
+            grd.addColorStop(0.4,'rgba(255,255,255,0.3)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle = grd; ctx.fillRect(0,0,64,64);
+            const tex = new THREE.Texture(cvs); tex.needsUpdate = true; return tex;
+        }
+
+        function updateSystem() {
+            if (particleSystem) scene.remove(particleSystem);
+            const counts = {}; let total = 0;
+            elementsDef.forEach(el => {
+                let c = Math.round(baseTotal * currentRatios[el.id]);
+                counts[el.id] = c; total += c;
+            });
+
+            const lDiv = document.getElementById('legend-container'); lDiv.innerHTML = '';
+            elementsDef.forEach(el => {
+                const pct = total>0 ? (counts[el.id]/total*100).toFixed(1) : 0;
+                lDiv.innerHTML += `<div class="legend-item"><div class="dot" style="background:${el.cssColor}"></div><div style="width:50px">${el.name}</div><div class="bar-container"><div class="bar" style="width:${pct}%;background:${el.cssColor}"></div></div><div class="count-text">${counts[el.id]}</div></div>`;
+            });
+
+            const geo = new THREE.BufferGeometry();
+            const pos=[], col=[], siz=[], pha=[], baseSiz=[];
+            const tmpCol = new THREE.Color();
+
+            elementsDef.forEach(el => {
+                for(let i=0; i<counts[el.id]; i++){
+                    const r = 12 + Math.random()*14;
+                    const theta = Math.random()*Math.PI*2;
+                    const phi = Math.acos(2*Math.random()-1);
+                    pos.push(r*Math.sin(phi)*Math.cos(theta), r*Math.sin(phi)*Math.sin(theta), r*Math.cos(phi));
+                    
+                    let h=el.baseH+(Math.random()-0.5)*0.06;
+                    let s=Math.max(0.3, Math.min(1.0, el.baseS+(Math.random()-0.5)*0.2));
+                    let l=Math.max(0.2, Math.min(0.7, el.baseL+(Math.random()-0.5)*0.2));
+                    tmpCol.setHSL(h,s,l);
+                    col.push(tmpCol.r, tmpCol.g, tmpCol.b);
+
+                    const bs = 2.5+Math.random()*3.5;
+                    siz.push(bs); baseSiz.push(bs); pha.push(Math.random()*Math.PI*2);
+                }
+            });
+
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(col,3));
+            geo.setAttribute('size', new THREE.Float32BufferAttribute(siz,1));
+            geo.setAttribute('phase', new THREE.Float32BufferAttribute(pha,1));
+            geo.setAttribute('baseSize', new THREE.Float32BufferAttribute(baseSiz,1));
+
+            const mat = new THREE.PointsMaterial({
+                size: 3.0, vertexColors: true, map: getSoftParticleTexture(),
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.45, sizeAttenuation: true
+            });
+
+            particleSystem = new THREE.Points(geo, mat);
+            scene.add(particleSystem);
+            particleAttributes = particleSystem.geometry.attributes;
+        }
+
+        setTimeout(() => {
+            if (typeof Solar !== 'undefined') {
+                const now = new Date();
+                const offset = now.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+                document.getElementById('birth-input').value = localISOTime;
+                calculateBazi();
+            }
+        }, 500);
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02;
+            if (particleSystem && particleAttributes) {
+                const s = particleAttributes.size.array;
+                const bs = particleAttributes.baseSize.array;
+                const p = particleAttributes.phase.array;
+                for(let i=0; i<s.length; i++) s[i] = Math.max(0.1, bs[i] + Math.sin(time*2.5+p[i])*4.5);
+                particleAttributes.size.needsUpdate = true;
+                particleSystem.rotation.y += 0.0015;
+            }
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        // 響應式調整
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // 手機版: 恢復預設中心視角 (因為面板在頂部可收起，不會擋住中間)
+            if (window.innerWidth <= 600) {
+                camera.position.y = 0;
+                camera.lookAt(0, 0, 0);
+            } else {
+                camera.position.y = 0;
+                camera.lookAt(0, 0, 0);
+            }
+        }
+        window.addEventListener('resize', onWindowResize);
+        onWindowResize();
     </script>
-</div>
 </body>
 </html>
