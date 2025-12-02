@@ -8,8 +8,12 @@
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.2.37/lunar.js"></script>
     <!-- 引入 Chart.js (雷達圖用) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 Chart.js DataLabels 插件 -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- 引入 html2canvas (截圖分享用) -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- 引入字型 -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Zcool+KuaiLe&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -18,13 +22,14 @@
             --accent-color: #FFE66D;
             --card-bg: rgba(255, 255, 255, 0.95);
             --text-main: #2C3E50;
+            --tech-cyan: #00f3ff;
         }
 
         body { 
             margin: 0; 
             overflow: hidden; 
             background: radial-gradient(circle at center, #2E2157 0%, #050508 100%);
-            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            font-family: 'Noto Sans TC', 'Nunito', sans-serif;
             color: white;
         }
 
@@ -34,21 +39,23 @@
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 1.8rem;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
-            font-weight: 900;
+            font-size: 1.6rem; 
+            color: #ffffff;    
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); 
+            font-weight: 700;
             z-index: 5;
             pointer-events: none;
             letter-spacing: 3px;
-            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
-            opacity: 0.8;
-            animation: breathe 4s ease-in-out infinite;
+            font-family: 'Orbitron', 'Noto Sans TC', sans-serif;
+            text-transform: uppercase;
+            width: 100%;
+            text-align: center;
+            animation: white-breathe 4s ease-in-out infinite;
         }
 
-        @keyframes breathe {
-            0%, 100% { opacity: 0.8; text-shadow: 0 0 15px rgba(255, 107, 107, 0.6); }
-            50% { opacity: 1; text-shadow: 0 0 25px rgba(255, 230, 109, 0.8); }
+        @keyframes white-breathe {
+            0%, 100% { opacity: 0.8; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+            50% { opacity: 1; text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
         }
         
         /* === UI 控制面板外層容器 === */
@@ -261,7 +268,9 @@
         @keyframes popIn { 0% { transform: scale(0.8) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
         .rpg-visual {
-            width: 40%; background: radial-gradient(circle at center, #333, #000);
+            /* 修改 4: 電腦版視覺圖加闊到 45% */
+            width: 45%; 
+            background: radial-gradient(circle at center, #333, #000);
             position: relative; display: flex; align-items: center; justify-content: center;
             border-right: 4px solid #1a1a2e; flex-shrink: 0;
             overflow: hidden; 
@@ -294,13 +303,47 @@
         .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
 
         .rpg-info {
-            width: 60%; padding: 30px; display: flex; flex-direction: column;
+            /* 修改 4: 電腦版資訊區縮小到 55% */
+            width: 55%; 
+            padding: 30px; display: flex; flex-direction: column;
             background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white;
             overflow-y: auto;
+            position: relative; 
         }
 
+        .rpg-header { margin-bottom: 10px; border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .rpg-class-type { font-size: 0.9rem; color: #FFE66D; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .rpg-class-name { font-size: 2.2rem; font-weight: 900; margin: 5px 0; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .rpg-desc { 
+            font-size: 0.95rem; 
+            color: #ddd; 
+            line-height: 1.6; 
+            background: rgba(0,0,0,0.3); 
+            padding: 12px; 
+            border-radius: 10px; 
+            margin-bottom: 5px; 
+            border-left: 4px solid #FFE66D; 
+        }
+        
+        .chart-wrapper { 
+            position: relative; 
+            width: 100%; 
+            height: 280px; 
+            min-height: 250px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -10px; 
+        }
+
+        /* === 按鈕群組 === */
+        /* 關閉按鈕 */
         .close-modal {
-            position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; z-index: 10;
+            position: absolute; top: 15px; right: 20px; 
+            /* 修改 2: 縮小白色交叉 */
+            font-size: 1.5rem; 
+            cursor: pointer; color: #fff; z-index: 10;
             background: rgba(0,0,0,0.5); 
             width: 40px; height: 40px; 
             min-width: 40px; min-height: 40px;
@@ -309,24 +352,38 @@
             padding: 0; 
             line-height: 1;
             flex-shrink: 0; 
+            border: 3px solid #FF6B6B; 
+            box-sizing: border-box; 
         }
 
-        .rpg-header { margin-bottom: 10px; border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 10px; }
-        .rpg-class-type { font-size: 0.9rem; color: #FFE66D; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
-        .rpg-class-name { font-size: 2.2rem; font-weight: 900; margin: 5px 0; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .rpg-desc { font-size: 0.95rem; color: #ddd; line-height: 1.6; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #FFE66D; }
-        .chart-wrapper { position: relative; width: 100%; min-height: 180px; }
-        .stats-list { display: flex; justify-content: space-between; margin-top: 10px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 15px; }
-        .stat-item { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.1); }
-        .stat-item:last-child { border-right: none; }
-        .stat-item span { display: block; font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
-        .stat-item b { display: block; font-size: 1.2rem; color: #fff; margin-top: 2px; }
+        /* 分享按鈕 */
+        .share-modal-btn {
+            position: absolute; 
+            /* 修改 2: 調整分享按鈕位置以適應縮小的關閉按鈕 */
+            top: 60px; 
+            right: 20px; 
+            z-index: 10;
+            background: linear-gradient(45deg, #FFD700, #FDB931);
+            color: #2C3E50;
+            width: 40px; height: 40px; 
+            min-width: 40px; min-height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0; 
+            line-height: 1;
+            flex-shrink: 0; 
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            font-size: 1.2rem;
+        }
+        .share-modal-btn:active { transform: translateY(2px); }
 
         /* === 手機版響應式設定 === */
         @media (max-width: 600px) {
             .floating-title {
                 top: 80px;
-                font-size: 1.5rem;
+                font-size: 1.3rem; 
             }
 
             #ui-wrapper {
@@ -383,7 +440,8 @@
             
             .rpg-visual { 
                 width: 100%; 
-                height: 200px;
+                /* 修改 1: 高度改回 200px */
+                height: 200px; 
                 border-right: none; 
                 border-bottom: 3px solid #1a1a2e; 
                 flex-shrink: 0;
@@ -393,7 +451,7 @@
             
             .rpg-info { 
                 width: 100%; 
-                padding: 20px; 
+                padding: 10px; 
                 flex: 1; 
                 overflow-y: auto; 
                 align-items: center;
@@ -405,22 +463,29 @@
                 width: 100%;
                 text-align: left;
                 align-self: flex-start;
+                margin-bottom: 2px;
             }
 
-            .rpg-class-name { font-size: 1.8rem; margin: 5px 0 10px 0; }
+            .rpg-class-type { font-size: 0.8rem; }
+
+            .rpg-class-name { 
+                font-size: 1.3rem; 
+                margin: 2px 0 2px 0; 
+            }
             
+            .rpg-desc {
+                font-size: 0.75rem;
+                padding: 5px;
+                line-height: 1.3;
+                margin-bottom: 2px;
+            }
+
             .chart-wrapper { 
-                min-height: 160px; 
-                margin: 0 auto;
-                width: 100%;
+                height: 210px; 
+                /* 修改 3: 手機版雷達圖整體縮小10% (設寬度90%並置中) */
+                width: 90%;
+                margin: -20px auto 0 auto; 
             }
-            
-            .stats-list { 
-                padding: 8px; 
-                width: 100%;
-                box-sizing: border-box; 
-            }
-            .stat-item b { font-size: 1rem; }
             
             #app-footer {
                 padding-bottom: 30px;
@@ -433,7 +498,7 @@
 <body>
     
     <!-- 浮動標題 -->
-    <div class="floating-title">您的專屬能量球</div>
+    <div class="floating-title">您的八字能量球</div>
 
     <!-- UI 控制面板 Wrapper -->
     <div id="ui-wrapper">
@@ -514,6 +579,11 @@
         <div class="rpg-card">
             <span class="close-modal" onclick="document.getElementById('rpg-modal').style.display='none'">&times;</span>
             
+            <!-- 新增：分享按鈕 (圓形圖示) -->
+            <div class="share-modal-btn" onclick="shareCard()">
+                📤
+            </div>
+            
             <div class="rpg-visual">
                 <div id="rarity-badge" class="rpg-rarity-badge rarity-SSR">SSR</div>
                 <!-- 容器：顯示圖片 -->
@@ -537,12 +607,9 @@
                     職業描述...
                 </div>
 
+                <!-- 修改：只保留圖表容器，刪除數值列表容器 -->
                 <div class="chart-wrapper">
                     <canvas id="statsChart"></canvas>
-                </div>
-
-                <div class="stats-list" id="stats-text-row">
-                    <!-- JS Populated -->
                 </div>
             </div>
         </div>
@@ -919,17 +986,7 @@
             if (elJobDesc) elJobDesc.innerText = data.jobDesc;
             
             const s = data.stats;
-            // 修正 3: 將顯示文字改為中文
-            const statsHtml = `
-                <div class="stat-item"><b style="color:#e74c3c">${s.STR}</b><span>力量</span></div>
-                <div class="stat-item"><b style="color:#3498db">${s.INT}</b><span>智力</span></div>
-                <div class="stat-item"><b style="color:#2ecc71">${s.AGI}</b><span>敏捷</span></div>
-                <div class="stat-item"><b style="color:#f1c40f">${s.VIT}</b><span>體力</span></div>
-                <div class="stat-item"><b style="color:#9b59b6">${s.LUK}</b><span>幸運</span></div>
-            `;
-            const elStatsRow = document.getElementById('stats-text-row');
-            if (elStatsRow) elStatsRow.innerHTML = statsHtml;
-
+            
             const canvas = document.getElementById('statsChart');
             if (canvas) {
                 const ctx = canvas.getContext('2d');
@@ -938,8 +995,14 @@
                 currentChart = new Chart(ctx, {
                     type: 'radar',
                     data: {
-                        // 修正 3: 圖表標籤改為中文
-                        labels: ['力量', '智力', '敏捷', '體力', '幸運'],
+                        // 修改：將標籤與數值組合在 labels 陣列中，以實現換行顯示
+                        labels: [
+                            ['力量', s.STR], 
+                            ['智力', s.INT], 
+                            ['敏捷', s.AGI], 
+                            ['體力', s.VIT], 
+                            ['幸運', s.LUK]
+                        ],
                         datasets: [{
                             label: '能力值',
                             data: [s.STR, s.INT, s.AGI, s.VIT, s.LUK],
@@ -953,16 +1016,29 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: 20 
+                        },
                         scales: {
                             r: {
                                 angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                                pointLabels: { color: '#ccc', font: { size: 12, family: 'Nunito' } },
-                                ticks: { display: false, max: 100, min: 0 },
-                                suggestedMax: 100
+                                pointLabels: { 
+                                    // 設定文字顏色，按照屬性順序
+                                    color: ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6'],
+                                    font: { size: 14, family: 'Nunito', weight: 'bold' } 
+                                },
+                                ticks: { display: false, max: 100, min: 0 }, 
+                                suggestedMax: 100,
+                                min: 0,
+                                max: 100
                             }
                         },
-                        plugins: { legend: { display: false } }
+                        plugins: { 
+                            legend: { display: false },
+                            // 禁用 datalabels 插件，因為數值已經整合在 label 中
+                            datalabels: { display: false }
+                        }
                     }
                 });
             }
@@ -974,6 +1050,59 @@
         function closeRPGModal(e) {
             if (e.target.id === 'rpg-modal' || e.target.className.includes('close-modal')) {
                 document.getElementById('rpg-modal').style.display = 'none';
+            }
+        }
+
+        // 新增分享功能
+        async function shareCard() {
+            const cardElement = document.querySelector('.rpg-card');
+            if (!cardElement) return;
+
+            // 顯示載入中提示 (用 icon 代替)
+            const btn = document.querySelector('.share-modal-btn');
+            const originalIcon = btn.innerText;
+            btn.innerText = '⌛'; // Loading hourglass
+            
+            try {
+                // 使用 html2canvas 截圖
+                const canvas = await html2canvas(cardElement, {
+                    backgroundColor: null, // 透明背景
+                    scale: 2 // 提高清晰度
+                });
+
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        alert('截圖失敗');
+                        btn.innerText = originalIcon;
+                        return;
+                    }
+
+                    // 檢查是否支援 Web Share API 且可以分享檔案 (通常是手機)
+                    const file = new File([blob], 'my-rpg-card.png', { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                title: '我的八字 RPG 角色卡',
+                                text: '快來看看你的八字屬性轉化為 RPG 角色是甚麼！',
+                                files: [file]
+                            });
+                        } catch (err) {
+                            console.log('分享取消或失敗', err);
+                        }
+                    } else {
+                        // 電腦版或不支援分享：直接下載
+                        const link = document.createElement('a');
+                        link.download = 'my-rpg-card.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        alert('已下載角色卡圖片！你可以手動發送給朋友。');
+                    }
+                    btn.innerText = originalIcon;
+                }, 'image/png');
+            } catch (err) {
+                console.error('截圖錯誤:', err);
+                alert('截圖失敗，請稍後再試。');
+                btn.innerText = originalIcon;
             }
         }
 
