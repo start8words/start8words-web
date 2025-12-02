@@ -28,7 +28,7 @@
             color: white;
         }
 
-        /* === 新增：浮動標題樣式 === */
+        /* === 浮動標題 === */
         .floating-title {
             position: absolute;
             top: 30px;
@@ -39,9 +39,9 @@
             text-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
             font-weight: 900;
             z-index: 5;
-            pointer-events: none; /* 確保唔會阻住滑鼠轉動地球 */
+            pointer-events: none;
             letter-spacing: 3px;
-            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif;
+            font-family: 'Zcool KuaiLe', 'Microsoft JhengHei', cursive;
             opacity: 0.8;
             animation: breathe 4s ease-in-out infinite;
         }
@@ -264,25 +264,23 @@
             width: 40%; background: radial-gradient(circle at center, #333, #000);
             position: relative; display: flex; align-items: center; justify-content: center;
             border-right: 4px solid #1a1a2e; flex-shrink: 0;
-            overflow: hidden; /* 確保圖片不溢出 */
+            overflow: hidden; 
         }
         
-        /* 角色圖片樣式 */
         .rpg-character-img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* 確保整張圖完整顯示 */
+            object-fit: contain; 
             position: relative;
             z-index: 1;
             animation: float 6s ease-in-out infinite;
         }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
 
-        /* 當圖片載入失敗時顯示的 Emoji 容器 */
         .rpg-fallback-icon {
             font-size: 6rem; 
             text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            display: none; /* 預設隱藏，只有圖片失敗才顯示 */
+            display: none; 
         }
 
         .rpg-rarity-badge {
@@ -326,7 +324,6 @@
 
         /* === 手機版響應式設定 === */
         @media (max-width: 600px) {
-            /* 調整浮動標題在手機上的位置，避免被 UI 遮住 */
             .floating-title {
                 top: 80px;
                 font-size: 1.5rem;
@@ -435,8 +432,8 @@
 </head>
 <body>
     
-    <!-- 新增：浮動標題 -->
-    <div class="floating-title">您的八字能量球</div>
+    <!-- 浮動標題 -->
+    <div class="floating-title">您的專屬能量球</div>
 
     <!-- UI 控制面板 Wrapper -->
     <div id="ui-wrapper">
@@ -497,7 +494,7 @@
             <div class="footer-links">
                 <a href="https://instagram.com/start_8words" target="_blank">
                     <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                     @start_8words
                 </a>
@@ -870,7 +867,6 @@
             if (!hasAnalyzed) {
                 const baziDesc = document.getElementById('bazi-desc');
                 baziDesc.innerHTML = '<span style="color:#FF6B6B; font-weight:bold;">⚠️ 請先按「開始分析能量」確認日期！</span>';
-                // 可以選擇將面板展開，提示用戶
                 const wrapper = document.getElementById('ui-wrapper');
                 if (wrapper.classList.contains('collapsed')) {
                     togglePanel();
@@ -892,17 +888,24 @@
                 bgContainer.style.background = data.mainColor;
             }
             
-            // 處理圖片邏輯
+            // --- 處理性別專屬圖片邏輯 ---
             const imgElement = document.getElementById('class-visual-img');
             const iconElement = document.getElementById('class-visual-icon');
             
+            // 獲取當前選擇的性別值 (1=男, 0=女)
+            const genderVal = document.querySelector('input[name="gender"]:checked').value;
+            // 設定後綴：男 -> _m, 女 -> _f
+            const genderSuffix = genderVal === "1" ? "_m" : "_f";
+            
             if (imgElement && iconElement) {
-                // 嘗試設定圖片
-                imgElement.src = `images/${data.jobImgId}.png`;
+                // 組合完整的圖片路徑
+                const imgPath = `images/${data.jobImgId}${genderSuffix}.png`;
+                
+                imgElement.src = imgPath;
                 imgElement.style.display = 'block';
                 iconElement.style.display = 'none'; // 先隱藏 Icon
                 
-                // 設定後備 Icon (如果圖片加載失敗會自動觸發 onerror，但我們也預設文字)
+                // 設定後備 Icon (如果圖片加載失敗會自動觸發 onerror)
                 iconElement.innerText = data.jobIcon;
             }
 
