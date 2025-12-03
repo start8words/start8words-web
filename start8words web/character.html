@@ -351,7 +351,7 @@
             padding: 0; 
             line-height: 1;
             flex-shrink: 0; 
-            border: 2px solid #FF6B6B; /* 微調邊框 */
+            border: 2px solid #FF6B6B; 
             box-sizing: border-box; 
         }
 
@@ -438,7 +438,8 @@
             
             .rpg-visual { 
                 width: 100%; 
-                height: 200px; 
+                /* 修改 2: 手機版視覺圖高度改為 240px */
+                height: 240px; 
                 border-right: none; 
                 border-bottom: 3px solid #1a1a2e; 
                 flex-shrink: 0;
@@ -470,8 +471,9 @@
                 margin: 2px 0 2px 0; 
             }
             
+            /* 修改 3: 手機版字體加大到 0.95rem */
             .rpg-desc {
-                font-size: 0.75rem;
+                font-size: 0.95rem;
                 padding: 5px;
                 line-height: 1.3;
                 margin-bottom: 2px;
@@ -479,7 +481,7 @@
 
             .chart-wrapper { 
                 height: 210px; 
-                width: 80%; /* 縮小雷達圖 */
+                width: 80%;
                 margin: -20px auto 0 auto; 
             }
             
@@ -1049,22 +1051,20 @@
             }
         }
 
-        // 修改：增強版分享功能
+        // 修改：統一使用下載模式
         async function shareCard() {
             const cardElement = document.querySelector('.rpg-card');
             if (!cardElement) return;
 
-            // 顯示載入中提示
             const btn = document.querySelector('.share-modal-btn');
             const originalIcon = btn.innerText;
-            btn.innerText = '⌛'; // Loading hourglass
+            btn.innerText = '⌛'; // Loading icon
             
             try {
-                // 使用 html2canvas 截圖，加入 useCORS 解決圖片跨域問題
                 const canvas = await html2canvas(cardElement, {
-                    backgroundColor: null, // 透明背景
-                    scale: 2, // 提高清晰度
-                    useCORS: true, // 關鍵：允許載入跨域圖片
+                    backgroundColor: null, 
+                    scale: 2, 
+                    useCORS: true, 
                     allowTaint: true,
                     logging: false
                 });
@@ -1076,27 +1076,18 @@
                         return;
                     }
 
-                    const file = new File([blob], 'my-rpg-card.png', { type: 'image/png' });
-
-                    // 優先嘗試使用 Web Share API (手機原生分享)
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                title: '我的八字 RPG 角色卡',
-                                text: '快來看看你的八字屬性轉化為 RPG 角色是甚麼！',
-                                files: [file]
-                            });
-                        } catch (err) {
-                            // 用戶取消分享不視為錯誤，但其他錯誤則 fallback
-                            if (err.name !== 'AbortError') {
-                                console.error('分享失敗，轉為下載模式', err);
-                                forceDownload(blob);
-                            }
-                        }
-                    } else {
-                        // 電腦版或不支援分享的手機：直接下載
-                        forceDownload(blob);
-                    }
+                    // 強制下載邏輯 (適用於電腦和手機)
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'my-rpg-card.png';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // 釋放記憶體
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                    
                     btn.innerText = originalIcon;
                 }, 'image/png');
             } catch (err) {
@@ -1104,23 +1095,6 @@
                 alert('截圖發生錯誤：' + err.message);
                 btn.innerText = originalIcon;
             }
-        }
-
-        // 輔助函數：強制下載圖片
-        function forceDownload(blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = 'my-rpg-card.png';
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // 釋放記憶體
-            setTimeout(() => URL.revokeObjectURL(url), 100);
-            
-            // 提示用戶 (特別是手機下載時)
-            // alert('已下載角色卡圖片！請在相簿中查看。'); 
         }
 
         function toggleLegend() {
