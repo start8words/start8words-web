@@ -268,8 +268,7 @@
         @keyframes popIn { 0% { transform: scale(0.8) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
         .rpg-visual {
-            /* 電腦版視覺圖寬度 50% */
-            width: 50%; 
+            width: 50%; /* 電腦版維持 50% */
             background: radial-gradient(circle at center, #333, #000);
             position: relative; display: flex; align-items: center; justify-content: center;
             border-right: 4px solid #1a1a2e; flex-shrink: 0;
@@ -303,8 +302,7 @@
         .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
 
         .rpg-info {
-            /* 電腦版資訊區寬度 50% */
-            width: 50%; 
+            width: 50%; /* 電腦版維持 50% */
             padding: 30px; display: flex; flex-direction: column;
             background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white;
             overflow-y: auto;
@@ -380,17 +378,17 @@
         /* === 新增：分享預覽視窗樣式 === */
         .preview-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 300;
-            display: none; /* 預設隱藏 */
+            background: rgba(0,0,0,0.9); z-index: 300;
+            display: none; 
             justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .preview-container {
             position: relative;
-            max-width: 90%; max-height: 90%;
+            max-width: 95%; max-height: 95%;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -398,32 +396,46 @@
         }
         
         .preview-hint {
-            color: #fff; margin-bottom: 15px;
+            color: #fff; margin-bottom: 10px;
             font-family: 'Noto Sans TC', sans-serif;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            font-size: 1.1rem;
+            font-size: 1rem;
             letter-spacing: 1px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 20px;
+            background: rgba(255, 107, 107, 0.8); /* 紅色背景提示 */
+            padding: 8px 20px;
+            border-radius: 30px;
+            animation: bounce 2s infinite;
         }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .preview-img {
-            max-width: 100%; max-height: 75vh;
+            max-width: 100%; max-height: 80vh;
             border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            border: 2px solid #FF6B6B;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            border: 3px solid #fff;
         }
 
         .close-preview {
-            position: absolute; top: -10px; right: -10px;
-            width: 35px; height: 35px;
-            background: #fff; color: #333;
+            position: absolute; top: -15px; right: -15px;
+            width: 36px; height: 36px;
+            background: #fff; color: #FF6B6B;
             border-radius: 50%;
-            font-size: 1.5rem; line-height: 35px;
+            font-size: 1.5rem; line-height: 36px;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             z-index: 310;
+            font-weight: bold;
+        }
+
+        /* === 截圖用隱藏容器 (關鍵修改) === */
+        /* 這個容器平時是隱藏的，只有截圖時會被短暫顯示 */
+        #screenshot-container {
+            position: fixed;
+            left: -9999px; /* 移出視窗 */
+            top: 0;
+            width: 375px; /* 鎖定手機寬度 */
+            z-index: -1;
+            visibility: hidden; /* 避免閃爍，但 html2canvas 仍可讀取 */
         }
 
         /* === 手機版響應式設定 === */
@@ -487,7 +499,7 @@
             
             .rpg-visual { 
                 width: 100%; 
-                /* 修改 2: 手機版視覺圖高度改為 240px */
+                /* 修改：手動高度調整為 240px */
                 height: 240px; 
                 border-right: none; 
                 border-bottom: 3px solid #1a1a2e; 
@@ -520,9 +532,9 @@
                 margin: 2px 0 2px 0; 
             }
             
-            /* 修改 3: 手機版字體加大到 0.95rem */
+            /* 修改：手動調整字體大小 */
             .rpg-desc {
-                font-size: 0.95rem;
+                font-size: 0.95rem; /* 改為 0.95rem */
                 padding: 5px;
                 line-height: 1.3;
                 margin-bottom: 2px;
@@ -606,7 +618,7 @@
             <div class="footer-links">
                 <a href="https://instagram.com/start_8words" target="_blank">
                     <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                     @start_8words
                 </a>
@@ -670,6 +682,9 @@
             <img id="share-preview-img" class="preview-img" src="" alt="Role Card">
         </div>
     </div>
+
+    <!-- 截圖專用容器 (隱藏) -->
+    <div id="screenshot-container"></div>
 
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1113,7 +1128,7 @@
             document.getElementById('share-preview-modal').style.display = 'none';
         }
 
-        // 修改：使用截圖預覽功能
+        // 修改：整版卡片截圖邏輯
         async function shareCard() {
             const cardElement = document.querySelector('.rpg-card');
             if (!cardElement) return;
@@ -1123,14 +1138,66 @@
             btn.innerText = '⌛'; // Loading icon
             
             try {
-                // 使用 html2canvas 截圖
-                const canvas = await html2canvas(cardElement, {
-                    backgroundColor: null, // 透明背景
-                    scale: 2, // 提高清晰度
-                    useCORS: true, // 解決跨域問題
+                // 1. 深度克隆卡片元素
+                const clone = cardElement.cloneNode(true);
+                
+                // 2. 移除克隆體內的按鈕（關閉和分享）
+                const closeBtn = clone.querySelector('.close-modal');
+                const shareBtn = clone.querySelector('.share-modal-btn');
+                if (closeBtn) closeBtn.remove();
+                if (shareBtn) shareBtn.remove();
+
+                // 3. 強制樣式設定：展開內容，適合截長圖
+                clone.style.width = "400px"; // 鎖定一個合適的寬度
+                clone.style.height = "auto"; // 高度自動
+                clone.style.maxHeight = "none"; // 移除最大高度限制
+                clone.style.overflow = "visible"; // 讓內容溢出可見
+                clone.style.position = "fixed";
+                clone.style.top = "0";
+                clone.style.left = "-9999px"; // 移出視窗
+                clone.style.zIndex = "-1";
+                clone.style.borderRadius = "20px"; // 保持圓角
+                
+                // 4. 強制設定內部元素樣式 (特別是手機版被 flex 影響的部分)
+                const visual = clone.querySelector('.rpg-visual');
+                const info = clone.querySelector('.rpg-info');
+                const chartWrapper = clone.querySelector('.chart-wrapper');
+                
+                // 強制改為垂直排列 (Mobile Layout)
+                clone.style.flexDirection = "column";
+                
+                if (visual) {
+                    visual.style.width = "100%";
+                    visual.style.height = "240px"; // 保持手機版視覺圖高度
+                    visual.style.borderRight = "none";
+                    visual.style.borderBottom = "3px solid #1a1a2e";
+                }
+                
+                if (info) {
+                    info.style.width = "100%";
+                    info.style.overflow = "visible"; // 確保文字不被裁切
+                    info.style.flex = "none"; // 取消 flex 彈性
+                }
+
+                if (chartWrapper) {
+                    chartWrapper.style.width = "90%";
+                    chartWrapper.style.margin = "0 auto";
+                }
+
+                // 5. 將克隆體暫時加入 DOM
+                document.body.appendChild(clone);
+
+                // 6. 使用 html2canvas 截取克隆體
+                const canvas = await html2canvas(clone, {
+                    backgroundColor: null, 
+                    scale: 2, 
+                    useCORS: true, 
                     allowTaint: true,
                     logging: false
                 });
+
+                // 7. 移除克隆體
+                document.body.removeChild(clone);
 
                 const imgData = canvas.toDataURL('image/png');
                 
