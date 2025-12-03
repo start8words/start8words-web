@@ -291,15 +291,7 @@
             display: none; 
         }
 
-        .rpg-rarity-badge {
-            position: absolute; top: 20px; left: 20px; padding: 8px 18px; border-radius: 12px;
-            font-weight: 900; font-style: italic; font-size: 1.8rem;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.3); z-index: 2; transform: rotate(-5deg);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .rarity-SSR { background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; border: 3px solid #fff; }
-        .rarity-SR { background: linear-gradient(45deg, #D980FA, #9980FA); color: #fff; border: 2px solid #fff; }
-        .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
+        /* [已刪除] RPG 稀有度 Badge 樣式代碼 */
 
         .rpg-info {
             width: 50%; /* 電腦版維持 50% */
@@ -514,7 +506,7 @@
                 height: 100%;
             }
             
-            .rpg-rarity-badge { font-size: 1.2rem; padding: 6px 12px; }
+            /* [已刪除] 手機版稀有度樣式 */
             
             .rpg-info { 
                 width: 100%; 
@@ -655,7 +647,8 @@
             </div>
             
             <div class="rpg-visual">
-                <div id="rarity-badge" class="rpg-rarity-badge rarity-SSR">SSR</div>
+                <!-- [已刪除] 稀有度 Badge HTML -->
+                
                 <!-- 容器：顯示圖片 -->
                 <div id="class-visual-container" style="width:100%; height:100%; display: flex; align-items: center; justify-content: center;">
                     <!-- 圖片 -->
@@ -959,7 +952,9 @@
             const subKey = sorted[1][0];  
             const subVal = sorted[1][1];
 
+            // 只保留選角邏輯：決定是用強角色(0)還是普通角色(1)
             const typeIndex = mainVal > 0.35 ? 0 : 1; 
+
             const mainClassData = RPG_DATA[mainKey];
             const classCategory = typeIndex === 0 ? mainClassData.mainA : mainClassData.mainB;
 
@@ -969,10 +964,7 @@
             }
             const branchData = mainClassData.branches[finalSubKey][typeIndex];
             
-            let rarity = 'R';
-            let focusScore = mainVal + (subVal * 0.5); 
-            if (mainVal > 0.45) rarity = 'SSR';
-            else if (mainVal > 0.35 || focusScore > 0.55) rarity = 'SR';
+            // [已刪除] 稀有度計算邏輯 (rarity)
 
             const r = currentRatios;
             const calcStat = (val) => Math.min(99, Math.round(30 + val * 120)); 
@@ -1004,7 +996,7 @@
                 jobImgId: branchData.id,
                 jobIcon: branchData.icon,
                 stats: s,
-                rarity: rarity,
+                // [已刪除] rarity 返回值
                 mainColor: RPG_DATA[mainKey].color,
                 mainElement: mainKey
             };
@@ -1026,12 +1018,7 @@
             // Store data for share function
             window.currentRPGData = data; 
             
-            const badge = document.getElementById('rarity-badge');
-            
-            if (badge) {
-                badge.className = `rpg-rarity-badge rarity-${data.rarity}`;
-                badge.innerText = data.rarity;
-            }
+            // [已刪除] 設定 Badge 的程式碼區塊
 
             const visualBg = document.getElementById('class-visual-container');
             const bgContainer = document.querySelector('.rpg-visual');
@@ -1172,14 +1159,11 @@
                         <!-- 上半部：視覺圖 -->
                         <div style="width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at center, ${data.mainColor}, #1a1a2e); position: relative; display:flex; justify-content:center; align-items:center; border-bottom: 4px solid #1a1a2e;">
                             
-                            <!-- 稀有度 -->
-                            <div style="position: absolute; top: 30px; left: 30px; padding: 12px 25px; background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; font-weight: 900; font-size: 2.5rem; border-radius: 15px; border: 4px solid #fff; transform: rotate(-5deg); z-index: 10; text-shadow: 2px 2px 0 rgba(0,0,0,0.2); font-style: italic;">${data.rarity}</div>
+                            <!-- [已刪除] 這裡原本是顯示稀有度的 Div -->
                             
                             <!-- 角色圖 (使用 img 標籤，確保 html2canvas 抓取) -->
                             <img src="${window.currentImgSrc}" style="width: 100%; aspect-ratio: 1 / 1; object-fit: contain;" onerror="this.style.display='none'">
                             
-                            <!-- 修改 2: 移除後備 Icon 顯示，避免重疊 -->
-                            <!-- <div style="position:absolute; font-size: 8rem; opacity: 0.5; z-index:0;">${data.jobIcon}</div> -->
                         </div>
 
                         <!-- 下半部：資訊區 -->
