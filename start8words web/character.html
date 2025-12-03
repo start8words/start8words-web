@@ -1161,9 +1161,9 @@
                 const chartCanvas = document.getElementById('statsChart');
                 const chartImgData = chartCanvas.toDataURL('image/png');
 
-                // 3. 修改 3: 計算手機版寬度 (90vw)，確保左右有空隙
+                // 3. 修改 3: 計算手機版寬度
                 const isMobile = window.innerWidth <= 600;
-                const cardWidth = isMobile ? Math.floor(window.innerWidth * 0.9) + 'px' : '600px'; // 手機版使用 90vw
+                const cardWidth = isMobile ? Math.floor(window.innerWidth * 1) + 'px' : '600px';
 
                 // 3. 構建「虛擬卡片」HTML 字串 (強制排版)
                 // 注意：這裡的樣式是 hardcode 的，確保匯出圖片不受螢幕影響
@@ -1177,7 +1177,7 @@
                             <div style="position: absolute; top: 30px; left: 30px; padding: 12px 25px; background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; font-weight: 900; font-size: 2.5rem; border-radius: 15px; border: 4px solid #fff; transform: rotate(-5deg); z-index: 10; text-shadow: 2px 2px 0 rgba(0,0,0,0.2); font-style: italic;">${data.rarity}</div>
                             
                             <!-- 角色圖 (使用 img 標籤，確保 html2canvas 抓取) -->
-                            <img src="${window.currentImgSrc}" style="height: 100%; width: 100%; object-fit: contain;" onerror="this.style.display='none'">
+                            <img src="${window.currentImgSrc}" style="width: 100%; aspect-ratio: 1 / 1; object-fit: contain;" onerror="this.style.display='none'">
                             
                             <!-- 修改 2: 移除後備 Icon 顯示，避免重疊 -->
                             <!-- <div style="position:absolute; font-size: 8rem; opacity: 0.5; z-index:0;">${data.jobIcon}</div> -->
