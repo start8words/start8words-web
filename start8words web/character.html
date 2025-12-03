@@ -676,8 +676,8 @@
                 <div class="rpg-desc" id="rpg-job-desc">
                     職業描述...
                 </div>
-
-                <!-- 修改：只保留圖表容器，刪除數值列表容器 -->
+                <!-- 空白區隔層 -->
+                <div style="height: 20px; width: 100%;"></div>
                 <div class="chart-wrapper">
                     <canvas id="statsChart"></canvas>
                 </div>
@@ -1200,9 +1200,6 @@
                             <div style="background: rgba(0,0,0,0.3); padding: 25px; border-radius: 20px; font-size: 1.3rem; line-height: 1.6; border-left: 8px solid ${data.mainColor}; margin-bottom: 30px; color: #ddd;">
                                 ${data.jobDesc}
                             </div>
-
-                            <!-- 空白區隔層 -->
-                            <div style="height: 20px; width: 100%;"></div>
 
                             <!-- 雷達圖 (直接放入圖片) -->
                             <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px;">
