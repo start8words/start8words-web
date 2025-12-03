@@ -268,10 +268,10 @@
         @keyframes popIn { 0% { transform: scale(0.8) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
         .rpg-visual {
-            /* 修改 2: 電腦版視覺圖加闊到 55% */
+            /* 電腦版視覺圖寬度 55% */
             width: 55%; 
             height: 100%;
-            /* 修改 3: 背景顏色會由 JS 動態覆蓋 (屬性顏色) */
+            /* 背景顏色會由 JS 動態覆蓋 */
             background: #333; 
             position: relative; display: flex; align-items: center; justify-content: center;
             border-right: 4px solid #1a1a2e; flex-shrink: 0;
@@ -305,7 +305,7 @@
         .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
 
         .rpg-info {
-            /* 修改: 電腦版資訊區縮小到 45% */
+            /* 電腦版資訊區縮小到 45% */
             width: 45%; 
             padding: 30px; display: flex; flex-direction: column;
             background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white;
@@ -501,9 +501,9 @@
             
             .rpg-visual { 
                 width: 100%; 
-                /* 修改 1: 改為正方形 */
+                /* 修改 1: 手機版寬度 100vw 確保橫向佔滿 */
                 height: 0;
-                padding-bottom: 100%; /* 1:1 比例 */
+                padding-bottom: 100%; /* 1:1 正方形 */
                 border-right: none; 
                 border-bottom: 3px solid #1a1a2e; 
                 flex-shrink: 0;
@@ -1112,7 +1112,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         layout: {
-                            padding: 20 
+                            padding: 5 // 修改 1: 減少 padding 以放大雷達圖 (原本為 20)
                         },
                         scales: {
                             r: {
@@ -1168,14 +1168,17 @@
                 const chartCanvas = document.getElementById('statsChart');
                 const chartImgData = chartCanvas.toDataURL('image/png');
 
+                // 3. 修改 3: 計算手機版寬度 (90vw)，確保左右有空隙
+                const isMobile = window.innerWidth <= 600;
+                const cardWidth = isMobile ? Math.floor(window.innerWidth * 0.9) + 'px' : '600px'; // 手機版使用 90vw
+
                 // 3. 構建「虛擬卡片」HTML 字串 (強制排版)
                 // 注意：這裡的樣式是 hardcode 的，確保匯出圖片不受螢幕影響
-                // 寬度固定 600px，高度自適應
                 const cardHTML = `
-                    <div style="width: 600px; background: #1a1a2e; border-radius: 30px; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; color: white; position: relative; border: 6px solid ${data.mainColor}; box-sizing: border-box;">
+                    <div style="width: ${cardWidth}; background: #1a1a2e; border-radius: 30px; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; color: white; position: relative; border: 6px solid ${data.mainColor}; box-sizing: border-box;">
                         
                         <!-- 上半部：視覺圖 -->
-                        <div style="width: 100%; height: 600px; background: radial-gradient(circle at center, ${data.mainColor}, #1a1a2e); position: relative; display:flex; justify-content:center; align-items:center; border-bottom: 4px solid #1a1a2e;">
+                        <div style="width: 100%; height: ${isMobile ? '300px' : '450px'}; background: radial-gradient(circle at center, ${data.mainColor}, #1a1a2e); position: relative; display:flex; justify-content:center; align-items:center; border-bottom: 4px solid #1a1a2e;">
                             
                             <!-- 稀有度 -->
                             <div style="position: absolute; top: 30px; left: 30px; padding: 12px 25px; background: linear-gradient(45deg, #FFD700, #FDB931); color: #fff; font-weight: 900; font-size: 2.5rem; border-radius: 15px; border: 4px solid #fff; transform: rotate(-5deg); z-index: 10; text-shadow: 2px 2px 0 rgba(0,0,0,0.2); font-style: italic;">${data.rarity}</div>
@@ -1183,8 +1186,8 @@
                             <!-- 角色圖 (使用 img 標籤，確保 html2canvas 抓取) -->
                             <img src="${window.currentImgSrc}" style="height: 100%; width: 100%; object-fit: contain;" onerror="this.style.display='none'">
                             
-                            <!-- 後備 Icon (如果圖片失敗) -->
-                            <div style="position:absolute; font-size: 8rem; opacity: 0.5; z-index:0;">${data.jobIcon}</div>
+                            <!-- 修改 2: 移除後備 Icon 顯示，避免重疊 -->
+                            <!-- <div style="position:absolute; font-size: 8rem; opacity: 0.5; z-index:0;">${data.jobIcon}</div> -->
                         </div>
 
                         <!-- 下半部：資訊區 -->
@@ -1207,7 +1210,7 @@
 
                             <!-- 雷達圖 (直接放入圖片) -->
                             <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px;">
-                                <img src="${chartImgData}" style="width: 450px; height: auto; display: block;">
+                                <img src="${chartImgData}" style="width: 100%; height: auto; display: block;">
                             </div>
                             
                             <!-- 頁尾 -->
