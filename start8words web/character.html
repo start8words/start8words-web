@@ -377,6 +377,55 @@
         }
         .share-modal-btn:active { transform: translateY(2px); }
 
+        /* === 新增：分享預覽視窗樣式 === */
+        .preview-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 300;
+            display: none; /* 預設隱藏 */
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .preview-container {
+            position: relative;
+            max-width: 90%; max-height: 90%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .preview-hint {
+            color: #fff; margin-bottom: 15px;
+            font-family: 'Noto Sans TC', sans-serif;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .preview-img {
+            max-width: 100%; max-height: 75vh;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border: 2px solid #FF6B6B;
+        }
+
+        .close-preview {
+            position: absolute; top: -10px; right: -10px;
+            width: 35px; height: 35px;
+            background: #fff; color: #333;
+            border-radius: 50%;
+            font-size: 1.5rem; line-height: 35px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 310;
+        }
+
         /* === 手機版響應式設定 === */
         @media (max-width: 600px) {
             .floating-title {
@@ -610,6 +659,15 @@
                     <canvas id="statsChart"></canvas>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- 新增：分享預覽視窗 -->
+    <div id="share-preview-modal" class="preview-overlay">
+        <div class="preview-container">
+            <span class="close-preview" onclick="closeSharePreview()">&times;</span>
+            <div class="preview-hint">👇 長按圖片儲存或分享 👇</div>
+            <img id="share-preview-img" class="preview-img" src="" alt="Role Card">
         </div>
     </div>
 
@@ -1051,7 +1109,11 @@
             }
         }
 
-        // 修改：統一使用下載模式
+        function closeSharePreview() {
+            document.getElementById('share-preview-modal').style.display = 'none';
+        }
+
+        // 修改：使用截圖預覽功能
         async function shareCard() {
             const cardElement = document.querySelector('.rpg-card');
             if (!cardElement) return;
@@ -1061,38 +1123,28 @@
             btn.innerText = '⌛'; // Loading icon
             
             try {
+                // 使用 html2canvas 截圖
                 const canvas = await html2canvas(cardElement, {
-                    backgroundColor: null, 
-                    scale: 2, 
-                    useCORS: true, 
+                    backgroundColor: null, // 透明背景
+                    scale: 2, // 提高清晰度
+                    useCORS: true, // 解決跨域問題
                     allowTaint: true,
                     logging: false
                 });
 
-                canvas.toBlob(async (blob) => {
-                    if (!blob) {
-                        alert('截圖生成失敗');
-                        btn.innerText = originalIcon;
-                        return;
-                    }
+                const imgData = canvas.toDataURL('image/png');
+                
+                // 顯示預覽視窗
+                const previewImg = document.getElementById('share-preview-img');
+                previewImg.src = imgData;
+                
+                document.getElementById('share-preview-modal').style.display = 'flex';
+                
+                btn.innerText = originalIcon;
 
-                    // 強制下載邏輯 (適用於電腦和手機)
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.download = 'my-rpg-card.png';
-                    link.href = url;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    // 釋放記憶體
-                    setTimeout(() => URL.revokeObjectURL(url), 100);
-                    
-                    btn.innerText = originalIcon;
-                }, 'image/png');
             } catch (err) {
                 console.error('截圖錯誤:', err);
-                alert('截圖發生錯誤：' + err.message);
+                alert('截圖生成失敗');
                 btn.innerText = originalIcon;
             }
         }
