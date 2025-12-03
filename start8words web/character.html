@@ -268,11 +268,8 @@
         @keyframes popIn { 0% { transform: scale(0.8) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
         .rpg-visual {
-            /* 電腦版視覺圖寬度 55% */
-            width: 55%; 
-            height: 100%;
-            /* 背景顏色會由 JS 動態覆蓋 */
-            background: #333; 
+            width: 50%; /* 電腦版維持 50% */
+            background: radial-gradient(circle at center, #333, #000);
             position: relative; display: flex; align-items: center; justify-content: center;
             border-right: 4px solid #1a1a2e; flex-shrink: 0;
             overflow: hidden; 
@@ -305,8 +302,7 @@
         .rarity-R { background: linear-gradient(45deg, #4ECDC4, #556270); color: #fff; border: 2px solid #fff; }
 
         .rpg-info {
-            /* 電腦版資訊區縮小到 45% */
-            width: 45%; 
+            width: 50%; /* 電腦版維持 50% */
             padding: 30px; display: flex; flex-direction: column;
             background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white;
             overflow-y: auto;
@@ -357,14 +353,14 @@
             box-sizing: border-box; 
         }
 
-        /* 分享按鈕 */
+        /* 修改：分享按鈕 (圓形圖示，對齊關閉按鈕) */
         .share-modal-btn {
             position: absolute; 
-            top: 53px; 
+            top: 53px; /* 15px(top) + 28px(height) + 10px(gap) */
             right: 20px; 
             z-index: 10;
-            background: linear-gradient(45deg, #FFD700, #FDB931);
-            color: #2C3E50;
+            background: rgba(0,0,0,0.5); /* 與關閉按鈕背景一致 */
+            color: #fff;
             width: 28px; height: 28px; 
             min-width: 28px; min-height: 28px;
             border-radius: 50%;
@@ -373,9 +369,9 @@
             line-height: 1;
             flex-shrink: 0; 
             cursor: pointer;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            border: 2px solid #FF6B6B; /* 與關閉按鈕邊框一致 */
+            box-sizing: border-box;
             transition: transform 0.2s;
-            font-size: 1rem;
         }
         .share-modal-btn:active { transform: translateY(2px); }
 
@@ -649,9 +645,13 @@
         <div class="rpg-card">
             <span class="close-modal" onclick="document.getElementById('rpg-modal').style.display='none'">&times;</span>
             
-            <!-- 新增：分享按鈕 (圓形圖示) -->
+            <!-- 修改：分享按鈕設計 (圓形圖示) -->
             <div class="share-modal-btn" onclick="shareCard()">
-                📤
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
             </div>
             
             <div class="rpg-visual">
@@ -1034,17 +1034,10 @@
                 badge.innerText = data.rarity;
             }
 
-            // 3. 修改：動態更新 .rpg-visual 的背景顏色
-            const visualSection = document.querySelector('.rpg-visual');
-            if (visualSection) {
-                // 使用主色調製作漸層
-                visualSection.style.background = `radial-gradient(circle at center, ${data.mainColor}, #1a1a2e)`;
-            }
-
+            const visualBg = document.getElementById('class-visual-container');
             const bgContainer = document.querySelector('.rpg-visual');
             if (bgContainer) {
-                // 這裡已經被上面的邏輯覆蓋，可以保留或刪除
-                // bgContainer.style.background = data.mainColor; 
+                bgContainer.style.background = data.mainColor;
             }
             
             // --- 處理性別專屬圖片邏輯 ---
@@ -1156,8 +1149,8 @@
         async function shareCard() {
             // 顯示載入中
             const btn = document.querySelector('.share-modal-btn');
-            const originalIcon = btn.innerText;
-            btn.innerText = '⌛'; 
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '⌛'; 
 
             try {
                 // 1. 獲取目前資料
@@ -1210,7 +1203,7 @@
 
                             <!-- 雷達圖 (直接放入圖片) -->
                             <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px;">
-                                <img src="${chartImgData}" style="width: 100%; height: auto; display: block;">
+                                <img src="${chartImgData}" style="width: 110%; height: auto; display: block; margin-left: -5%;">
                             </div>
                             
                             <!-- 頁尾 -->
@@ -1253,12 +1246,12 @@
                 previewImg.src = imgData;
                 document.getElementById('share-preview-modal').style.display = 'flex';
                 
-                btn.innerText = originalIcon;
+                btn.innerHTML = originalContent;
 
             } catch (err) {
                 console.error('截圖錯誤:', err);
                 alert('截圖生成失敗: ' + err.message);
-                btn.innerText = originalIcon;
+                btn.innerHTML = originalContent;
             }
         }
 
