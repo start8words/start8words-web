@@ -875,7 +875,7 @@
                         { n:"👹 修羅", id: "asura", icon: "👹", d:"覺得滿血係廢柴，殘血先係真男人嘅痴線佬。打交嗰陣係咁叫「打我啦笨」，醫生見到都頭痛。" }
                     ],
                     metal: [
-                        { n:"⚡ 電漿術士", id: "plasma_mage", icon: "⚡", d:"玩火玩到變電漿，熱到瞬間蒸發牛扒。唔好問佢借火食煙，分分鐘連個肺都氣化埋。" }, 
+                        { n:"⚡ 電漿術士", id: "plasma_mage", icon: "⚡", d:"玩火玩到變電漿，熱到瞬間蒸發牛扒。唔好問佢借火食煙，分分鐘連你個肺都氣化埋。" }, 
                         { n:"⚔️ 戰神", id: "god_of_war", icon: "⚔️", d:"十八般武藝樣樣精，勁到無朋友。聽講佢用隻匙羹都殺到人，搞到食飯無人敢搶佢個布丁。" }
                     ],
                     wood:  [
@@ -1080,7 +1080,31 @@
             }
 
             const date = new Date(input);
-            const solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), 0);
+
+            // --- 修改：子時換日邏輯 (23:00後算作第二天) ---
+            // 備份原始日期用於顯示，以免顯示的時間被改動
+            const displayDate = new Date(input);
+            
+            // 準備計算用的年月日時分
+            let cYear = date.getFullYear();
+            let cMonth = date.getMonth() + 1;
+            let cDay = date.getDate();
+            let cHour = date.getHours();
+            let cMinute = date.getMinutes();
+
+            // 如果是 23:00 或之後，當作第二天處理 (將日期加1，時間設為0點)
+            if (cHour >= 23) {
+                const nextDate = new Date(date);
+                nextDate.setDate(date.getDate() + 1); // 日期加一天
+                
+                cYear = nextDate.getFullYear();
+                cMonth = nextDate.getMonth() + 1;
+                cDay = nextDate.getDate();
+                cHour = 0; // 強制歸為 0 點 (子時)
+            }
+
+            // 使用調整後的日期進行排盤
+            const solar = Solar.fromYmdHms(cYear, cMonth, cDay, cHour, cMinute, 0);
             const bazi = solar.getLunar().getEightChar();
             
             const pillars = [
@@ -1097,7 +1121,8 @@
             userBaziInfo.dayStem = dayMaster;
             userBaziInfo.dayPillar = pillars[2].gan + pillars[2].zhi;
 
-            const dateStr = `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            // 顯示時使用 displayDate (原始輸入時間)
+            const dateStr = `${displayDate.getFullYear()}/${String(displayDate.getMonth()+1).padStart(2,'0')}/${String(displayDate.getDate()).padStart(2,'0')} ${String(displayDate.getHours()).padStart(2,'0')}:${String(displayDate.getMinutes()).padStart(2,'0')}`;
             const genderVal = document.querySelector('input[name="gender"]:checked').value;
             const genderText = genderVal == "1" ? "♂" : "♀";
             const masterElement = GAN_WUXING[dayMaster];
@@ -1212,7 +1237,8 @@
             const visualBg = document.getElementById('class-visual-container');
             const bgContainer = document.querySelector('.rpg-visual');
             if (bgContainer) {
-                bgContainer.style.background = data.mainColor;
+                // 修改：使用 radial-gradient 製作漸變效果：中心是主色，邊緣漸變到深色背景
+                bgContainer.style.background = `radial-gradient(circle at center, ${data.mainColor} 0%, #1a1a2e 120%)`;
             }
             
             // --- 處理性別專屬圖片邏輯 ---
@@ -1377,7 +1403,8 @@
                     <div style="width: ${cardWidth}; background: #1a1a2e; border-radius: 30px; overflow: hidden; font-family: 'Noto Sans TC', sans-serif; color: white; position: relative; border: 6px solid ${data.mainColor}; box-sizing: border-box;">
                         
                         <!-- 上半部：視覺圖 -->
-                        <div style="width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at center, ${data.mainColor}, #1a1a2e); position: relative; display:flex; justify-content:center; align-items:center; border-bottom: 4px solid #1a1a2e;">
+                        <!-- 修改：這裡也同步使用了 radial-gradient 漸變 -->
+                        <div style="width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at center, ${data.mainColor} 0%, #1a1a2e 120%); position: relative; display:flex; justify-content:center; align-items:center; border-bottom: 4px solid #1a1a2e;">
                             
                             <!-- [已刪除] 這裡原本是顯示稀有度的 Div -->
                             
