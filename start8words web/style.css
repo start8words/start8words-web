@@ -1,4 +1,4 @@
-/* ... (保留原本的 :root, body, header 等所有設定，直到 .input-row) ... */
+/* ... (保留原本的 :root 到 .main-display.screenshot-mode 的所有設定) ... */
 :root {
     /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
@@ -241,7 +241,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed var(--border); width: 100%; flex-wrap: nowrap; }
 .note { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
 
-/* ... (保留 info-dashboard 至 screenshot-mode 的所有樣式) ... */
 .info-dashboard {
     display: none;
     grid-template-columns: 3.5fr 6.5fr; 
@@ -702,10 +701,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         flex-wrap: nowrap; /* 強制不換行 */
     }
     
-    /* 權重分配：名字最寬，性別與分類較窄 */
-    #nameInput { flex: 2; min-width: 0; }
-    #tagsInput { flex: 1.5; min-width: 0; }
-    #gender { flex: 1; min-width: 60px; }
+    /* 權重分配：名字佔3，性別佔3，分類佔2 */
+    #nameInput { flex: 3; min-width: 0; }
+    #gender { flex: 3; min-width: 0; }
+    #tagsInput { flex: 2; min-width: 0; }
 
     /* --- 2. 其它樣式微調 --- */
     .auth-box { padding: 10px; gap: 5px; }
