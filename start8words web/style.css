@@ -649,38 +649,51 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
    ========================================= */
 .solar-select-group {
     display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
+    gap: 2px;
+    flex-wrap: nowrap; /* 強制單行 */
     width: 100%;
     align-items: center;
 }
 
-/* 標籤容器 */
-.solar-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1; /* 平均分配空間 */
-    min-width: 50px;
-}
-
-/* 標籤文字 */
+/* 文字標籤 (放在右邊) */
 .solar-label {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-secondary);
-    margin-bottom: 2px;
-    font-weight: bold;
+    margin: 0 4px 0 1px; /* 左邊稍微留空，右邊留間距 */
+    white-space: nowrap; /* 不換行 */
+    flex-shrink: 0; /* 不壓縮 */
 }
 
 /* 選單本體 */
 .solar-select-group select {
-    padding: 8px 4px;
+    padding: 6px 0 6px 4px;
     text-align: center;
     min-width: auto !important;
-    width: 100%;
+    width: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    -webkit-appearance: none; /* 移除默認箭頭 */
+    -moz-appearance: none;
+    appearance: none;
+    /* 恢復下拉圖示但縮小內距 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px top 50%;
+    background-size: 8px auto;
+    padding-right: 12px; /* 為箭頭留空間 */
 }
 
-#solarYear { flex: 1.5; } /* 年份寬度稍微大一點 */
+/* 暗黑模式下箭頭顏色變白 */
+[data-theme="dark"] .solar-select-group select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+#solarYear { flex-grow: 1.5; min-width: 45px; }
+#solarMonth { flex-grow: 0.8; min-width: 30px; }
+#solarDay { flex-grow: 0.8; min-width: 30px; }
+#solarHour { flex-grow: 0.8; min-width: 30px; }
+#solarMinute { flex-grow: 0.8; min-width: 30px; }
+
 
 /* =========================================
    手機版排版優化
@@ -692,8 +705,8 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         display: none; 
     } 
     /* 顯示 .solar-label (例外，因為我們需要年月日時分) */
-    .solar-cell span.solar-label {
-        display: block;
+    .solar-select-group span.solar-label {
+        display: inline; /* 保持同行顯示 */
     }
 
     .input-row { 
@@ -701,10 +714,10 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         flex-wrap: nowrap; /* 強制不換行 */
     }
     
-    /* 權重分配：名字佔3，性別佔3，分類佔2 */
+    /* 權重分配：名字佔3，性別佔4(變寬)，分類佔1.5(變窄) */
     #nameInput { flex: 3; min-width: 0; }
-    #gender { flex: 3; min-width: 0; }
-    #tagsInput { flex: 2; min-width: 0; }
+    #gender { flex: 4; min-width: 0; } /* 增加權重 */
+    #tagsInput { flex: 1.5; min-width: 0; } /* 減少權重 */
 
     /* --- 2. 其它樣式微調 --- */
     .auth-box { padding: 10px; gap: 5px; }
@@ -733,6 +746,7 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     #shareImgContainer { padding: 10px; }
     
     /* Solar select 微調 */
-    .solar-select-group { gap: 2px; }
-    .solar-select-group select { font-size: 13px; padding: 6px 2px; }
+    .solar-select-group { gap: 1px; }
+    .solar-select-group select { font-size: 13px; padding: 6px 0 6px 2px; padding-right: 10px; }
+    .solar-label { font-size: 12px; margin: 0 2px 0 0; }
 }
