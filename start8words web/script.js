@@ -21,12 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Dark Mode Init ---
     initTheme();
 
+    // --- Init Solar Selects ---
+    initSolarSelects();
+
     const now = new Date();
-    const offset = now.getTimezoneOffset() * 60000;
-    const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
-    
-    const elBirthDate = document.getElementById('birthDate');
-    if(elBirthDate) elBirthDate.value = localISOTime;
+    // 預設為現在時間
+    setSolarSelects(now);
 
     const elLunarYear = document.getElementById('lunarYear');
     if(elLunarYear) elLunarYear.value = now.getFullYear();
@@ -93,6 +93,67 @@ function updateThemeIcon(theme) {
     if (btn) {
         btn.innerText = theme === 'dark' ? '☀️' : '🌙';
     }
+}
+
+// ==========================================
+// 2.2 Solar Select Logic (新功能)
+// ==========================================
+function initSolarSelects() {
+    const yearSel = document.getElementById('solarYear');
+    const monthSel = document.getElementById('solarMonth');
+    const daySel = document.getElementById('solarDay');
+    const hourSel = document.getElementById('solarHour');
+    const minSel = document.getElementById('solarMinute');
+
+    if (!yearSel || !monthSel || !daySel || !hourSel || !minSel) return;
+
+    // 年份: 1900 - 2100
+    for (let y = 1900; y <= 2100; y++) {
+        yearSel.add(new Option(y, y));
+    }
+
+    // 月份: 1 - 12
+    for (let m = 1; m <= 12; m++) {
+        monthSel.add(new Option(m, m));
+    }
+
+    // 日期: 1 - 31 (簡單處理，不依據月份動態變更，Lunar.js 會處理溢出)
+    for (let d = 1; d <= 31; d++) {
+        daySel.add(new Option(d, d));
+    }
+
+    // 小時: 0 - 23
+    for (let h = 0; h <= 23; h++) {
+        // 補零顯示
+        const txt = h < 10 ? '0' + h : '' + h;
+        hourSel.add(new Option(txt, h));
+    }
+
+    // 分鐘: 0 - 59
+    for (let m = 0; m <= 59; m++) {
+        const txt = m < 10 ? '0' + m : '' + m;
+        minSel.add(new Option(txt, m));
+    }
+}
+
+// 供外部調用：設定選單值
+window.setSolarSelects = function(dateObj) {
+    const yearSel = document.getElementById('solarYear');
+    const monthSel = document.getElementById('solarMonth');
+    const daySel = document.getElementById('solarDay');
+    const hourSel = document.getElementById('solarHour');
+    const minSel = document.getElementById('solarMinute');
+
+    if (yearSel) yearSel.value = dateObj.getFullYear();
+    if (monthSel) monthSel.value = dateObj.getMonth() + 1;
+    if (daySel) daySel.value = dateObj.getDate();
+    if (hourSel) hourSel.value = dateObj.getHours();
+    if (minSel) minSel.value = dateObj.getMinutes();
+}
+
+// 供外部調用：重置選單
+window.resetSolarSelects = function() {
+    window.setSolarSelects(new Date());
 }
 
 function populateGZ(idPrefix) {
@@ -339,7 +400,12 @@ function showReverseResults(results) {
 window.closeReverseModal = function() { document.getElementById('reverseResultModal').style.display = 'none'; }
 window.selectReverseDate = function(dateStr, timeStr) {
     window.switchTab('solar');
-    document.getElementById('birthDate').value = dateStr + 'T' + timeStr;
+    // 注意：這裡因為介面改為下拉，所以需要解析 dateStr 並設定下拉選單
+    // dateStr 格式通常是 YYYY-MM-DD
+    const d = new Date(dateStr + 'T' + timeStr);
+    if (!isNaN(d.getTime())) {
+        window.setSolarSelects(d);
+    }
     window.closeReverseModal();
     window.startNewChart();
 }
@@ -363,9 +429,16 @@ window.initChart = function() {
 
         window.originSolar = null;
         if (window.currentInputMode === 'solar') {
-            const dateStr = document.getElementById('birthDate').value;
-            if(!dateStr) return alert("請輸入日期");
-            window.originSolar = Solar.fromDate(new Date(dateStr));
+            // 【修改】從下拉選單讀取時間
+            const yy = parseInt(document.getElementById('solarYear').value);
+            const mm = parseInt(document.getElementById('solarMonth').value);
+            const dd = parseInt(document.getElementById('solarDay').value);
+            const hh = parseInt(document.getElementById('solarHour').value);
+            const mi = parseInt(document.getElementById('solarMinute').value);
+            
+            // 構建 Solar 物件
+            window.originSolar = Solar.fromYmdHms(yy, mm, dd, hh, mi, 0);
+
         } else if (window.currentInputMode === 'lunar') {
             const y = parseInt(document.getElementById('lunarYear').value);
             const m = parseInt(document.getElementById('lunarMonth').value);
