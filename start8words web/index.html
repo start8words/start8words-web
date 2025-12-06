@@ -70,7 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
@@ -137,30 +137,15 @@
             </select>
         </div>
 
-        <!-- 修改部分：西曆輸入改為下拉選單 -->
+        <!-- 修改部分：西曆輸入改為下拉選單，標籤放在右邊 -->
         <div class="input-row" id="panelSolar">
             <span>西曆：</span>
             <div class="solar-select-group">
-                <div class="solar-cell">
-                    <span class="solar-label">年</span>
-                    <select id="solarYear" aria-label="年"></select>
-                </div>
-                <div class="solar-cell">
-                    <span class="solar-label">月</span>
-                    <select id="solarMonth" aria-label="月"></select>
-                </div>
-                <div class="solar-cell">
-                    <span class="solar-label">日</span>
-                    <select id="solarDay" aria-label="日"></select>
-                </div>
-                <div class="solar-cell">
-                    <span class="solar-label">時</span>
-                    <select id="solarHour" aria-label="時"></select>
-                </div>
-                <div class="solar-cell">
-                    <span class="solar-label">分</span>
-                    <select id="solarMinute" aria-label="分"></select>
-                </div>
+                <select id="solarYear" aria-label="年"></select><span class="solar-label">年</span>
+                <select id="solarMonth" aria-label="月"></select><span class="solar-label">月</span>
+                <select id="solarDay" aria-label="日"></select><span class="solar-label">日</span>
+                <select id="solarHour" aria-label="時"></select><span class="solar-label">時</span>
+                <select id="solarMinute" aria-label="分"></select><span class="solar-label">分</span>
             </div>
         </div>
 
@@ -422,7 +407,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=15"></script>
+    <script src="script.js?v=16"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
