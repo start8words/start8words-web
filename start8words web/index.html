@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+    <!-- ... (保留原本的 Head 內容) ... -->
     <!-- Google Tag Manager / Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WW024NHKJF"></script>
     <script>
@@ -36,11 +37,11 @@
 
     <!-- 社群分享預覽 -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="逸晴命理 - 免費八字排盤工具">
+    <meta property="og:title" content="逸晴命理 - 專業免費八字排盤工具">
     <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
     <meta property="og:url" content="https://start8words.com/">
     <meta property="og:site_name" content="逸晴命理 Start8Words">
-    <meta property="og:image" content="https://start8words.com/icon.png">
+    <meta property="og:image" content="https://start8words.com/share-preview.png">
 
     <!-- JSON-LD 結構化資料 -->
     <script type="application/ld+json">
@@ -70,7 +71,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
 
@@ -79,8 +80,6 @@
     <div class="app-header">
         <h1>逸晴命理</h1>
         <div style="font-size: 14px; font-weight: normal; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
-        
-        <!-- 原本在 Header 的按鈕已移除，改由 JS 動態插入 -->
     </div>
 
     <div id="auth-container" class="auth-box">
@@ -88,7 +87,6 @@
             <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
             <div style="display:flex; align-items:center; gap:10px;">
                 <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
-                <!-- 這裡是用來放切換按鈕的容器 (未登入時) -->
                 <div id="themeBtnContainerLoggedOut"></div>
             </div>
         </div>
@@ -102,7 +100,6 @@
             <div style="display: flex; gap: 8px; align-items: center;">
                 <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
                 <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
-                <!-- 這裡是用來放切換按鈕的容器 (已登入時) -->
                 <div id="themeBtnContainerLoggedIn"></div>
             </div>
         </div>
@@ -140,9 +137,18 @@
             </select>
         </div>
 
+        <!-- 修改部分：西曆輸入改為下拉選單 -->
         <div class="input-row" id="panelSolar">
             <span>西曆：</span>
-            <input type="datetime-local" id="birthDate">
+            <div class="solar-select-group">
+                <select id="solarYear" aria-label="年"></select>
+                <select id="solarMonth" aria-label="月"></select>
+                <select id="solarDay" aria-label="日"></select>
+                
+                <select id="solarHour" aria-label="時"></select>
+                <span class="time-separator">:</span>
+                <select id="solarMinute" aria-label="分"></select>
+            </div>
         </div>
 
         <div class="input-row" id="panelLunar" style="display:none;">
@@ -222,6 +228,7 @@
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
 
+    <!-- ... (保留控制列、工具列、資訊區、命盤顯示區等) ... -->
     <!-- 50:50 控制列 -->
     <div class="toggle-row">
         <div class="toggle-col left" id="toggleInputBtn" onclick="toggleInputs()">
@@ -289,6 +296,7 @@
         <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
+    <!-- ... (保留 Modal 與 Footer) ... -->
     <!-- 我的命盤 Modal -->
     <div id="chartModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -350,7 +358,7 @@
         </div>
     </div>
 
-    <!-- iOS 安裝教學 Modal (新增) -->
+    <!-- iOS 安裝教學 Modal -->
     <div id="iosInstallModal" class="modal-overlay" style="display: none;">
         <div class="modal-content ios-install-content">
             <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
@@ -403,11 +411,11 @@
         </div>
     </footer>
 
-    <script src="script.js?v=13"></script>
+    <script src="script.js?v=14"></script>
     <script type="module">
+        // ... (Firebase 模組代碼保持不變) ...
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
-        // ... (保留原本的 Firebase Logic) ...
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
@@ -466,10 +474,14 @@
         
         function resetInputs() {
             document.getElementById('nameInput').value = '';
+            
+            // 重置下拉選單為現在時間
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
-            document.getElementById('birthDate').value = localISOTime;
+            // 更新 UI，這裡調用 script.js 裡的新函數來重設選單
+            if (typeof window.resetSolarSelects === 'function') {
+                window.resetSolarSelects();
+            }
             
             document.getElementById('locationName').value = '';
             document.getElementById('longitude').value = '120.0';
@@ -602,8 +614,18 @@
             }
 
             window.switchTab('solar'); 
-            const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
-            document.getElementById('birthDate').value = isoTime;
+            
+            // 處理日期格式 (ISO String: "YYYY-MM-DD HH:mm")
+            // 假設 data.birthDate 格式為 "2023-10-25 14:30:00" 或類似
+            // 為了相容下拉選單，我們需要解析這個字串
+            const dateStr = data.birthDate.replace(' ', 'T'); 
+            const d = new Date(dateStr);
+            
+            if (!isNaN(d.getTime())) {
+                if (typeof window.setSolarSelects === 'function') {
+                    window.setSolarSelects(d);
+                }
+            }
 
             window.currentDocId = data.id;
             window.initChart();
