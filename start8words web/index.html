@@ -36,11 +36,11 @@
 
     <!-- 社群分享預覽 -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="逸晴命理 - 免費八字排盤工具">
+    <meta property="og:title" content="逸晴命理 - 專業免費八字排盤工具">
     <meta property="og:description" content="精準支援真太陽時、流年大運、神煞分析。立即免費排盤，探索你的命理密碼。">
     <meta property="og:url" content="https://start8words.com/">
     <meta property="og:site_name" content="逸晴命理 Start8Words">
-    <meta property="og:image" content="https://start8words.com/icon.png">
+    <meta property="og:image" content="https://start8words.com/share-preview.png">
 
     <!-- JSON-LD 結構化資料 -->
     <script type="application/ld+json">
@@ -70,7 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
@@ -79,8 +79,6 @@
     <div class="app-header">
         <h1>逸晴命理</h1>
         <div style="font-size: 14px; font-weight: normal; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
-        
-        <!-- 原本在 Header 的按鈕已移除，改由 JS 動態插入 -->
     </div>
 
     <div id="auth-container" class="auth-box">
@@ -88,7 +86,6 @@
             <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
             <div style="display:flex; align-items:center; gap:10px;">
                 <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
-                <!-- 這裡是用來放切換按鈕的容器 (未登入時) -->
                 <div id="themeBtnContainerLoggedOut"></div>
             </div>
         </div>
@@ -102,7 +99,6 @@
             <div style="display: flex; gap: 8px; align-items: center;">
                 <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
                 <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
-                <!-- 這裡是用來放切換按鈕的容器 (已登入時) -->
                 <div id="themeBtnContainerLoggedIn"></div>
             </div>
         </div>
@@ -124,6 +120,12 @@
             <span>稱呼：</span>
             <input type="text" id="nameInput" placeholder="輸入姓名" style="width: 100px;">
             
+            <!-- 將性別選單移動到中間 -->
+            <select id="gender" style="width: 100px;">
+                <option value="1">男 (乾造)</option>
+                <option value="0">女 (坤造)</option>
+            </select>
+
             <span>分類：</span>
             <select id="tagsInput" style="width: 100px;">
                 <option value="自己">自己</option>
@@ -133,16 +135,18 @@
                 <option value="名人">名人</option>
                 <option value="案例">案例</option>
             </select>
-
-            <select id="gender" style="width: 100px;">
-                <option value="1">男 (乾造)</option>
-                <option value="0">女 (坤造)</option>
-            </select>
         </div>
 
+        <!-- 修改部分：西曆輸入改為下拉選單，標籤放在右邊 -->
         <div class="input-row" id="panelSolar">
             <span>西曆：</span>
-            <input type="datetime-local" id="birthDate">
+            <div class="solar-select-group">
+                <select id="solarYear" aria-label="年"></select><span class="solar-label">年</span>
+                <select id="solarMonth" aria-label="月"></select><span class="solar-label">月</span>
+                <select id="solarDay" aria-label="日"></select><span class="solar-label">日</span>
+                <select id="solarHour" aria-label="時"></select><span class="solar-label">時</span>
+                <select id="solarMinute" aria-label="分"></select><span class="solar-label">分</span>
+            </div>
         </div>
 
         <div class="input-row" id="panelLunar" style="display:none;">
@@ -403,7 +407,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=14"></script>
+    <script src="script.js?v=16"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
@@ -466,10 +470,14 @@
         
         function resetInputs() {
             document.getElementById('nameInput').value = '';
+            
+            // 重置下拉選單為現在時間
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
-            document.getElementById('birthDate').value = localISOTime;
+            // 更新 UI，這裡調用 script.js 裡的新函數來重設選單
+            if (typeof window.resetSolarSelects === 'function') {
+                window.resetSolarSelects();
+            }
             
             document.getElementById('locationName').value = '';
             document.getElementById('longitude').value = '120.0';
@@ -602,8 +610,18 @@
             }
 
             window.switchTab('solar'); 
-            const isoTime = data.birthDate.replace(' ', 'T').substring(0, 16);
-            document.getElementById('birthDate').value = isoTime;
+            
+            // 處理日期格式 (ISO String: "YYYY-MM-DD HH:mm")
+            // 假設 data.birthDate 格式為 "2023-10-25 14:30:00" 或類似
+            // 為了相容下拉選單，我們需要解析這個字串
+            const dateStr = data.birthDate.replace(' ', 'T'); 
+            const d = new Date(dateStr);
+            
+            if (!isNaN(d.getTime())) {
+                if (typeof window.setSolarSelects === 'function') {
+                    window.setSolarSelects(d);
+                }
+            }
 
             window.currentDocId = data.id;
             window.initChart();
@@ -674,4 +692,3 @@
 </div>
 </body>
 </html>
-

@@ -1,4 +1,4 @@
-/* ... (保留原有的 :root 和 [data-theme="dark"] 設定) ... */
+/* ... (保留原本的 :root 到 .main-display.screenshot-mode 的所有設定) ... */
 :root {
     /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
@@ -230,7 +230,7 @@ body {
 
 .input-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
 .input-row > * { flex: 1; min-width: 80px; }
-.input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; }
+.input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; color: var(--text-secondary); }
 input, select { padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-color); border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
 button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; transition: background-color 0.2s; }
@@ -582,35 +582,144 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .ios-icon-row { color: var(--text-color); }
 .ios-arrow-down { color: var(--text-color); }
 
-/* --- 截圖專用模式 --- */
-/* 只處理版面配置，不強制顏色，實現「所見即所得」 */
+/* --- 截圖模式強制變數重置 (Fix) --- */
 .main-display.screenshot-mode {
-    display: inline-flex !important; 
-    width: auto !important;
-    min-width: auto !important;
-    justify-content: flex-start !important; 
-    gap: 5px !important; 
-    background-color: var(--bg-color) !important; /* 使用當前主題背景 */
-    margin: 0 !important;
-    padding: 20px !important; 
-    border-bottom: none !important; 
-    overflow: visible !important;
+    --bg-color: #f4f6f8;
+    --panel-bg: #ffffff;
+    --text-color: #333333;
+    --text-secondary: #666666;
+    --border: #e0e0e0;
+    --accent: #4caf50;
+    --highlight: #e3f2fd;
+    --active-border: #2196f3;
+    --input-bg: #ffffff;
+    --rail-bg: #f1f1f1;
+    --pillar-bg: #ffffff;
+    --pillar-header: #f0f0f0;
+    --pillar-footer: #fafafa;
+    --modal-bg: #ffffff;
+    
+    --color-wood: #2e7d32;
+    --color-fire: #d32f2f;
+    --color-earth: #795548;
+    --color-metal: #d1a906;
+    --color-water: #1565c0;
+    
+    --color-shishen: #666; 
+    --color-daymaster: #000;
+    --rail-shishen: #888;
+
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
 }
 
-.main-display.screenshot-mode .group-container {
-    flex: 0 0 auto !important; 
-    width: auto !important;
-    max-width: none !important;
-}
-
+.main-display.screenshot-mode .group-container,
 .main-display.screenshot-mode .pillar.main {
-    flex: 0 0 auto !important; 
-    width: 90px !important;    
-    min-width: 90px !important;
+    background: var(--panel-bg) !important;
+    border-color: var(--border) !important;
 }
 
-/* Mobile */
+.main-display.screenshot-mode .title-text {
+    color: var(--text-color) !important;
+    background: var(--pillar-header) !important;
+}
+
+.main-display.screenshot-mode .top-info,
+.main-display.screenshot-mode .canggan-shishen,
+.main-display.screenshot-mode .zhangsheng-text,
+.main-display.screenshot-mode .group-label {
+    color: var(--text-secondary) !important;
+}
+
+.main-display.screenshot-mode .shishen-top,
+.main-display.screenshot-mode .shensha-tag {
+    color: var(--color-shishen) !important;
+}
+
+.main-display.screenshot-mode .shishen-top.dm {
+    color: var(--color-daymaster) !important;
+}
+
+.main-display.screenshot-mode .gan { color: inherit !important; }
+.main-display.screenshot-mode .zhi { color: inherit !important; }
+
+
+/* =========================================
+   【新增】西曆下拉選單優化
+   ========================================= */
+.solar-select-group {
+    display: flex;
+    gap: 2px;
+    flex-wrap: nowrap; /* 強制單行 */
+    width: 100%;
+    align-items: center;
+}
+
+/* 文字標籤 (放在右邊) */
+.solar-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 4px 0 1px; /* 左邊稍微留空，右邊留間距 */
+    white-space: nowrap; /* 不換行 */
+    flex-shrink: 0; /* 不壓縮 */
+}
+
+/* 選單本體 */
+.solar-select-group select {
+    padding: 6px 0 6px 4px;
+    text-align: center;
+    min-width: auto !important;
+    width: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    -webkit-appearance: none; /* 移除默認箭頭 */
+    -moz-appearance: none;
+    appearance: none;
+    /* 恢復下拉圖示但縮小內距 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px top 50%;
+    background-size: 8px auto;
+    padding-right: 12px; /* 為箭頭留空間 */
+}
+
+/* 暗黑模式下箭頭顏色變白 */
+[data-theme="dark"] .solar-select-group select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+#solarYear { flex-grow: 1.5; min-width: 45px; }
+#solarMonth { flex-grow: 0.8; min-width: 30px; }
+#solarDay { flex-grow: 0.8; min-width: 30px; }
+#solarHour { flex-grow: 0.8; min-width: 30px; }
+#solarMinute { flex-grow: 0.8; min-width: 30px; }
+
+
+/* =========================================
+   手機版排版優化
+   ========================================= */
 @media (max-width: 600px) {
+    /* --- 1. 輸入列優化 (單行並排) --- */
+    /* 隱藏標籤文字，節省空間 */
+    .input-row span { 
+        display: none; 
+    } 
+    /* 顯示 .solar-label (例外，因為我們需要年月日時分) */
+    .solar-select-group span.solar-label {
+        display: inline; /* 保持同行顯示 */
+    }
+
+    .input-row { 
+        gap: 5px; /* 縮小間距 */
+        flex-wrap: nowrap; /* 強制不換行 */
+    }
+    
+    /* 權重分配：名字佔3，性別佔4(變寬)，分類佔1.5(變窄) */
+    #nameInput { flex: 3; min-width: 0; }
+    #gender { flex: 4; min-width: 0; } /* 增加權重 */
+    #tagsInput { flex: 1.5; min-width: 0; } /* 減少權重 */
+
+    /* --- 2. 其它樣式微調 --- */
     .auth-box { padding: 10px; gap: 5px; }
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
     #btnLogin { font-size: 12px !important; padding: 6px 12px !important; width: auto !important; }
@@ -635,4 +744,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .tools-bar { justify-content: space-between; gap: 8px; }
     .tool-btn { flex: 1; justify-content: center; padding: 8px 0; font-size: 12px; }
     #shareImgContainer { padding: 10px; }
+    
+    /* Solar select 微調 */
+    .solar-select-group { gap: 1px; }
+    .solar-select-group select { font-size: 13px; padding: 6px 0 6px 2px; padding-right: 10px; }
+    .solar-label { font-size: 12px; margin: 0 2px 0 0; }
 }
