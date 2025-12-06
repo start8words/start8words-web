@@ -608,6 +608,17 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     width: 90px !important;    
     min-width: 90px !important;
 }
+/* --- 截圖模式強制變數重置 (Fix) --- */
+.main-display.screenshot-mode {
+    /* ... (保留你之前的截圖修復代碼) ... */
+    --bg-color: #f4f6f8;
+    --panel-bg: #ffffff;
+    --text-color: #333333;
+    /* ... 略 ... */
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+/* ... (保留截圖相關子元素設定) ... */
 
 /* Mobile */
 @media (max-width: 600px) {
@@ -636,3 +647,44 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     .tool-btn { flex: 1; justify-content: center; padding: 8px 0; font-size: 12px; }
     #shareImgContainer { padding: 10px; }
 }
+
+/* =========================================
+   【新增】西曆下拉選單優化
+   ========================================= */
+.solar-select-group {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
+}
+
+/* 讓下拉選單緊湊排列，不要受限於全域的 min-width: 80px */
+.solar-select-group select {
+    padding: 8px 4px; /* 減少內距 */
+    text-align: center;
+    min-width: auto !important; /* 覆蓋預設 */
+    flex: 1; /* 自動分配空間 */
+}
+
+/* 年份稍微寬一點 */
+#solarYear { flex: 1.5; }
+
+/* 冒號分隔符號 */
+.time-separator {
+    font-weight: bold;
+    margin: 0 2px;
+}
+
+/* 手機版微調 */
+@media (max-width: 600px) {
+    /* 如果太擠，可以讓時間換行，或者保持現狀 (flex-wrap會自動處理) */
+    .solar-select-group {
+        gap: 3px;
+    }
+    .solar-select-group select {
+        font-size: 13px; /* 字體稍小 */
+        padding: 8px 2px;
+    }
+}
+
