@@ -70,7 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -304,7 +304,21 @@
                 
                 <input type="text" id="searchInput" class="search-input" placeholder="搜尋姓名或年份...">
                 
-                <div class="category-filters">
+                <!-- 【新增】排序控制列 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <span style="font-size: 13px; color: var(--text-secondary); font-weight: bold;">排序方式：</span>
+                    <select id="sortSelect" style="width: auto; padding: 4px 8px; font-size: 13px;">
+                        <option value="newest">建立時間 (新 → 舊)</option>
+                        <option value="oldest">建立時間 (舊 → 新)</option>
+                        <option value="birth_desc">出生日期 (近 → 遠)</option>
+                        <option value="birth_asc">出生日期 (遠 → 近)</option>
+                        <!-- 【新增】姓名排序 -->
+                        <option value="name_asc">姓名 (A → Z / 筆劃少 → 多)</option>
+                        <option value="name_desc">姓名 (Z → A / 筆劃多 → 少)</option>
+                    </select>
+                </div>
+
+                <div class="category-filters" style="margin-top: 10px;">
                     <button class="filter-chip active" onclick="filterCategory('全部')">全部</button>
                     <button class="filter-chip" onclick="filterCategory('自己')">自己</button>
                     <button class="filter-chip" onclick="filterCategory('家人')">家人</button>
@@ -407,10 +421,11 @@
         </div>
     </footer>
 
-    <script src="script.js?v=16"></script>
+    <script src="script.js?v=17"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
+        // ... (保留原本的 Firebase Logic) ...
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
@@ -555,6 +570,10 @@
                         return (b.birthDate || '').localeCompare(a.birthDate || '');
                     case 'birth_asc': // 出生日期 遠 -> 近 (數值小 -> 大)
                         return (a.birthDate || '').localeCompare(b.birthDate || '');
+                    case 'name_asc': // 姓名 (A → Z / 筆劃少 → 多)
+                        return (a.name || '').localeCompare(b.name || '', 'zh-HK');
+                    case 'name_desc': // 姓名 (Z → A / 筆劃多 → 少)
+                        return (b.name || '').localeCompare(a.name || '', 'zh-HK');
                     default:
                         return 0;
                 }
