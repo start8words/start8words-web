@@ -1,4 +1,4 @@
-/* ... (保留原本的 :root 到 .main-display.screenshot-mode 的所有設定) ... */
+/* ... (保留原本的 :root 到 .ios-arrow-down 的所有設定) ... */
 :root {
     /* --- 預設 (淺色模式) --- */
     --bg-color: #f4f6f8;
@@ -639,9 +639,6 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
 .main-display.screenshot-mode .shishen-top.dm {
     color: var(--color-daymaster) !important;
 }
-
-.main-display.screenshot-mode .gan { color: inherit !important; }
-.main-display.screenshot-mode .zhi { color: inherit !important; }
 
 
 /* =========================================
