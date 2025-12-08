@@ -217,30 +217,18 @@ window.toggleTools = function() {
 window.toggleMap = function(forceClose) {
     const container = document.getElementById('mapContainer');
     const btn = document.getElementById('btnToggleMap');
-    
-    // 強制關閉
     if (forceClose === true) {
         if(container) container.style.display = 'none';
-        // if(btn) btn.innerText = '地圖'; // 不需要改文字，保持「地圖」即可，或可改成「關閉地圖」
+        if(btn) btn.innerText = '📍 開啟地圖設定地點';
         return;
     }
-    
-    // 切換顯示
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'block';
-        
-        // 【修復關鍵】：確保容器顯示後再初始化或重繪地圖
-        setTimeout(() => { 
-            if (!window.map) {
-                initMap(); 
-            } else {
-                // 如果地圖已經存在，強制重繪大小 (Invalidate Size)
-                window.map.invalidateSize();
-            }
-        }, 100); // 稍微延遲以配合 CSS 渲染
-        
+        btn.innerText = '📍 摺疊地圖';
+        setTimeout(() => { if (!window.map) initMap(); }, 200);
     } else {
         container.style.display = 'none';
+        btn.innerText = '📍 開啟地圖設定地點';
     }
 }
 
