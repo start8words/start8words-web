@@ -411,7 +411,6 @@
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
-        // ... (保留原本的 Firebase Logic) ...
         const btnLogin = document.getElementById('btnLogin');
         const btnLogout = document.getElementById('btnLogout');
         const btnMyCharts = document.getElementById('btnMyCharts');
@@ -424,6 +423,7 @@
         const modal = document.getElementById('chartModal');
         const chartList = document.getElementById('chartList');
         const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect'); // 新增排序選單
         const themeBtnContainerLoggedOut = document.getElementById('themeBtnContainerLoggedOut');
         const themeBtnContainerLoggedIn = document.getElementById('themeBtnContainerLoggedIn');
         const themeToggle = document.getElementById('themeToggle');
@@ -471,10 +471,7 @@
         function resetInputs() {
             document.getElementById('nameInput').value = '';
             
-            // 重置下拉選單為現在時間
             const now = new Date();
-            const offset = now.getTimezoneOffset() * 60000;
-            // 更新 UI，這裡調用 script.js 裡的新函數來重設選單
             if (typeof window.resetSolarSelects === 'function') {
                 window.resetSolarSelects();
             }
@@ -494,6 +491,8 @@
                 chartList.innerHTML = '<p style="text-align:center; padding:20px;">載入中...</p>';
                 
                 searchInput.value = ''; 
+                // 重置排序為預設
+                if(sortSelect) sortSelect.value = 'newest';
                 window.filterCategory('全部'); 
 
                 try {
@@ -514,6 +513,8 @@
                     querySnapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         data.id = docSnap.id;
+                        // 確保 timestamp 存在，若無則補上一個舊時間以免排序報錯
+                        if (!data.timestamp) data.timestamp = { seconds: 0 }; 
                         allCharts.push(data);
                     });
 
@@ -532,14 +533,41 @@
 
         function applyFilters() {
             const term = searchInput.value.toLowerCase();
-            const filtered = allCharts.filter(c => {
+            let filtered = allCharts.filter(c => {
                 const nameMatch = (c.name || '').toLowerCase().includes(term);
                 const yearMatch = (c.birthDate || '').includes(term);
                 const isSearchMatch = nameMatch || yearMatch;
                 const isCategoryMatch = (currentCategory === '全部') || (c.tags === currentCategory);
                 return isSearchMatch && isCategoryMatch;
             });
+
+            // --- 排序邏輯 ---
+            const sortMode = sortSelect ? sortSelect.value : 'newest';
+            
+            filtered.sort((a, b) => {
+                switch (sortMode) {
+                    case 'newest':
+                        // timestamp 是 Firestore Timestamp 物件 (seconds)
+                        return (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0);
+                    case 'oldest':
+                        return (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0);
+                    case 'birth_desc': // 出生日期 近 -> 遠 (數值大 -> 小)
+                        return (b.birthDate || '').localeCompare(a.birthDate || '');
+                    case 'birth_asc': // 出生日期 遠 -> 近 (數值小 -> 大)
+                        return (a.birthDate || '').localeCompare(b.birthDate || '');
+                    default:
+                        return 0;
+                }
+            });
+
             renderChartList(filtered);
+        }
+
+        // 綁定排序事件
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => {
+                applyFilters();
+            });
         }
 
         window.filterCategory = function(category) {
@@ -567,12 +595,14 @@
             }
 
             charts.forEach(data => {
-                const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : '';
                 const div = document.createElement('div');
                 div.className = 'chart-item';
                 const tagHtml = data.tags ? `<span style="background:var(--highlight); color:var(--active-border); padding:2px 5px; border-radius:4px; font-size:11px; margin-left:5px;">${data.tags}</span>` : '';
                 
                 const genderStr = data.gender === 1 ? '男' : '女';
+                
+                // 顯示儲存時間 (可選)
+                // const saveTime = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : '';
 
                 div.innerHTML = `
                     <div class="chart-info">
@@ -611,9 +641,6 @@
 
             window.switchTab('solar'); 
             
-            // 處理日期格式 (ISO String: "YYYY-MM-DD HH:mm")
-            // 假設 data.birthDate 格式為 "2023-10-25 14:30:00" 或類似
-            // 為了相容下拉選單，我們需要解析這個字串
             const dateStr = data.birthDate.replace(' ', 'T'); 
             const d = new Date(dateStr);
             
@@ -650,7 +677,6 @@
         }
 
         onAuthStateChanged(auth, (user) => {
-            // 移動按鈕邏輯
             if (themeToggle && themeBtnContainerLoggedOut && themeBtnContainerLoggedIn) {
                 if (user) {
                     themeBtnContainerLoggedIn.appendChild(themeToggle);
