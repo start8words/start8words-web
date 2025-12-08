@@ -194,32 +194,40 @@
             </div>
         </div>
 
-        <div class="tst-section">
-            <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
-            <div style="display:flex; gap:5px; width:100%;">
-                <input type="text" id="locationName" placeholder="輸入地點(如：香港)，點選定位" style="flex:1;">
-                <button class="map-btn" onclick="searchLocation()" style="width:60px;">定位</button>
+               <div class="tst-section">
+            <!-- 第一行：輸入地點 + 地圖按鈕 + 定位 -->
+            <div class="tst-top-row">
+                <!-- 地圖按鈕：改名為「地圖」，移到這裡 -->
+                <button class="map-btn" id="btnToggleMap" onclick="toggleMap()" style="width: auto; min-width: 60px;">地圖</button>
+                
+                <input type="text" id="locationName" placeholder="輸入地點 (如：香港)" style="flex:1;">
+                
+                <button class="map-btn" onclick="searchLocation()" style="width: auto; min-width: 60px;">定位</button>
             </div>
             
+            <!-- 第二行：經度 + 真太陽時 + 保存 (橫向排列) -->
             <div class="tst-bottom-row">
-                <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
+                <span style="font-size:13px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
                 <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
                 
-                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
+                <!-- TST Checkbox -->
+                <label class="checkbox-label">
                     <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
                 </label>
 
-                <label id="lblSaveChart" class="disabled-label" style="font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:15px; transition: all 0.3s;">
+                <!-- Save Checkbox -->
+                <label id="lblSaveChart" class="checkbox-label disabled-label">
                     <input type="checkbox" id="saveChartCheck" disabled style="width:auto; margin:0;"> 保存命盤
                 </label>
             </div>
 
-            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed var(--border); width:100%;">
-                <span style="font-size:12px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
-                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <!-- 第三行：子時處理 -->
+            <div class="zishi-row">
+                <span style="font-size:13px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
+                <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px; color:var(--text-color);">
                     <input type="radio" name="zishiMode" value="23" checked style="width:auto; margin:0;"> 23:00 換日
                 </label>
-                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px; color:var(--text-color);">
                     <input type="radio" name="zishiMode" value="00" style="width:auto; margin:0;"> 00:00 換日
                 </label>
             </div>
@@ -746,3 +754,4 @@
 </div>
 </body>
 </html>
+
