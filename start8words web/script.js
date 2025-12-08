@@ -219,16 +219,16 @@ window.toggleMap = function(forceClose) {
     const btn = document.getElementById('btnToggleMap');
     if (forceClose === true) {
         if(container) container.style.display = 'none';
-        if(btn) btn.innerText = '📍 開啟地圖設定地點';
+        if(btn) btn.innerText = '📍地圖';
         return;
     }
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'block';
-        btn.innerText = '📍 摺疊地圖';
+        btn.innerText = '📍摺疊';
         setTimeout(() => { if (!window.map) initMap(); }, 200);
     } else {
         container.style.display = 'none';
-        btn.innerText = '📍 開啟地圖設定地點';
+        btn.innerText = '📍地圖';
     }
 }
 
@@ -1180,3 +1180,4 @@ window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     console.log('PWA was installed');
 });
+
