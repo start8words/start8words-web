@@ -214,21 +214,22 @@ window.toggleTools = function() {
     }
 }
 
+// 【修改】地圖切換邏輯：保持按鈕文字為「地圖」
 window.toggleMap = function(forceClose) {
     const container = document.getElementById('mapContainer');
     const btn = document.getElementById('btnToggleMap');
     if (forceClose === true) {
         if(container) container.style.display = 'none';
-        if(btn) btn.innerText = '📍 開啟地圖設定地點';
+        if(btn) btn.innerText = '地圖'; // 保持簡短文字
         return;
     }
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'block';
-        btn.innerText = '📍 摺疊地圖';
+        btn.innerText = '收起'; // 展開時變為收起，保持2字
         setTimeout(() => { if (!window.map) initMap(); }, 200);
     } else {
         container.style.display = 'none';
-        btn.innerText = '📍 開啟地圖設定地點';
+        btn.innerText = '地圖';
     }
 }
 
@@ -267,6 +268,7 @@ function updateLocation(lat, lon) {
     }
 }
 
+// ... (後續排盤邏輯保持不變，直接從第 4 部分開始) ...
 // ==========================================
 // 4. 排盤核心邏輯
 // ==========================================
@@ -1180,4 +1182,3 @@ window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     console.log('PWA was installed');
 });
-
