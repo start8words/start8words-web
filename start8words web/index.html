@@ -16,6 +16,7 @@
     <!-- PWA 設定 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff">
+    <!-- iOS PWA 支援 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="逸晴命理">
@@ -40,11 +41,6 @@
     <meta property="og:url" content="https://start8words.com/">
     <meta property="og:site_name" content="逸晴命理 Start8Words">
     <meta property="og:image" content="https://start8words.com/share-preview.png">
-
-    <!-- 【新增】Google Fonts (Nunito & Noto Sans TC) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- JSON-LD 結構化資料 -->
     <script type="application/ld+json">
@@ -74,8 +70,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    <!-- 引入新的 Style -->
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -83,41 +78,38 @@
 
     <div class="app-header">
         <h1>逸晴命理</h1>
-        <div style="font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
+        <div style="font-size: 14px; font-weight: normal; color: var(--text-secondary); margin-top: 5px;">免費八字排盤工具</div>
     </div>
 
-    <div id="auth-container" class="auth-box card-style">
+    <div id="auth-container" class="auth-box">
         <div id="loggedOutUI" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <span class="auth-hint">登入後可儲存命盤紀錄 ☁️</span>
+            <span class="auth-hint">使用Google帳戶登入後可以儲存命盤。</span>
             <div style="display:flex; align-items:center; gap:10px;">
-                <button id="btnLogin" class="action-btn google-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" style="fill:currentColor; margin-right:5px;"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/></svg>
-                    Google 登入
-                </button>
+                <button id="btnLogin" class="action-btn" style="background-color: #4285F4; width: auto; padding: 8px 20px; font-size: 14px; white-space: nowrap;">Google 登入</button>
                 <div id="themeBtnContainerLoggedOut"></div>
             </div>
         </div>
         
         <div id="userProfile" style="display: none; align-items: center; justify-content: flex-end; gap: 15px; width: 100%; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 10px; margin-right: auto;">
-                <img id="userAvatar" src="" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border);">
+                <img id="userAvatar" src="" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd;">
                 <span id="userName" style="font-weight: bold; font-size: 15px;"></span>
             </div>
             
             <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="btnMyCharts" class="tool-btn rounded-btn">📂 我的排盤</button>
-                <button id="btnLogout" class="tool-btn rounded-btn">登出</button>
+                <button id="btnMyCharts" class="map-btn" style="width: auto; background-color: #2196f3;">我的排盤</button>
+                <button id="btnLogout" class="map-btn" style="width: auto; background-color: #666;">登出</button>
                 <div id="themeBtnContainerLoggedIn"></div>
             </div>
         </div>
     </div>
 
     <!-- 隱藏的按鈕本體，等待 JS 移動 -->
-    <button id="themeToggle" class="theme-toggle-btn" aria-label="切換深色模式">
+    <button id="themeToggle" class="theme-toggle-btn" aria-label="切換深色模式" style="position:static; margin-left: 5px; border-radius: 6px; width: 36px; height: 36px; padding: 0;">
         🌙
     </button>
 
-    <div class="control-wrapper card-style" id="inputWrapper">
+    <div class="control-wrapper" id="inputWrapper">
         <div class="tabs">
             <div class="tab active" onclick="switchTab('solar')">西曆</div>
             <div class="tab" onclick="switchTab('lunar')">農曆</div>
@@ -145,7 +137,7 @@
             </select>
         </div>
 
-        <!-- 西曆輸入下拉選單 -->
+        <!-- 修改部分：西曆輸入改為下拉選單，標籤放在右邊 -->
         <div class="input-row" id="panelSolar">
             <span>西曆：</span>
             <div class="solar-select-group">
@@ -194,40 +186,32 @@
             </div>
         </div>
 
-               <div class="tst-section">
-            <!-- 第一行：輸入地點 + 地圖按鈕 + 定位 -->
-            <div class="tst-top-row">
-                <!-- 地圖按鈕：改名為「地圖」，移到這裡 -->
-                <button class="map-btn" id="btnToggleMap" onclick="toggleMap()" style="width: auto; min-width: 60px;">地圖</button>
-                
-                <input type="text" id="locationName" placeholder="輸入地點 (如：香港)" style="flex:1;">
-                
-                <button class="map-btn" onclick="searchLocation()" style="width: auto; min-width: 60px;">定位</button>
+        <div class="tst-section">
+            <button class="map-btn" id="btnToggleMap" onclick="toggleMap()">📍 開啟地圖設定地點</button>
+            <div style="display:flex; gap:5px; width:100%;">
+                <input type="text" id="locationName" placeholder="輸入地點(如：香港)，點選定位" style="flex:1;">
+                <button class="map-btn" onclick="searchLocation()" style="width:60px;">定位</button>
             </div>
             
-            <!-- 第二行：經度 + 真太陽時 + 保存 (橫向排列) -->
             <div class="tst-bottom-row">
-                <span style="font-size:13px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
+                <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">經度:</span>
                 <input type="number" id="longitude" value="120.0" step="0.01" style="width:80px;">
                 
-                <!-- TST Checkbox -->
-                <label class="checkbox-label">
+                <label style="font-weight:bold; color:var(--active-border); cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:10px;">
                     <input type="checkbox" id="useTST" style="width:auto; margin:0;"> 真太陽時
                 </label>
 
-                <!-- Save Checkbox -->
-                <label id="lblSaveChart" class="checkbox-label disabled-label">
+                <label id="lblSaveChart" class="disabled-label" style="font-weight:bold; font-size:12px; display:flex; align-items:center; gap:4px; margin-left:15px; transition: all 0.3s;">
                     <input type="checkbox" id="saveChartCheck" disabled style="width:auto; margin:0;"> 保存命盤
                 </label>
             </div>
 
-            <!-- 第三行：子時處理 -->
-            <div class="zishi-row">
-                <span style="font-size:13px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
-                <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px; color:var(--text-color);">
+            <div style="display:flex; align-items:center; gap:15px; padding-top:5px; border-top:1px dashed var(--border); width:100%;">
+                <span style="font-size:12px; color:var(--text-secondary); font-weight:bold;">子時處理：</span>
+                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
                     <input type="radio" name="zishiMode" value="23" checked style="width:auto; margin:0;"> 23:00 換日
                 </label>
-                <label style="font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px; color:var(--text-color);">
+                <label style="font-size:12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
                     <input type="radio" name="zishiMode" value="00" style="width:auto; margin:0;"> 00:00 換日
                 </label>
             </div>
@@ -236,8 +220,8 @@
         <div id="mapContainer"></div>
         <div class="note">* 預設時區為 UTC+8。如勾選真太陽時，系統將根據經度及均時差校正出生時間。</div>
 
-        <div style="margin-top:20px; text-align:center;">
-            <button class="action-btn main-action-btn" onclick="startNewChart()">✨ 開始排盤 / 搜尋</button>
+        <div style="margin-top:15px; text-align:center;">
+            <button class="action-btn" onclick="startNewChart()">即時排盤 / 搜尋</button>
         </div>
         <span id="statusMsg" style="color: #d32f2f; display: none; font-weight: bold;">Library 未加載</span>
     </div>
@@ -253,22 +237,22 @@
     </div>
 
     <!-- 截圖與 APP 安裝工具列 -->
-    <div id="toolsBar" class="tools-bar card-style" style="display: none;">
-        <!-- PWA 安裝按鈕 -->
-        <button id="btnInstallApp" class="tool-btn highlight-btn" style="display:none;">
+    <div id="toolsBar" class="tools-bar" style="display: none;">
+        <!-- PWA 安裝按鈕 (預設隱藏，由 JS 控制顯示) -->
+        <button id="btnInstallApp" class="tool-btn" style="display:none; border-color: #4caf50; color: #2e7d32; background: #e8f5e9;">
             📲 安裝 APP
         </button>
         
-        <div class="tool-label">分享：</div>
-        <button class="tool-btn rounded-btn" onclick="shareChart('origin')">
+        <div class="tool-label">分享截圖：</div>
+        <button class="tool-btn" onclick="shareChart('origin')">
             📷 原局四柱
         </button>
-        <button class="tool-btn rounded-btn" onclick="shareChart('main')">
+        <button class="tool-btn" onclick="shareChart('main')">
             📷 原局運歲六柱
         </button>
     </div>
 
-    <div id="infoDashboard" class="info-dashboard card-style">
+    <div id="infoDashboard" class="info-dashboard">
         <div class="info-col left">
             <div class="info-item"><span class="info-label">稱呼:</span><span class="info-val" id="dispName">-</span></div>
             <div class="info-item"><span class="info-label">男/女:</span><span class="info-val" id="dispGender">-</span></div>
@@ -282,17 +266,17 @@
     </div>
 
     <div class="main-display" id="topDisplay" style="display:none;">
-        <div class="group-container card-style">
+        <div class="group-container">
             <div class="group-label">
-                原局
-                <div id="btnToggleShenSha" class="shensha-toggle-btn" onclick="toggleShenShaAll()">▼</div>
-            </div>
+    原局
+    <div id="btnToggleShenSha" class="shensha-toggle-btn" onclick="toggleShenShaAll()">▼</div>
+</div>
             <div class="pillar main" id="baseHour"></div>
             <div class="pillar main" id="baseDay"></div>
             <div class="pillar main" id="baseMonth"></div>
             <div class="pillar main" id="baseYear"></div>
         </div>
-        <div class="group-container dynamic-group card-style">
+        <div class="group-container dynamic-group">
             <div class="pillar main" id="activeDaYun"></div>
             <div class="pillar main" id="activeYear"></div>
             <div class="pillar main" id="activeMonth"></div>
@@ -302,16 +286,16 @@
     </div>
 
     <div class="rail-container" id="rails" style="display:none;">
-        <div class="rail-row card-style"><div class="rail-title">大運</div><div class="rail-items" id="dayunRail"></div></div>
-        <div class="rail-row card-style"><div class="rail-title">流年</div><div class="rail-items" id="yearRail"></div></div>
-        <div class="rail-row card-style"><div class="rail-title">流月</div><div class="rail-items" id="monthRail"></div></div>
-        <div class="rail-row card-style"><div class="rail-title">流日</div><div class="rail-items" id="dayRail"></div></div>
-        <div class="rail-row card-style"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
+        <div class="rail-row"><div class="rail-title">大運</div><div class="rail-items" id="dayunRail"></div></div>
+        <div class="rail-row"><div class="rail-title">流年</div><div class="rail-items" id="yearRail"></div></div>
+        <div class="rail-row"><div class="rail-title">流月</div><div class="rail-items" id="monthRail"></div></div>
+        <div class="rail-row"><div class="rail-title">流日</div><div class="rail-items" id="dayRail"></div></div>
+        <div class="rail-row"><div class="rail-title">流時</div><div class="rail-items" id="hourRail"></div></div>
     </div>
 
     <!-- 我的命盤 Modal -->
     <div id="chartModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content card-style">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title-row">
                     <h3>📂 我的命盤紀錄</h3>
@@ -320,6 +304,7 @@
                 
                 <input type="text" id="searchInput" class="search-input" placeholder="搜尋姓名或年份...">
                 
+                <!-- 【新增】排序控制列 -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <span style="font-size: 13px; color: var(--text-secondary); font-weight: bold;">排序方式：</span>
                     <select id="sortSelect" style="width: auto; padding: 4px 8px; font-size: 13px;">
@@ -327,6 +312,7 @@
                         <option value="oldest">建立時間 (舊 → 新)</option>
                         <option value="birth_desc">出生日期 (近 → 遠)</option>
                         <option value="birth_asc">出生日期 (遠 → 近)</option>
+                        <!-- 【新增】姓名排序 -->
                         <option value="name_asc">姓名 (A → Z / 筆劃少 → 多)</option>
                         <option value="name_desc">姓名 (Z → A / 筆劃多 → 少)</option>
                     </select>
@@ -350,7 +336,7 @@
 
     <!-- 反推結果 Modal -->
     <div id="reverseResultModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content card-style">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title-row">
                     <h3>📅 干支反推結果</h3>
@@ -366,7 +352,7 @@
 
     <!-- 截圖分享 Modal -->
     <div id="shareModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content card-style" style="max-width: 90%; width: 500px; background: var(--bg-color);">
+        <div class="modal-content" style="max-width: 90%; width: 500px; background: var(--bg-color);">
             <div class="modal-header">
                 <div class="modal-title-row">
                     <h3>📤 命盤截圖</h3>
@@ -382,9 +368,9 @@
         </div>
     </div>
 
-    <!-- iOS 安裝教學 Modal -->
+    <!-- iOS 安裝教學 Modal (新增) -->
     <div id="iosInstallModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content ios-install-content card-style">
+        <div class="modal-content ios-install-content">
             <div class="modal-header" style="border-bottom:none; padding-bottom:0;">
                 <div class="modal-title-row">
                     <h3>安裝到 iPhone / iPad</h3>
@@ -411,7 +397,7 @@
     </div>
 
     <!-- SEO 頁尾內容區 -->
-    <footer class="seo-footer card-style" style="margin: 20px auto; max-width: 1000px; border-radius: 16px;">
+    <footer class="seo-footer">
         <section class="seo-content">
             <h2>關於逸晴命理 (Start8Words)</h2>
             <p>
@@ -424,7 +410,7 @@
             </p>
         </section>
 
-        <div class="app-footer" style="border-top: 1px dashed var(--border);">
+        <div class="app-footer">
             <p>© 2025 逸晴命理 All Rights Reserved.</p>
             <a href="https://instagram.com/start_8words" target="_blank">
                 <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -435,7 +421,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=20"></script>
+    <script src="script.js?v=17"></script>
     <script type="module">
         import { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged, collection, addDoc, query, where, orderBy, getDocs, deleteDoc, doc, setDoc } from './firebase-config.js';
 
@@ -500,10 +486,7 @@
         function resetInputs() {
             document.getElementById('nameInput').value = '';
             
-            // 重置下拉選單為現在時間
             const now = new Date();
-            const offset = now.getTimezoneOffset() * 60000;
-            // 更新 UI，這裡調用 script.js 裡的新函數來重設選單
             if (typeof window.resetSolarSelects === 'function') {
                 window.resetSolarSelects();
             }
