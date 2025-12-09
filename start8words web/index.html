@@ -311,6 +311,7 @@
                         <option value="birth_desc">出生日期 (近 → 遠)</option>
                         <option value="birth_asc">出生日期 (遠 → 近)</option>
                         <option value="name_asc">姓名 (A → Z)</option>
+                        <option value="name_desc">姓名 (Z → A)</option>
                     </select>
                 </div>
 
@@ -496,7 +497,7 @@
                 chartList.innerHTML = '<p style="text-align:center; padding:20px;">載入中...</p>';
                 
                 searchInput.value = ''; 
-                if(sortSelect) sortSelect.value = 'newest';
+                if(sortSelect) sortSelect.value = 'name_asc';
                 window.filterCategory('全部'); 
 
                 try {
@@ -544,7 +545,7 @@
                 return isSearchMatch && isCategoryMatch;
             });
 
-            const sortMode = sortSelect ? sortSelect.value : 'newest';
+            const sortMode = sortSelect ? sortSelect.value : 'name_asc';
             
             filtered.sort((a, b) => {
                 switch (sortMode) {
@@ -558,6 +559,8 @@
                         return (a.birthDate || '').localeCompare(b.birthDate || '');
                     case 'name_asc': 
                         return (a.name || '').localeCompare(b.name || '', 'zh-HK');
+                    case 'name_desc': 
+                        return (b.name || '').localeCompare(a.name || '', 'zh-HK');
                     default:
                         return 0;
                 }
