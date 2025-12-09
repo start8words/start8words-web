@@ -1,64 +1,97 @@
 /* ... (保留原本的 :root 到 .ios-arrow-down 的所有設定) ... */
 :root {
-    /* --- 預設 (淺色模式) --- */
-    --bg-color: #f4f6f8;
-    --panel-bg: #ffffff;
-    --text-color: #333333;
-    --text-secondary: #666666;
-    --border: #e0e0e0;
-    --accent: #4caf50;
-    --highlight: #e3f2fd;
-    --active-border: #2196f3;
-    --input-bg: #ffffff;
-    --rail-bg: #f1f1f1;
-    --pillar-bg: #ffffff;
-    --pillar-header: #f0f0f0;
-    --pillar-footer: #fafafa;
-    --modal-bg: #ffffff;
-    --shadow-color: rgba(0,0,0,0.05);
+    /* =========================================================
+       1. 預設介面顏色 (淺色模式 Light Mode)
+       修改這裡可以改變「白天」模式下的外觀
+       ========================================================= */
+    --bg-color: #EFEEEA;       /* 整個網頁的背景顏色 */
+    --panel-bg: #ffffff;       /* 排盤區塊、卡片的背景顏色 */
+    --text-color: #333333;     /* 主要文字顏色 (深灰/黑) */
+    --text-secondary: #666666; /* 次要文字顏色 (淺灰，用於說明文字) */
+    --border: #e0e0e0;         /* 線條、邊框的顏色 */
+    --accent: #fe7743;         /* 主要按鈕、強調功能的顏色 */
+    --highlight: #fdece3;      /* 選中項目、滑鼠懸停時的背景底色 */
+    --active-border: #fe7743;  /* 點擊選中時的邊框顏色*/
+    --input-bg: #ffffff;       /* 輸入框 (Input/Select) 的背景色 */
+    --rail-bg: #f1f1f1;        /* 運勢軌道 (下方滑動條) 的背景色 */
+    --pillar-bg: #ffffff;      /* 八字柱子的背景色 */
+    --pillar-header: #f0f0f0;  /* 八字柱子頂部標題 (年柱、月柱...) 背景色 */
+    --pillar-footer: #fafafa;  /* 八字柱子底部 (神煞區) 背景色 */
+    --modal-bg: #ffffff;       /* 彈出視窗的背景色 */
+    --shadow-color: rgba(0,0,0,0.05); /* 陰影顏色 (半透明黑) */
     
-    /* 五行顏色 (淺色底) */
+    /* =========================================================
+       2. 五行顏色設定 (淺色模式)
+       影響：天干地支文字顏色 (甲乙丙丁...)
+       ========================================================= */
+    /* 木 (甲、乙、寅、卯) - 綠色系 */
     --color-wood: #2e7d32;
+    
+    /* 火 (丙、丁、巳、午) - 紅色系 */
     --color-fire: #d32f2f;
+    
+    /* 土 (戊、己、辰、戌、丑、未) - 啡/黃色系 */
     --color-earth: #795548;
+    
+    /* 金 (庚、辛、申、酉) - 金/灰色系 */
     --color-metal: #d1a906;
+    
+    /* 水 (壬、癸、亥、子) - 藍/黑色系 */
     --color-water: #1565c0;
     
-    /* 十神顏色 */
-    --color-shishen: #666; 
-    --color-daymaster: #000;
-    --rail-shishen: #888;
+    /* =========================================================
+       3. 十神與其他顏色 (淺色模式)
+       ========================================================= */
+    --color-shishen: #666;      /* 十神文字顏色 (如：正官、七殺) */
+    --color-daymaster: #000;    /* 日主 (日元) 的文字顏色 (通常最深色) */
+    --rail-shishen: #888;       /* 運勢軌道上的十神小字顏色 */
 }
 
-/* --- 暗黑模式變數覆寫 --- */
+/* =========================================================
+   4. 暗黑模式變數覆寫 (Dark Mode)
+   修改這裡可以改變「黑夜」模式下的外觀
+   ========================================================= */
 [data-theme="dark"] {
-    --bg-color: #121212;
-    --panel-bg: #1e1e1e;
-    --text-color: #e0e0e0;
-    --text-secondary: #aaaaaa;
-    --border: #333333;
-    --accent: #66bb6a;
-    --highlight: #2c3e50;
-    --active-border: #64b5f6;
-    --input-bg: #2d2d2d;
-    --rail-bg: #2d2d2d;
-    --pillar-bg: #252525;
-    --pillar-header: #333333;
-    --pillar-footer: #2a2a2a;
-    --modal-bg: #1e1e1e;
-    --shadow-color: rgba(0,0,0,0.5);
+    --bg-color: #121212;       /* [暗黑] 網頁背景 */
+    --panel-bg: #1e1e1e;       /* [暗黑] 卡片背景 */
+    --text-color: #e0e0e0;     /* [暗黑] 主要文字 (淺白) */
+    --text-secondary: #aaaaaa; /* [暗黑] 次要文字 (灰白) */
+    --border: #333333;         /* [暗黑] 邊框顏色 */
+    --accent: #fe7743;         /* [暗黑] 按鈕顏色 */
+    --highlight: #50392c;      /* [暗黑] 高亮背景 */
+    --active-border: #fe7743;  /* [暗黑] 選中邊框 */
+    --input-bg: #2d2d2d;       /* [暗黑] 輸入框背景 */
+    --rail-bg: #2d2d2d;        /* [暗黑] 軌道背景 */
+    --pillar-bg: #252525;      /* [暗黑] 柱子背景 */
+    --pillar-header: #333333;  /* [暗黑] 柱子標題背景 */
+    --pillar-footer: #2a2a2a;  /* [暗黑] 柱子底部背景 */
+    --modal-bg: #1e1e1e;       /* [暗黑] 彈窗背景 */
+    --shadow-color: rgba(0,0,0,0.5); /* [暗黑] 陰影 (較深) */
 
-    /* 五行顏色 (深色底) */
+    /* =========================================================
+       5. 五行顏色設定 (暗黑模式 - 建議使用較明亮的顏色以利閱讀)
+       ========================================================= */
+    /* 木 - 淺綠 */
     --color-wood: #81c784;
+    
+    /* 火 - 淺紅 */
     --color-fire: #e57373;
+    
+    /* 土 - 淺啡/卡其 */
     --color-earth: #a1887f;
+    
+    /* 金 - 淺金/黃 */
     --color-metal: #fff176;
+    
+    /* 水 - 淺藍 */
     --color-water: #64b5f6;
     
-    /* 十神顏色 */
-    --color-shishen: #999; 
-    --color-daymaster: #ffffff;
-    --rail-shishen: #aaa;
+    /* =========================================================
+       6. 十神顏色 (暗黑模式)
+       ========================================================= */
+    --color-shishen: #999;      /* [暗黑] 十神文字 */
+    --color-daymaster: #ffffff; /* [暗黑] 日主文字 (純白) */
+    --rail-shishen: #aaa;       /* [暗黑] 軌道十神 */
 }
 
 body {
@@ -163,7 +196,7 @@ body {
     font-weight: bold;
     user-select: none;
     transition: background-color 0.2s;
-    background-color: var(--pillar-header); 
+    background-color: var(--panel-bg); 
 }
 
 .toggle-col:hover {
@@ -233,9 +266,9 @@ body {
 .input-row span { flex: 0 0 auto; min-width: auto; font-size: 14px; color: var(--text-secondary); }
 input, select { padding: 8px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-color); border-radius: 6px; outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
 
-button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; font-size: 16px; width: 100%; transition: background-color 0.2s; }
+button.action-btn { padding: 10px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; border-radius: 24px; font-size: 16px; width: 100%; transition: background-color 0.2s; }
 button.action-btn:hover { filter: brightness(1.1); }
-button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; width: 100%; }
+button.map-btn { padding: 8px; background: #273F4F; color: white; border: none; border-radius: 18px; cursor: pointer; font-size: 13px; width: 100%; }
 #mapContainer { height: 250px; width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; display: none; }
 .tst-section { background: var(--rail-bg); padding: 10px; border-radius: 6px; border: 1px dashed var(--border); display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
 .tst-bottom-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-top: 5px; border-top: 1px dashed var(--border); width: 100%; flex-wrap: nowrap; }
@@ -589,9 +622,9 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
     --text-color: #333333;
     --text-secondary: #666666;
     --border: #e0e0e0;
-    --accent: #4caf50;
+    --accent: #fe7743;
     --highlight: #e3f2fd;
-    --active-border: #2196f3;
+    --active-border: #fe7743;
     --input-bg: #ffffff;
     --rail-bg: #f1f1f1;
     --pillar-bg: #ffffff;
@@ -711,15 +744,15 @@ button.map-btn { padding: 8px; background: #2196f3; color: white; border: none; 
         flex-wrap: nowrap; /* 強制不換行 */
     }
     
-    /* 權重分配：名字佔3，性別佔4(變寬)，分類佔1.5(變窄) */
-    #nameInput { flex: 3; min-width: 0; }
-    #gender { flex: 4; min-width: 0; } /* 增加權重 */
+    /* 權重分配：名字佔4，性別佔2，分類佔1.5 */
+    #nameInput { flex: 4; min-width: 0; }
+    #gender { flex: 2; min-width: 0; } /* 增加權重 */
     #tagsInput { flex: 1.5; min-width: 0; } /* 減少權重 */
 
     /* --- 2. 其它樣式微調 --- */
     .auth-box { padding: 10px; gap: 5px; }
     .auth-hint { font-size: 11px; white-space: normal; line-height: 1.2; flex: 1; }
-    #btnLogin { font-size: 12px !important; padding: 6px 12px !important; width: auto !important; }
+    #btnLogin { font-size: 12px !important; padding: 7px 12px !important; width: auto !important; }
     .main-display { overflow-x: auto; gap: 2px; justify-content: flex-start; }
     .group-container { padding: 4px 2px; gap: 1px; flex: 0 0 auto; }
     .group-container.dynamic-group { flex: 0 0 auto; }
